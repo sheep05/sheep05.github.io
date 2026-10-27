@@ -1,0 +1,125 @@
+{
+  "camera": [
+    2.35,
+    1.28,
+    3.48
+  ],
+  "target": [
+    0.75,
+    0.97,
+    -0.3
+  ],
+  "fov": 64,
+  "standCamera": [
+    1.88,
+    1.65,
+    3.1
+  ],
+  "walkCamera": [
+    0.7,
+    1.65,
+    1.45
+  ],
+  "zoomCamera": [
+    0,
+    1.49,
+    0.35
+  ],
+  "zoomTarget": [
+    0,
+    1.485,
+    -0.305
+  ],
+  "laptopScreen": [
+    0,
+    1.485,
+    -0.305
+  ],
+  "screenMeshName": "LaptopScreen",
+  "units": "metres",
+  "coordinates": "glTF / Three.js Y up",
+  "interiorKeyLight": [
+    -3.6,
+    2.45,
+    -0.15
+  ],
+  "deskLampLight": [
+    -1.18,
+    1.505,
+    -0.59
+  ],
+  "bedsideLampLight": [
+    3.57,
+    1.03,
+    1.55
+  ],
+  "curtains": {
+    "names": [
+      "BreezeCurtainLeft",
+      "BreezeCurtainRight"
+    ],
+    "localUpAxis": "y",
+    "minY": 0.82,
+    "maxY": 3.3,
+    "normalAxis": "x",
+    "grid": [
+      24,
+      36
+    ],
+    "pinFormula": "weight = pow(clamp((3.30 - localY) / 2.48, 0, 1), 1.7); offsetX = weight * (0.07*sin(time*1.2 + localZ*2.5) + 0.025*sin(time*2.0 + localY*3.0)); top row fixed. Start from cached base positions every frame."
+  },
+  "bedBounds": {
+    "min": [
+      2.13,
+      0.04,
+      1.55
+    ],
+    "max": [
+      3.87,
+      1.46,
+      3.93
+    ]
+  },
+  "roomBounds": {
+    "min": [
+      -3.92,
+      0,
+      -3.42
+    ],
+    "max": [
+      3.92,
+      3.64,
+      3.92
+    ]
+  },
+  "blenderVersion": "4.5.15 LTS",
+  "photoSources": [
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+    "https://images.unsplash.com/photo-1470770841072-f978cf4d019e"
+  ],
+  "nightBackdrop": {
+    "mesh": "WindowJapanNight",
+    "source": "AI-generated Tokyo residential night scene",
+    "texture": "japan-night-web.jpg",
+    "planeX": -22,
+    "planeYBounds": [
+      -16,
+      23
+    ],
+    "planeHeightBounds": [
+      -15,
+      11
+    ],
+    "depthLayers": {
+      "utilityCablesX": [
+        -6.15,
+        -6.41
+      ],
+      "nearHouseX": -7.15,
+      "sideHouseX": -8.5,
+      "apartmentX": -12.1
+    },
+    "geometry": "Pitched rooftops, actual building volumes, layered window frames and sills, balcony rails and utility cables."
+  },
+  "notes": "Fully enclosed room. The viewer sits on the bed, steps left into the clear aisle, stands, and approaches laptop. Keep light inside the room so ceiling does not block it. WindowJapanNight should disable castShadow. Demonstration photographs are placeholders."
+}

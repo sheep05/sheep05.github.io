@@ -1,0 +1,24 @@
+{
+  "bytes": 2360476,
+  "meshes": 102,
+  "triangles": 49518,
+  "exteriorMeshNames": [
+    "ExteriorGeometry_Exterior warm gray plaster",
+    "ExteriorGeometry_Exterior charcoal roof tile",
+    "ExteriorGeometry_Exterior dark balcony metal",
+    "ExteriorGeometry_Exterior warm lived-in windows",
+    "ExteriorGeometry_Exterior unlit glass",
+    "ExteriorGeometry_Exterior weathered blue-gray plaster",
+    "ExteriorUtilityCable0",
+    "ExteriorUtilityCable1",
+    "ExteriorUtilityCable2"
+  ],
+  "screenPosition": [
+    0,
+    1.4850000143051147,
+    -0.3050000071525574
+  ],
+  "preservedRequiredMeshes": true,
+  "embeddedImages": 6,
+  "externalImageURIs": []
+}

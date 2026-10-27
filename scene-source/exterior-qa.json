@@ -1,0 +1,63 @@
+{
+  "panoramaCoverage": {
+    "testedWindowCornerRays": 252,
+    "minYZ": [
+      -5.849999904632568,
+      -1.3927658796310425
+    ],
+    "maxYZ": [
+      16.191734313964844,
+      10.619999885559082
+    ],
+    "panoramaBoundsYZ": [
+      [
+        -16,
+        23
+      ],
+      [
+        -15,
+        11
+      ]
+    ],
+    "maxRayDistance": 32.1141690650144,
+    "cameraFar": 80,
+    "pass": true
+  },
+  "projectedLandmarks": {
+    "exterior-entry": {
+      "nearRoof": [
+        0.06269,
+        0.28532
+      ],
+      "apartment": [
+        0.36152,
+        0.43304
+      ],
+      "farReference": [
+        0.23444,
+        0.50654
+      ]
+    },
+    "exterior-approach": {
+      "nearRoof": [
+        -0.04938,
+        0.20827
+      ],
+      "apartment": [
+        0.46519,
+        0.44022
+      ],
+      "farReference": [
+        0.39039,
+        0.53224
+      ]
+    }
+  },
+  "geometryLayersX": [
+    -6.15,
+    -7.15,
+    -8.5,
+    -12.1,
+    -22
+  ]
+}
