@@ -5,11 +5,8 @@ if (!/^http:\/\/(localhost|127\.0\.0\.1):/.test(origin))
   throw new Error(
     "This test creates and removes fixtures and must run against a local preview.",
   );
-const login = await fetch(`${origin}/signin-with-chatgpt?return_to=/studio`, {
-  redirect: "manual",
-});
-const cookie = login.headers.get("set-cookie")?.split(";")[0];
-assert.ok(cookie, "Local authentication cookie issued");
+const token = (await readFile(new URL("../work/local-access-token", import.meta.url), "utf8")).trim();
+const cookie = `quiet-dev-session=${token}`;
 const auth = { Cookie: cookie };
 const get = async (owner = false) => {
   const r = await fetch(`${origin}/api/studio?drafts=1`, {

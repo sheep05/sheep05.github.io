@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "quiet-studio-backend",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "quiet-studio-db",
+    "database_id": "7b33229d-bd6a-4e9f-963b-b24925ad3393",
+    "migrations_dir": "drizzle"
+  }],
+  "kv_namespaces": [{"binding": "PHOTOS", "id": "e67ccaf066384fa8b868fe80a7e6599d"}],
+  "vars": {
+    "OWNER_GITHUB_ID": "152187410",
+    "GITHUB_CLIENT_ID": "Ov23lifv3HFo9vwxs4at",
+    "STUDIO_ORIGIN": "https://quiet-studio-backend.sheep05.workers.dev"
+  }
+}

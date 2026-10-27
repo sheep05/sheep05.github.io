@@ -8,6 +8,13 @@
       "when": 1793005771910,
       "tag": "0000_gigantic_maestro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793088589315,
+      "tag": "0001_owner_sessions",
+      "breakpoints": true
     }
   ]
 }

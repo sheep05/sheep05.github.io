@@ -3,6 +3,7 @@ import {
   text,
   integer,
   primaryKey,
+  index,
 } from "drizzle-orm/sqlite-core";
 export const studio = sqliteTable("studio", {
   id: text("id").primaryKey(),
@@ -45,3 +46,15 @@ export const albumPhotos = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.albumId, t.photoId] })],
 );
+
+export const authFlows = sqliteTable("auth_flows", {
+  stateHash: text("state_hash").primaryKey(),
+  verifier: text("verifier").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+}, (t) => [index("auth_flows_expiry").on(t.expiresAt)]);
+export const authSessions = sqliteTable("auth_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  githubId: text("github_id").notNull(),
+  login: text("login").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+}, (t) => [index("auth_sessions_expiry").on(t.expiresAt)]);

@@ -1,16 +1,16 @@
 import { env } from "cloudflare:workers";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
+import { getStudioUser } from "./auth";
 import { defaults, type Collection, type Photo, type Album } from "./types";
 export async function identity() {
-  const user = await getChatGPTUser();
+  const user = await getStudioUser();
   if (!user) return { user: null, isOwner: false };
   let row = await env.DB.prepare("SELECT owner_id FROM studio WHERE id=?")
     .bind("main")
     .first<{ owner_id: string | null }>();
   if (
     !row?.owner_id &&
-    env.OWNER_EMAIL &&
-    user.email.toLowerCase() === env.OWNER_EMAIL.toLowerCase()
+    env.OWNER_GITHUB_ID &&
+    user.userId === env.OWNER_GITHUB_ID
   ) {
     await env.DB.prepare(
       "INSERT INTO studio (id,owner_id,name,tagline,bio,email,show_samples) VALUES (?,?,?,?,?,?,1) ON CONFLICT(id) DO UPDATE SET owner_id=excluded.owner_id WHERE studio.owner_id IS NULL",
@@ -28,7 +28,7 @@ export async function identity() {
       .bind("main")
       .first<{ owner_id: string | null }>();
   }
-  return { user, isOwner: row?.owner_id === user.userId };
+  return { user, isOwner: row?.owner_id === user.userId && user.userId === env.OWNER_GITHUB_ID };
 }
 export async function collection(includeDrafts = false, publicOnly = false): Promise<Collection> {
   const { user, isOwner } = publicOnly

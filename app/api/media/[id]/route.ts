@@ -19,13 +19,14 @@ export async function GET(
     .first();
   if (!published && !(await identity()).isOwner)
     return new Response("Not found", { status: 404 });
-  const object = await env.BUCKET.get(
+  const object = await env.PHOTOS.get(
     new URL(request.url).searchParams.get("size") === "small"
       ? photo.thumb_key
       : photo.key,
+    "stream",
   );
   if (!object) return new Response("Not found", { status: 404 });
-  return new Response(object.body, {
+  return new Response(object, {
     headers: {
       "Content-Type": "image/jpeg",
       "Cache-Control": "private, no-store",

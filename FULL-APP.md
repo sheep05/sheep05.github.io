@@ -1,53 +1,77 @@
-# Quiet Studio
+# Quiet Studio: operation and deployment
 
-An interactive photography studio and a private publishing workspace. The opening view is inside a spacious, enclosed bedroom with dim amber lamps, faint dusk light, and gently animated linen curtains: sit on the bed, rise, walk to the desk over 9.5 seconds with subtle camera sway, and enter the laptop screen. Blender creates the room; visitors load a lightweight glTF model in their browser. No Blender installation is required for visitors.
+Quiet Studio combines a static public gallery with a private publishing workspace. Blender creates the room; visitors load a glTF model in their browser and do not need Blender installed.
 
-## Run locally
+## Architecture
 
-Node.js 22.13+ is required. Install dependencies with `npm ci --include=dev --include=optional`.
+- **GitHub Pages:** public frontend at `https://sheep05.github.io/`, published from `main /docs`.
+- **Cloudflare Worker:** `quiet-studio-backend`, API and `/studio` at `https://quiet-studio-backend.sheep05.workers.dev`.
+- **D1 binding `DB`:** albums, photo metadata, settings and short-lived owner sessions.
+- **KV binding `PHOTOS`:** optimized JPEGs and thumbnails. No R2 or billing enrollment is required for the selected Free plan.
+- **GitHub OAuth:** public-profile identity only, with no repository or private-email scopes. Owner access is tied to immutable GitHub user ID `152187410` (sheep05).
 
-1. Set `OWNER_EMAIL=seedy@sites.test` in ignored `.dev.vars` for the starter's loopback-only mock sign-in.
-2. Run `npm run build` to emit the local Wrangler configuration.
-3. Apply each pending SQL migration in `drizzle/`, in order, with `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_gigantic_maestro.sql`. Do not replay applied migrations.
-4. Run `npm run dev` and open its localhost URL. `/studio` is the owner workspace; local sign-in uses a development-only account.
-5. `node tests/integration.mjs` runs meaningful local API/persistence/access checks and removes its own fixtures.
+The public feed ignores sessions and draft parameters. Cross-origin media access is enabled only for published photographs. Every media request checks publication in D1; KV is not trusted to decide access. Private and unfiled photographs require the owner's session.
 
+OAuth uses PKCE S256, a matching state cookie, and an atomically consumed ten-minute flow record. Session cookies are Secure, HttpOnly and SameSite=Lax. Only hashes of session tokens are stored in D1; sessions expire after eight hours and are revoked on sign-out. Caller-supplied ChatGPT or Cloudflare identity headers are ignored.
 
-## Publishing and ownership
+## Production setup
 
-`.openai/hosting.json` binds the Site to D1 (`DB`) and R2 (`BUCKET`). Publish through the Sites workflow; the platform applies committed migrations. Production `OWNER_EMAIL` is a server-side secret set to the Site owner's authenticated email. The first verified matching sign-in binds the stable Site user ID in D1; later writes require that ID. Authentication headers are supplied by Sites dispatch. Never expose the Worker behind a proxy that accepts user-supplied identity headers.
+The checked-in `wrangler.jsonc` identifies this deployment's database, KV namespace, public GitHub client ID and backend origin. Resource IDs and OAuth client IDs are not secrets. To deploy to a different account, create replacement free D1/KV resources and update those IDs first.
 
-The initial publication is owner-private. Public visitor access and a purchased custom domain can be configured separately when the owner chooses to launch. Domain registration is not included.
+1. Authorize Wrangler for the selected Cloudflare account.
+2. Apply pending migrations: `npx wrangler d1 migrations apply DB --remote --config wrangler.jsonc`.
+3. Register a GitHub OAuth app owned by the studio owner. Homepage: `https://sheep05.github.io/`. Redirect URI: `https://quiet-studio-backend.sheep05.workers.dev/auth/callback`. Leave wildcard matching and Device Flow disabled.
+4. Set `GITHUB_CLIENT_ID`, `STUDIO_ORIGIN`, and `OWNER_GITHUB_ID` in Wrangler's `vars`.
+5. Store `GITHUB_CLIENT_SECRET` as a Cloudflare Worker **secret**, using the dashboard or interactive `npx wrangler secret put GITHUB_CLIENT_SECRET --config wrangler.jsonc`. Never put it in source, chat, screenshots or a frontend environment variable.
+6. Run `npm run build`, then `npx wrangler deploy --config dist/server/wrangler.json`.
+7. Verify owner sign-in at `/studio`, upload a photograph, assign it to an album, and publish that album.
+8. Build the public frontend with `VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run build:pages`, replace `docs/` with the output, and publish to GitHub.
+
+The first verified owner visit initializes the studio. Other GitHub accounts cannot claim it. Pending OAuth configuration produces a controlled unavailable response; it never enables public editing.
+
+## Run and test locally
+
+Node.js 22.13+ is required.
+
+```sh
+npm ci --include=dev --include=optional
+npx wrangler d1 migrations apply DB --local --config wrangler.jsonc
+node --experimental-strip-types tests/prepare-local-auth.mjs
+npx wrangler d1 execute DB --local --config wrangler.jsonc --file work/local-auth.sql
+npm run dev
+```
+
+The test helper writes an expiring local session, SQL fixture and `.dev.vars`, all ignored by Git. Apply `work/local-auth.sql` **only with `--local`**, never remotely. The development-only cookie is accepted only by the development build on loopback hosts. Changing the D1 database ID changes the local database location; apply migrations again if that ID changes.
+
+In another terminal, run `node tests/integration.mjs`. The integration test refuses non-loopback URLs and cleans up its own fixtures. It checks uploads, persistence, album membership, ordering, cover handling, publication, private media, settings, deletion, and forged identity/CSRF attempts. `npm run test:auth` checks PKCE, OAuth state, owner identity, session expiry and logout. Run `npx tsc --noEmit` and `npm run build` for type/build checks.
 
 ## Managing photographs
 
-- **Studio settings**: rename the site, edit the opening line and biography, set contact email, hide sample collections.
-- **Photographs**: upload JPG/PNG/WebP/AVIF (50 MB source limit); the browser creates a maximum 3200px JPEG and an 800px preview, preserving aspect ratio and stripping EXIF/GPS. Originals remain on the user's device and are not stored by the site.
-- **Collections**: create and rename albums, choose covers, reorder albums and photographs, preview drafts, publish/hide. A photograph can belong to multiple collections.
-- Draft photographs and unfiled uploads are available only to the owner. Deleting a collection keeps the photographs; deleting a photograph removes it from every collection and from storage.
+- **Studio settings:** rename the site, edit the opening line and biography, set a contact email, and hide sample collections.
+- **Photographs:** upload JPG/PNG/WebP/AVIF (50 MB source limit). The browser creates a maximum 3200px JPEG plus an 800px preview, preserving aspect ratio and stripping EXIF/GPS. Originals stay on your device.
+- **Collections:** create and rename albums, choose covers, reorder albums and photographs, preview drafts, publish or hide. One photograph can belong to multiple albums.
+- Deleting an album keeps its photographs. Deleting a photo removes it from every album and storage. Unfiled photographs remain owner-only.
 
-Demo photography is explicitly labeled and credited. Provenance is in `public/samples/samples.json`. The Blender room source and installation provenance are in `scene-source/README.md`; `.blend` contains packed textures.
+KV is eventually consistent: newly uploaded images can take a minute or more to appear in another region. Metadata publication changes are checked in D1 on each media request. Keep original photographs and maintain backups of database metadata and stored images separately from Git.
+
+## Free-plan limits
+
+The selected plan requires no R2 subscription or Cloudflare Access enrollment. Workers Free and KV have finite daily request/operation allowances. KV's free allowance includes 1 GB storage, 100,000 reads/day and 1,000 writes/day; each upload uses at least two writes (image and thumbnail). Exceeding a free allowance can cause operations to fail. Do not enable a paid plan without the owner's approval.
+
+Check current limits before changing the architecture:
+- https://developers.cloudflare.com/workers/platform/pricing/
+- https://developers.cloudflare.com/kv/platform/pricing/
+- https://developers.cloudflare.com/kv/platform/limits/
+- https://developers.cloudflare.com/kv/concepts/how-kv-works/
 
 ## Accessibility and rendering
 
-Keyboard-accessible entry, a direct collection route, native dialog focus trapping, Escape/arrow controls in the photo viewer, a static reduced-motion entrance, and a rendered fallback if WebGL is unavailable. Uploaded photo descriptions can be edited in the studio. The 3D scene only renders while visible.
+Keyboard-accessible entry, direct collection navigation, native dialog focus trapping, Escape/arrow controls in the photo viewer, reduced-motion entrance, and a rendered fallback if WebGL is unavailable. Photo descriptions are editable. The 3D scene renders only while visible.
 
-## Your domain and portability
+Sample photographs are explicitly labeled and credited in `public/samples/samples.json`. The decorative Japanese night scene is separate from portfolio photography; its provenance is recorded in `scene-source/japan-night.provenance.json`. Blender source and packed textures are included.
 
-Quiet Studio is an editable site name. The current deployment uses ChatGPT Sites, and its preview is owner-private. Sites supports connecting an owned custom domain where that feature is available; domain registration and DNS are separate. A custom domain alone does not change the audience or remove sign-in.
+## Custom domains and portability
 
-The complete React/Three.js source, Blender source, packed `.blend`, glTF model, and assets live in this repository. Transferring hosting is possible but requires an actual migration: deploy the app to a compatible runtime, migrate the D1 album/metadata database and R2 uploaded images, replace Sites-provided identity with secure owner authentication, and update deployment configuration/DNS. The existing sign-in header trust must not be copied to an untrusted public proxy. A source archive alone does not include live uploaded photos or production database contents.
+Quiet Studio is an editable name. A custom domain can point to GitHub Pages while the backend remains on Cloudflare. Moving the backend requires updating its OAuth redirect URI, `STUDIO_ORIGIN` and the public frontend's backend URL. Moving to another provider also requires database and photo migration and equivalent secure owner authentication.
 
-The Japanese night backdrop is a generated decorative scene, separate from portfolio photographs. Its prompt and provenance are recorded in `scene-source/japan-night.provenance.json`.
-
-## GitHub Pages build
-
-`npm run build:pages` creates `outputs/github-pages/`. This separate static entry uses the same portfolio and room components as the full application, with only the credited demo albums. It does not include live uploads, draft albums, an API, or an admin dashboard. The original Sites app remains intact.
-
-For a user site named `USERNAME.github.io`, keep the default base `/`. For a project site, set `PAGES_BASE_PATH=/REPOSITORY/` when building so navigation, sample photos and scene assets all use the repository prefix. Do not upload the entire workspace or local environment files to publish the site.
-
-One simple manual publication route: create the chosen public repository with a README, put the built folder's contents at its root (including an empty `.nojekyll`), then select Settings → Pages → Deploy from a branch → main → /(root). This publishes the static demo only. A connected backend or a separately implemented export workflow is needed before claiming that the existing upload/admin workflow publishes photos to GitHub Pages.
-
-GitHub Pages is static hosting. Keeping uploads and album management requires a separate backend with authenticated writes and publicly accessible published images/data. The current owner-private Sites origin cannot simply be used as that backend without access, identity and cross-origin changes. The selected GitHub account is sheep05. A deployable backend origin is still required.
-
-The chosen target is `sheep05.github.io`, with a separate upload/admin backend. Set `VITE_STUDIO_BACKEND_URL` to the verified public backend origin when building the GitHub frontend. It requests the read-only `/api/public` feed without credentials, converts uploaded image paths to backend URLs, and links Studio management to the backend. Without that variable the build is an explicitly sample-only demo. The public feed ignores owner sessions and draft query parameters; cross-origin image access is enabled only for published photos. Admin writes remain same-origin and authenticated. No backend origin has been provisioned or made public yet.
+The complete React/Three.js source, Blender source and assets are in this repository. Live uploads, database contents, secrets and account credentials are not. Keep ownership of the GitHub and Cloudflare accounts; their operation is independent of the ChatGPT account used to develop the site.

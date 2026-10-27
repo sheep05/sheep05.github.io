@@ -130,9 +130,9 @@ export async function POST(request: Request) {
           env.DB.prepare("DELETE FROM album_photos WHERE photo_id=?").bind(
             body.id,
           ),
-          env.DB.prepare("DELETE FROM photos WHERE id=?").bind(body.id),
         ]);
-        await env.BUCKET.delete([p.key, p.thumb_key]);
+        await Promise.all([env.PHOTOS.delete(p.key), env.PHOTOS.delete(p.thumb_key)]);
+        await env.DB.prepare("DELETE FROM photos WHERE id=?").bind(body.id).run();
       }
     } else if (action === "reorderAlbums" || action === "reorderPhotos") {
       if (
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
     return json(
       {
         error:
-          e instanceof Error && !/D1|SQL|R2/i.test(e.message)
+          e instanceof Error && !/D1|SQL|KV/i.test(e.message)
             ? e.message
             : "Could not save your changes. Please try again.",
       },
@@ -221,12 +221,8 @@ async function upload(request: Request) {
     key = `photos/${id}.jpg`,
     thumbKey = `photos/${id}-small.jpg`;
   try {
-    await env.BUCKET.put(key, file.stream(), {
-      httpMetadata: { contentType: "image/jpeg" },
-    });
-    await env.BUCKET.put(thumbKey, thumb.stream(), {
-      httpMetadata: { contentType: "image/jpeg" },
-    });
+    await env.PHOTOS.put(key, await file.arrayBuffer());
+    await env.PHOTOS.put(thumbKey, await thumb.arrayBuffer());
     const title = validText(String(data.get("title") || "Untitled"), 200);
     const ops = [
       env.DB.prepare(
@@ -241,7 +237,7 @@ async function upload(request: Request) {
       );
     await env.DB.batch(ops);
   } catch (e) {
-    await env.BUCKET.delete([key, thumbKey]);
+    await Promise.allSettled([env.PHOTOS.delete(key), env.PHOTOS.delete(thumbKey)]);
     throw e;
   }
   return json({ ok: true, id });

@@ -1,5 +1,4 @@
 import { collection } from "@/lib/store";
-import { chatGPTSignInPath, chatGPTSignOutPath } from "../chatgpt-auth";
 import Studio from "./Studio";
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -24,18 +23,14 @@ export default async function StudioPage() {
           <p>
             {data.signedIn
               ? "This account does not have access to manage the studio. Sign in with the owner account."
-              : "Sign in to upload photographs, curate collections, and make this space your own."}
+              : "Sign in with GitHub to upload photographs, curate collections, and make this space your own."}
           </p>
           <a
             className="button primary"
             target="_top"
-            href={
-              data.signedIn
-                ? chatGPTSignOutPath("/studio")
-                : chatGPTSignInPath("/studio")
-            }
+            href="/auth/login"
           >
-            {data.signedIn ? "Switch account" : "Sign in to your studio"} ↗
+            Sign in with GitHub ↗
           </a>
           <a className="text-link" href="/">
             ← Back to the photographs

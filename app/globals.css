@@ -2186,3 +2186,5 @@ select {
       linear-gradient(to top, #211b1499, transparent 25%);
   }
 }
+
+.admin-storage-note { font-size: 12px; color: var(--muted); margin: 0 0 18px; line-height: 1.6; }

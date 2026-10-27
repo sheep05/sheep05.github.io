@@ -257,15 +257,14 @@ export default function Studio({ initial }: { initial: Collection }) {
           <a className="text-link" href="/" target="_blank">
             View website ↗
           </a>
-          <a href="/signout-with-chatgpt?return_to=%2F" target="_top">
-            Sign out
-          </a>
+          <form action="/auth/logout" method="post"><button className="text-link" type="submit">Sign out</button></form>
           <span className="eyebrow">
             <span className="status-dot" /> PRIVATE WORKSPACE
           </span>
         </div>
       </aside>
       <main className="admin-main">
+        <p className="admin-storage-note">Free photo storage: 1 GB. Newly uploaded images may take a minute to appear everywhere.</p>
         <header className="admin-heading">
           <div>
             <p className="eyebrow">STUDIO MANAGEMENT</p>
