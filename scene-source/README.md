@@ -1,6 +1,6 @@
 # Quiet Studio scene
 
-Created with Blender 4.5.15 LTS on Apple Silicon. Browser visitors do not install Blender; the site loads the exported glTF asset.
+Editable Blender source, room-generation scripts, textures, and visual checks for the 3D entrance, created with Blender 4.5.15 LTS. The exported browser assets live in `../public/scene/`; visitors do not need Blender installed.
 
 ## Files
 - `quiet-studio.blend`: editable scene with packed textures.

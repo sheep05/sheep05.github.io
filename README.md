@@ -1,41 +1,82 @@
-# Quiet Studio — Photography
+# Quiet Studio photography website
 
-An enclosed, warmly lit bedroom leads visitors from the bed to a laptop and into a photography collection. The 9.5-second walk has subtle camera sway; linen curtains move gently, and the window overlooks dimensional Japanese buildings at night.
+A photography portfolio with a warm 3D room entrance and a private workspace for uploading photographs and publishing collections. GitHub Pages and Cloudflare display the same published photo library.
 
-## Addresses
+**Visit:** [Public website](https://sheep05.github.io/) · [Upload and edit](https://quiet-studio-backend.sheep05.workers.dev/studio)
 
-- Public website: https://sheep05.github.io/
-- Upload and album workspace: https://quiet-studio-backend.sheep05.workers.dev/studio
-- Public photo feed: https://quiet-studio-backend.sheep05.workers.dev/api/public
+**Start here:** [Photo and website editing guide](WEBSITE-GUIDE.md) · [Deployment and technical setup](FULL-APP.md)
 
-GitHub Pages serves the public website from **main /docs**. A separate Cloudflare Worker serves the owner workspace and API. D1 stores album metadata; Workers KV stores optimized photos and thumbnails. Only the configured GitHub owner can edit. OAuth configuration must be complete before owner sign-in works.
+## What each folder does
 
-## Build the public website
+| Folder | Purpose |
+| --- | --- |
+| [`app/`](app/) | The website interface and backend routes: gallery, 3D room, private Studio, sign-in, and photo API. Start here to change how the website looks or behaves. |
+| [`frontend/`](frontend/) | The small entry page that runs the shared gallery on GitHub Pages and loads published photos from Cloudflare. It was previously called `pages-preview`. |
+| [`lib/`](lib/) | Shared photo/album types, database queries, sample collections, and owner-session logic. Both the gallery and Studio use these helpers. |
+| [`db/`](db/) | The database schema and its migration history in `db/migrations/`. This defines album/photo metadata and sign-in records; it does not contain your uploaded image files. |
+| [`public/`](public/) | Source assets copied into website builds: the exported 3D model, fallback room image, sample photographs, and favicon. Edit or replace an asset here before rebuilding. |
+| [`docs/`](docs/) | The compiled public website served by GitHub Pages, including generated JavaScript, CSS, and copied assets. Rebuild it from the source; do not edit its generated bundles by hand. |
+| [`scene-source/`](scene-source/) | The editable Blender room, its textures, generation scripts, and visual verification files. Use this for changes to the bed, furniture, lighting, or Japanese exterior. |
+| [`tests/`](tests/) | Authentication checks and local upload/album integration tests, plus a local-only sign-in fixture helper. These help verify that editing works and drafts remain private. |
+| [`worker/`](worker/) | The Cloudflare Worker entry point that passes requests to the backend application. Hosting settings are in the root `wrangler.jsonc` file. |
 
-Use Node.js 22.13 or newer.
+GitHub's text beside each folder is the **latest commit message**, not its description. The table above and each source folder's README explain what it actually contains.
+
+## Where to make a change
+
+| Change | Where to go |
+| --- | --- |
+| Upload photos, create albums, rename the site, or edit your biography | [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio); no code commit needed |
+| Gallery layout | [`app/components/Portfolio.tsx`](app/components/Portfolio.tsx) |
+| Colors, fonts, and spacing | [`app/globals.css`](app/globals.css) |
+| Camera movement and curtain animation | [`app/components/Room.tsx`](app/components/Room.tsx) |
+| Room furniture and geometry | [`scene-source/README.md`](scene-source/README.md) |
+| Upload and editing interface | [`app/studio/Studio.tsx`](app/studio/Studio.tsx) |
+| Browser-tab title on GitHub Pages | [`frontend/index.html`](frontend/index.html) |
+
+## Important root files
+
+| File | Purpose |
+| --- | --- |
+| `WEBSITE-GUIDE.md` | Step-by-step instructions for daily photo management and website edits. |
+| `FULL-APP.md` | Developer instructions for authentication, storage, testing, deployment, and moving hosts. |
+| `package.json` and `package-lock.json` | Commands and the exact dependency versions used to install and build the project. |
+| `wrangler.jsonc` | Cloudflare Worker settings and database/photo-storage bindings. The private GitHub client secret is stored in Cloudflare, not in this file. |
+| `vite.config.ts` and `vite.pages.config.ts` | Build settings for the Cloudflare application and GitHub Pages frontend, respectively. |
+| `drizzle.config.ts` | Tells the database tooling where the schema and migration history live. |
+| `tsconfig.json`, `eslint.config.mjs`, and `postcss.config.mjs` | Type checking, code checks, and CSS build settings. |
+| `next.config.ts` and the root `.d.ts` files | Framework configuration and TypeScript declarations for browser and Cloudflare APIs. |
+| `.gitignore` and `.npmrc` | Keep generated/private local files out of Git and set npm's installation preferences. |
+
+## Run and build
+
+Use Node.js 22.13 or newer. Install dependencies with `npm run install:ci`.
 
 ```sh
-npm ci --include=dev --include=optional
-npm run dev:pages
+# Preview the public gallery using the shared photo library:
+VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run dev:pages
+
+# Build GitHub Pages into outputs/github-pages/:
 VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run build:pages
+
+# Build the Cloudflare application into dist/:
+npm run build
 ```
 
-The static build appears in `outputs/github-pages/`. Replace the contents of `docs/` with that build, including `.nojekyll`, then commit/push. Without `VITE_STUDIO_BACKEND_URL`, the build shows credited sample collections only. Do not open `pages-preview/index.html` directly as a file; use its development server.
+Copy the public build into `docs/`, then commit and push to publish through GitHub Pages. Backend changes require a separate Cloudflare deployment; see [the editing guide](WEBSITE-GUIDE.md#update-the-design-or-code).
 
-## Make it yours
+## Folders visible only on your computer
 
-Read [the website management guide](WEBSITE-GUIDE.md) for the visitor and editing addresses, step-by-step uploads, album publishing, renaming, and code-update instructions.
+These are ignored by Git and do not clutter the GitHub repository.
 
-The private studio supports photo uploads, site and photo renaming, album creation, covers, ordering, and draft/publish controls. A photo can belong to multiple albums. Uploads are resized in your browser and lose EXIF/GPS metadata; keep your original files separately.
+| Folder | Purpose |
+| --- | --- |
+| `node_modules/` | Installed software dependencies; recreated by `npm run install:ci`. |
+| `dist/` | Generated Cloudflare application build. |
+| `outputs/` | Generated GitHub Pages build before it is copied into `docs/`. |
+| `.next/` and `.vinext/` | Framework-generated types, caches, and temporary build state. |
+| `.wrangler/` | Local Cloudflare database/storage state and deployment-tool state; this checkout also keeps its Wrangler sign-in here. |
+| `work/` | Local test fixtures, logs, and deployment notes. |
+| `.git/` | Repository history and Git's internal bookkeeping. |
 
-- Gallery design: `app/components/Portfolio.tsx` and `app/globals.css`.
-- Camera and curtain animation: `app/components/Room.tsx`.
-- Editable Blender room: `scene-source/quiet-studio.blend`.
-- Scene generation and provenance: `scene-source/README.md`.
-- Sample photography credits: `public/samples/samples.json`.
-
-## Hosting and ownership
-
-The selected setup uses Cloudflare's free services without R2, Access, or billing enrollment. KV has a 1 GB free storage allowance and daily operation limits; exceeded free limits can interrupt uploads or browsing. New images can take a minute or more to reach every region. See `FULL-APP.md` for setup, authentication, testing and portability.
-
-The website and backend belong to your GitHub and Cloudflare accounts. A custom domain can be attached later. Changing ChatGPT accounts does not transfer or delete those resources. This source repository does not contain credentials, uploaded photos, or a production database backup.
+Your live uploaded photographs are stored in Cloudflare KV; their titles and album memberships are in Cloudflare D1. They are not files in this repository. Keep original photographs and database/image backups separately.

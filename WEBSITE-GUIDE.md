@@ -67,7 +67,7 @@ These are separate names and addresses:
 - **Website name:** the visible brand, editable in Studio settings.
 - **GitHub OAuth application name:** the name on the sign-in screen, editable in [GitHub application settings](https://github.com/settings/applications/3968032).
 - **Public address:** `sheep05.github.io`. Editing either name above does not change this address.
-- **Browser-tab title and search description:** currently defined in the code, in `pages-preview/index.html` for GitHub Pages and `app/layout.tsx` for the backend site.
+- **Browser-tab title and search description:** currently defined in the code, in `frontend/index.html` for GitHub Pages and `app/layout.tsx` for the backend site.
 
 ## Update the design or code
 
@@ -116,7 +116,7 @@ Do not edit the minified files inside `docs/assets/` directly. A future build ov
 | Room geometry and furnishings | `scene-source/quiet-studio.blend`; export/update the web model using the scene-source instructions |
 | Photo-management interface | `app/studio/Studio.tsx` |
 | Upload and album API behavior | `app/api/studio/route.ts` |
-| Database schema | `db/schema.ts` and migrations in `drizzle/` |
+| Database schema | `db/schema.ts` and migrations in `db/migrations/` |
 
 ### Backend changes require a separate deployment
 

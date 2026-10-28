@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
-  root: fileURLToPath(new URL("./pages-preview", import.meta.url)),
+  root: fileURLToPath(new URL("./frontend", import.meta.url)),
   base: process.env.PAGES_BASE_PATH || "/",
   publicDir: fileURLToPath(new URL("./public", import.meta.url)),
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
