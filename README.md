@@ -20,7 +20,7 @@ A photography portfolio with a warm 3D room entrance and a private workspace for
 | [`tests/`](tests/) | Authentication checks and local upload/album integration tests, plus a local-only sign-in fixture helper. These help verify that editing works and drafts remain private. |
 | [`worker/`](worker/) | The Cloudflare Worker entry point that passes requests to the backend application. Hosting settings are in the root `wrangler.jsonc` file. |
 
-GitHub's text beside each folder is the **latest commit message**, not its description. The table above and each source folder's README explain what it actually contains.
+GitHub's file-list rows currently use short, purpose-specific documentation commits. Later edits replace those labels with their newer commit messages; the folder descriptions above remain the reference.
 
 ## Where to make a change
 
