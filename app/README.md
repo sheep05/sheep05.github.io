@@ -1,4 +1,4 @@
-# Website and backend routes
+# Gallery, Studio, and API source
 
 This folder contains the gallery, interactive room, private Studio dashboard, and server routes. Changes here affect the interface or the way the backend handles visitors and the owner.
 
