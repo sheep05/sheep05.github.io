@@ -1,4 +1,4 @@
-# Quiet Studio scene
+# Blender source for the 3D room
 
 Editable Blender source, room-generation scripts, textures, and visual checks for the 3D entrance, created with Blender 4.5.15 LTS. The exported browser assets live in `../public/scene/`; visitors do not need Blender installed.
 
