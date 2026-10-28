@@ -133,6 +133,16 @@ select {
   z-index: 5;
   border-bottom: 1px solid var(--line);
 }
+.collection-status {
+  margin: 0 0 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
 .site-header nav {
   display: flex;
   gap: 34px;

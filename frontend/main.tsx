@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Portfolio from "../app/components/Portfolio";
 import { defaults, type Collection } from "../lib/types";
+import { loadCollection } from "./load-collection";
 import "../app/globals.css";
 
 const backend = (import.meta.env.VITE_STUDIO_BACKEND_URL || "").replace(/\/$/, "");
@@ -10,38 +11,27 @@ const demo: Collection = {
 };
 
 function Gallery() {
-  const [data, setData] = useState<Collection | null>(backend ? null : demo);
-  const [failed, setFailed] = useState(false);
+  const [data, setData] = useState<Collection>(backend
+    ? { ...demo, settings: { ...defaults, showSamples: false } } : demo);
+  const [status, setStatus] = useState<"loading" | "error" | null>(backend ? "loading" : null);
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     if (!backend) return;
     const abort = new AbortController();
-    fetch(`${backend}/api/public`, { credentials: "omit", signal: abort.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("Gallery unavailable");
-        const result: Collection = await response.json();
-        if (!result.settings || !Array.isArray(result.albums) || !Array.isArray(result.photos)) {
-          throw new Error("Invalid gallery response");
-        }
-        setData({
-          ...result,
-          isOwner: false,
-          signedIn: false,
-          photos: result.photos.map((photo) => ({
-            ...photo,
-            url: new URL(photo.url, `${backend}/`).href,
-            thumb: new URL(photo.thumb, `${backend}/`).href,
-          })),
-        });
+    loadCollection(backend, abort.signal)
+      .then((result) => {
+        if (abort.signal.aborted) return;
+        setData(result);
+        setStatus(null);
       })
-      .catch(() => { if (!abort.signal.aborted) setFailed(true); });
+      .catch(() => { if (!abort.signal.aborted) setStatus("error"); });
     return () => abort.abort();
-  }, []);
-  if (!data) return <main style={{ padding: "15vh 8vw" }}>
-    <h1>Quiet Studio</h1>
-    <p role="status">{failed ? "The collection is temporarily unavailable. Please try again." : "Opening the collection…"}</p>
-    {failed && <button onClick={() => location.reload()}>Try again</button>}
-  </main>;
+  }, [attempt]);
   return <Portfolio initial={data} assetBase={import.meta.env.BASE_URL}
+    collectionStatus={status} onRetry={() => {
+      setStatus("loading");
+      setAttempt((value) => value + 1);
+    }}
     managementUrl={backend ? `${backend}/studio` : null} />;
 }
 

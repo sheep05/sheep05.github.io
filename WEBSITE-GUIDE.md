@@ -156,3 +156,12 @@ A shared gallery/style change needs **both** publishing steps to update both web
 | An upload fails | Check its displayed error, file type/size, connection, and free storage/operation limits |
 
 The selected free photo storage allowance is 1 GB. Keep your original photographs separately, and back up the live database/photo storage before migration; a GitHub source-code backup does not contain uploaded photos. Your GitHub and Cloudflare accounts own the website independently of your ChatGPT account.
+
+
+### If the entrance or photographs seem stuck
+
+Open [the main entrance](https://sheep05.github.io/) to see the room. The `?view=collection` link intentionally skips it. Select **The studio** in the navigation to return, then **Walk over to the desk**. If the room is still downloading, your click waits for it before beginning the 9.5-second walk.
+
+The entrance now loads independently of the photo service. If photographs cannot load within eight seconds, the collection offers **Retry photographs**. Try it after your connection recovers. If your network cannot reach `quiet-studio-backend.sheep05.workers.dev`, the room can still work on GitHub Pages, but uploaded photographs and owner management require access to that backend; a retry cannot override a network block.
+
+Browsers with reduced motion enabled, unsupported 3D graphics, or a failed/timed-out model download show the still-image entrance with **Open the collection**. After a new deployment, reload the page once to obtain the latest build. A real iPad/iPhone may need its old website tab closed and reopened if it still shows the previous version.

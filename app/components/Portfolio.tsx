@@ -10,10 +10,14 @@ export default function Portfolio({
   initial,
   assetBase = "/",
   managementUrl = "/studio",
+  collectionStatus = null,
+  onRetry,
 }: {
   initial: Collection;
   assetBase?: string;
   managementUrl?: string | null;
+  collectionStatus?: "loading" | "error" | null;
+  onRetry?: () => void;
 }) {
   const { settings } = initial;
   const samples = settings.showSamples
@@ -28,7 +32,8 @@ export default function Portfolio({
   const [view, setView] = useState("studio"),
     [activeId, setActiveId] = useState<string | null>(null),
     [entering, setEntering] = useState(false),
-    [sceneReady, setSceneReady] = useState(false),
+    [walkRequested, setWalkRequested] = useState(false),
+    [sceneState, setSceneState] = useState<"loading" | "ready" | "fallback">("loading"),
     [lightbox, setLightbox] = useState<{
       photos: Photo[];
       index: number;
@@ -41,6 +46,9 @@ export default function Portfolio({
       const p = new URLSearchParams(location.search);
       setView(p.has("album") ? "album" : p.get("view") || "studio");
       setActiveId(p.get("album"));
+      setEntering(false);
+      setWalkRequested(false);
+      if (p.has("album") || (p.get("view") && p.get("view") !== "studio")) setSceneState("loading");
     };
     read();
     window.addEventListener("popstate", read);
@@ -62,6 +70,8 @@ export default function Portfolio({
     setView(next);
     setActiveId(id || null);
     setEntering(false);
+    setWalkRequested(false);
+    if (next !== "studio") setSceneState("loading");
     history.pushState(
       {},
       "",
@@ -95,6 +105,18 @@ export default function Portfolio({
         : null,
     );
   const contact = settings.email ? `mailto:${settings.email}` : null;
+  let entranceLabel = "Walk over to the desk.";
+  if (entering) entranceLabel = "Entering the collection…";
+  else if (walkRequested) entranceLabel = "Preparing your walk…";
+  else if (sceneState === "fallback") entranceLabel = "Open the collection.";
+  const collectionNotice = collectionStatus && (
+          <div className="collection-status" role="status">
+            <p>{collectionStatus === "loading"
+              ? "Loading photographs. You can explore the room while they arrive."
+              : "The photo service isn’t responding on this connection. You can still explore the room."}</p>
+            {collectionStatus === "error" && <button className="text-link" onClick={onRetry}>Retry photographs ↗</button>}
+          </div>
+  );
   return (
     <div className={`portfolio view-${view}`}>
       <a className="skip-link" href="#main">
@@ -172,29 +194,30 @@ export default function Portfolio({
                     }))
                     .filter((p) => p.url)}
                   title={settings.name}
-                  entering={entering}
+                  entering={walkRequested}
                   onEnter={() => navigate("collection")}
                   onBegin={() => {
                     window.scrollTo({ top: 0, behavior: "instant" });
                     setEntering(true);
+                    setWalkRequested(true);
                   }}
-                  onReady={() => setSceneReady(true)}
+                  onReady={() => setSceneState("ready")}
+                  onUnavailable={() => setSceneState("fallback")}
                 />
               </div>
               <button
                 className="enter-laptop"
-                onClick={() => setEntering(true)}
-                disabled={entering}
+                onClick={() => setWalkRequested(true)}
+                disabled={walkRequested}
               >
                 <span className="enter-ring">↗</span>
                 <span>
-                  {entering
-                    ? "Entering the collection…"
-                    : "Walk over to the desk."}
+                  {entranceLabel}
                   <small>
-                    {sceneReady
+                    {sceneState === "ready"
                       ? "STAND UP · WALK · EXPLORE"
-                      : "ENTER THE COLLECTION"}
+                      : sceneState === "loading" ? "THE ROOM IS LOADING"
+                      : "STILL-IMAGE ENTRANCE"}
                   </small>
                 </span>
               </button>
@@ -216,6 +239,7 @@ export default function Portfolio({
               </div>
             </section>
             <section id="selected" className="selected-section">
+              {collectionNotice}
               <div className="section-heading">
                 <div>
                   <p className="eyebrow">A FEW WAYS OF SEEING</p>
@@ -244,7 +268,7 @@ export default function Portfolio({
                   />
                 ))}
               </div>
-              {albums.length === 0 && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
+              {albums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
             </section>
             <section className="closing-note">
               <p>
@@ -260,6 +284,7 @@ export default function Portfolio({
         )}
         {view === "collection" && (
           <section className="collection-page">
+            {collectionNotice}
             <div className="collection-heading">
               <p className="eyebrow">THE PHOTOGRAPHIC ARCHIVE</p>
               <h1>
@@ -307,7 +332,7 @@ export default function Portfolio({
                 </button>
               ))}
             </div>
-            {albums.length === 0 && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
+            {albums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
           </section>
         )}
         {view === "album" &&
@@ -377,7 +402,8 @@ export default function Portfolio({
             </section>
           ) : (
             <section className="empty">
-              <h1>Collection unavailable</h1>
+              {collectionNotice}
+              <h1>{collectionStatus === "loading" ? "Loading this collection…" : "Collection unavailable"}</h1>
               <button
                 className="text-link"
                 onClick={() => navigate("collection")}

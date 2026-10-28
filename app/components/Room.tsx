@@ -6,6 +6,7 @@ export default function Room({
   entering,
   onEnter,
   onReady,
+  onUnavailable,
   onBegin,
   title,
   featured,
@@ -14,6 +15,7 @@ export default function Room({
   entering: boolean;
   onEnter: () => void;
   onReady: () => void;
+  onUnavailable: () => void;
   onBegin: () => void;
   title: string;
   featured: { url: string; title: string }[];
@@ -24,11 +26,18 @@ export default function Room({
     [failed, setFailed] = useState(false);
   const callback = useRef(onEnter);
   callback.current = onEnter;
+  const artwork = useRef({ title, featured });
+  artwork.current = { title, featured };
+  const updateArtwork = useRef(() => {});
+  const artworkKey = JSON.stringify(featured);
+  useEffect(() => { updateArtwork.current(); }, [title, artworkKey]);
   useEffect(() => {
     let cleanup = () => {},
       disposed = false;
+    const modelAbort = new AbortController();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setFailed(true);
+      onUnavailable();
       return;
     }
     async function init() {
@@ -231,8 +240,24 @@ export default function Room({
           renderer.dispose();
           renderer.domElement.remove();
         };
-        const gltf = await new GLTFLoader().loadAsync(
-          `${assetBase}scene/quiet-studio.glb`,
+        const modelTimeout = setTimeout(
+          () => modelAbort.abort(new Error("Studio room timed out")),
+          30000,
+        );
+        let modelBytes: ArrayBuffer;
+        try {
+          const response = await fetch(`${assetBase}scene/quiet-studio.glb`, {
+            signal: modelAbort.signal,
+          });
+          if (!response.ok) throw new Error("Studio room unavailable");
+          modelBytes = await response.arrayBuffer();
+        } finally {
+          clearTimeout(modelTimeout);
+        }
+        if (disposed) return;
+        const gltf = await new GLTFLoader().parseAsync(
+          modelBytes,
+          new URL(`${assetBase}scene/`, location.href).href,
         );
         if (disposed) {
           gltf.scene.traverse((o: any) => o.geometry?.dispose());
@@ -271,105 +296,121 @@ export default function Room({
           lamp.position.fromArray(position);
           scene.add(lamp);
         }
-        const screen = object.getObjectByName("LaptopScreen");
-        if (screen) {
-          const canvas = document.createElement("canvas");
-          canvas.width = 1200;
-          canvas.height = 750;
-          const ctx = canvas.getContext("2d")!;
-          ctx.fillStyle = "#f7f5f0";
-          ctx.fillRect(0, 0, 1200, 750);
-          ctx.fillStyle = "#35372f";
-          ctx.font = "20px Arial";
-          ctx.fillText(title.toUpperCase(), 55, 60);
-          ctx.font = "13px Arial";
-          ctx.fillText("THE COLLECTION", 960, 60);
-          ctx.fillStyle = "#d5d4c9";
-          ctx.fillRect(55, 88, 1090, 1);
-          ctx.fillStyle = "#35372f";
-          ctx.font = "64px Georgia";
-          ctx.fillText("Collected moments.", 55, 180);
-          ctx.font = "15px Arial";
-          ctx.fillText(
-            "PLACES. PASSING LIGHT. THE MOMENTS IN BETWEEN.",
-            55,
-            222,
-          );
-          const texture = new THREE.CanvasTexture(canvas);
-          texture.flipY = false;
-          texture.colorSpace = THREE.SRGBColorSpace;
-          const material = new THREE.MeshBasicMaterial({ map: texture });
-          screen.material = material;
-          featured.slice(0, 3).forEach((photo, i) => {
-            const img = new Image();
-            img.onload = () => {
-              if (disposed) return;
-              const w = 340,
-                h = 350,
-                x = 55 + i * 375,
-                y = 270;
-              const ratio = Math.max(w / img.width, h / img.height);
-              ctx.save();
-              ctx.beginPath();
-              ctx.rect(x, y, w, h);
-              ctx.clip();
-              ctx.drawImage(
-                img,
-                x + (w - img.width * ratio) / 2,
-                y + (h - img.height * ratio) / 2,
-                img.width * ratio,
-                img.height * ratio,
-              );
-              ctx.restore();
-              ctx.fillStyle = "#35372f";
-              ctx.font = "20px Georgia";
-              ctx.fillText(photo.title.slice(0, 26), x, 660);
-              texture.needsUpdate = true;
-            };
-            img.src = photo.url;
-          });
-        }
-        let frameIndex = 0;
-        object.traverse((obj: any) => {
-          if (obj.isMesh && obj.name.endsWith("print")) {
-            const photo = featured[frameIndex++ % Math.max(1, featured.length)];
-            if (photo)
-              new THREE.TextureLoader().load(photo.url, (texture) => {
-                if (disposed) {
-                  texture.dispose();
-                  return;
-                }
-                texture.flipY = false;
-                texture.colorSpace = THREE.SRGBColorSpace;
-                obj.material = new THREE.MeshBasicMaterial({ map: texture });
-              });
-            else
-              obj.material = new THREE.MeshStandardMaterial({
-                color: 0xdad6c9,
-                roughness: 1,
-              });
+        let artworkVersion = 0;
+        const replaceMaterial = (mesh: any, material: any) => {
+          mesh.material.map?.dispose();
+          mesh.material.dispose();
+          mesh.material = material;
+        };
+        updateArtwork.current = () => {
+          const version = ++artworkVersion;
+          const { title, featured } = artwork.current;
+          const screen = object.getObjectByName("LaptopScreen");
+          if (screen) {
+            const canvas = document.createElement("canvas");
+            canvas.width = 1200;
+            canvas.height = 750;
+            const ctx = canvas.getContext("2d")!;
+            ctx.fillStyle = "#f7f5f0";
+            ctx.fillRect(0, 0, 1200, 750);
+            ctx.fillStyle = "#35372f";
+            ctx.font = "20px Arial";
+            ctx.fillText(title.toUpperCase(), 55, 60);
+            ctx.font = "13px Arial";
+            ctx.fillText("THE COLLECTION", 960, 60);
+            ctx.fillStyle = "#d5d4c9";
+            ctx.fillRect(55, 88, 1090, 1);
+            ctx.fillStyle = "#35372f";
+            ctx.font = "64px Georgia";
+            ctx.fillText("Collected moments.", 55, 180);
+            ctx.font = "15px Arial";
+            ctx.fillText(
+              "PLACES. PASSING LIGHT. THE MOMENTS IN BETWEEN.",
+              55,
+              222,
+            );
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.flipY = false;
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const material = new THREE.MeshBasicMaterial({ map: texture });
+            replaceMaterial(screen, material);
+            featured.slice(0, 3).forEach((photo, i) => {
+              const img = new Image();
+              img.crossOrigin = "anonymous";
+              img.onload = () => {
+                if (disposed || version !== artworkVersion) return;
+                const w = 340,
+                  h = 350,
+                  x = 55 + i * 375,
+                  y = 270;
+                const ratio = Math.max(w / img.width, h / img.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x, y, w, h);
+                ctx.clip();
+                ctx.drawImage(
+                  img,
+                  x + (w - img.width * ratio) / 2,
+                  y + (h - img.height * ratio) / 2,
+                  img.width * ratio,
+                  img.height * ratio,
+                );
+                ctx.restore();
+                ctx.fillStyle = "#35372f";
+                ctx.font = "20px Georgia";
+                ctx.fillText(photo.title.slice(0, 26), x, 660);
+                texture.needsUpdate = true;
+              };
+              img.src = photo.url;
+            });
           }
-        });
+          let frameIndex = 0;
+          object.traverse((obj: any) => {
+            if (obj.isMesh && obj.name.endsWith("print")) {
+              const photo = featured[frameIndex++ % Math.max(1, featured.length)];
+              if (photo)
+                new THREE.TextureLoader().load(photo.url, (texture) => {
+                  if (disposed || version !== artworkVersion) {
+                    texture.dispose();
+                    return;
+                  }
+                  texture.flipY = false;
+                  texture.colorSpace = THREE.SRGBColorSpace;
+                  replaceMaterial(obj, new THREE.MeshBasicMaterial({ map: texture }));
+                });
+              else
+                replaceMaterial(obj, new THREE.MeshStandardMaterial({
+                  color: 0xdad6c9,
+                  roughness: 1,
+                }));
+            }
+          });
+        };
+        updateArtwork.current();
         setReady(true);
         onReady();
       } catch (e) {
+        if (disposed) return;
         console.error("Studio scene unavailable", e);
         setFailed(true);
+        onUnavailable();
         cleanup();
       }
     }
     init();
     return () => {
       disposed = true;
+      modelAbort.abort();
+      updateArtwork.current = () => {};
       cleanup();
     };
   }, []);
   useEffect(() => {
     if (entering) {
       if (ready) go.current();
-      else callback.current();
+      else if (failed) callback.current();
     }
-  }, [entering, ready]);
+  }, [entering, ready, failed]);
   return (
     <div className={`room ${ready ? "room-ready" : ""}`}>
       <img
