@@ -1,3 +1,4 @@
+// Framework configuration for the backend application.
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
