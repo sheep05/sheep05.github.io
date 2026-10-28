@@ -1,3 +1,4 @@
+// Database schema and migration-generation settings.
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
