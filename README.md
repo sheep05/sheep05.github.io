@@ -2,9 +2,15 @@
 
 A photography portfolio with a warm 3D room entrance and a private workspace for uploading photographs and publishing collections. GitHub Pages and Cloudflare display the same published photo library.
 
-**Visit:** [Public website](https://sheep05.github.io/) · [Upload and edit](https://quiet-studio-backend.sheep05.workers.dev/studio)
+## Open the website
 
-**Start here:** [Photo and website editing guide](WEBSITE-GUIDE.md) · [Deployment and technical setup](FULL-APP.md)
+### [→ Open the photography website](https://sheep05.github.io/)
+
+**[Upload photos and manage albums](https://quiet-studio-backend.sheep05.workers.dev/studio)** · **[Browse the collection directly](https://sheep05.github.io/?view=collection)**
+
+You are currently viewing the source-code repository. Use the links above to enter the live website or sign in to your private Studio.
+
+**[Read the owner guide](WEBSITE-GUIDE.md)** for step-by-step uploads, the current folder map, and publishing instructions. [Technical setup](FULL-APP.md) covers hosting, authentication, and storage.
 
 ## What each folder does
 
@@ -63,7 +69,7 @@ VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run
 npm run build
 ```
 
-Copy the public build into `docs/`, then commit and push to publish through GitHub Pages. Backend changes require a separate Cloudflare deployment; see [the editing guide](WEBSITE-GUIDE.md#update-the-design-or-code).
+Copy the public build into `docs/`, then commit and push to publish through GitHub Pages. Backend changes require a separate Cloudflare deployment; see [the editing guide](WEBSITE-GUIDE.md#6-build-and-publish-a-code-change).
 
 ## Folders visible only on your computer
 
