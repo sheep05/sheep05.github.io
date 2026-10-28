@@ -1,5 +1,6 @@
 {
   "name": "quiet-studio",
+  "description": "Photography portfolio with a 3D room and private photo management.",
   "version": "0.1.0",
   "private": true,
   "engines": {
