@@ -1,4 +1,4 @@
-# Quiet Studio: operation and deployment
+# Technical guide to hosting, authentication, and storage
 
 Quiet Studio combines a static public gallery with a private publishing workspace. Blender creates the room; visitors load a glTF model in their browser and do not need Blender installed.
 
