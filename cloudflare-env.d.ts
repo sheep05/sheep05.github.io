@@ -1,3 +1,4 @@
+// Type definitions for Cloudflare storage and sign-in.
 declare namespace Cloudflare {
   interface Env {
     DB: D1Database;
