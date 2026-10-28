@@ -1,3 +1,4 @@
+// Build settings for the GitHub Pages frontend.
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
