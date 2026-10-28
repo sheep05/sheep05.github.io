@@ -1,3 +1,4 @@
+// TypeScript checks, import aliases, and compiler settings.
 {
   "compilerOptions": {
     "target": "ES2017",
