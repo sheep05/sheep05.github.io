@@ -1,4 +1,4 @@
-# Managing your photography website
+# Owner guide to photos, collections, and website edits
 
 Use the Studio dashboard for photographs, collections and site text. Use the source code for layout, styling, the 3D room and new features. Everyday photo changes do not require GitHub commits.
 
