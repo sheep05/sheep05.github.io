@@ -59,3 +59,40 @@ test("logout blocks cross-origin requests and revokes the server-side session",a
  const good=await signOut(new Request("https://studio.example.test/auth/logout",{method:"POST",headers:{Origin:"https://studio.example.test",Cookie:`__Host-quiet-session=${token}`}}),{...config,DB});
  assert.equal(good.status,303);assert.equal(calls[0].value,await digest(token));assert.match(good.headers.get("set-cookie"),/Max-Age=0/);
 });
+
+test("callback distinguishes GitHub configuration failures from a different owner without leaking credentials", async t => {
+  const state = randomToken();
+  const request = () => new Request(`https://studio.example.test/auth/callback?code=test-code&state=${state}`, {headers:{Cookie:`__Host-quiet-oauth=${state}`}});
+  let sessions = 0;
+  const DB = {prepare(sql){return {bind(){return this;},async first(){return {verifier:'test-verifier'};},async run(){sessions++;}}}};
+  const scenarios = [
+    {payload:{error:'incorrect_client_credentials',error_description:'DO-NOT-EXPOSE-test-secret'},status:503,text:/client ID or client secret/},
+    {payload:{error:'redirect_uri_mismatch'},status:503,text:/callback address/},
+    {payload:{error:'bad_verification_code'},status:400,text:/expired or was rejected/},
+    {payload:{error:'unexpected-sensitive-error'},status:502,text:/could not complete/},
+  ];
+  for(const scenario of scenarios){
+    t.mock.method(globalThis,'fetch',async()=>Response.json(scenario.payload));
+    const response=await finishSignIn(request(),{...config,DB});
+    assert.equal(response.status,scenario.status);
+    const body=await response.text();assert.match(body,scenario.text);
+    assert.doesNotMatch(body,/DO-NOT-EXPOSE|test-secret|test-code|unexpected-sensitive-error|Only the studio owner/);
+    t.mock.restoreAll();
+  }
+  assert.equal(sessions,0);
+});
+
+test("callback still denies another account and grants only the configured owner after exchange", async t => {
+  const state=randomToken();
+  for(const id of [987654321,152187410]) {
+    let calls=0;const sessions=[];
+    t.mock.method(globalThis,'fetch',async()=>Response.json(++calls===1?{access_token:'private-fixture-token',token_type:'bearer'}:{id,login:'fixture-login'}));
+    const DB={prepare(){return {bind(...args){this.args=args;return this;},async first(){return {verifier:'test-verifier'};},async run(){sessions.push(this.args);}}}};
+    const response=await finishSignIn(new Request(`https://studio.example.test/auth/callback?code=fixture-code&state=${state}`,{headers:{Cookie:`__Host-quiet-oauth=${state}`}}),{...config,DB});
+    assert.equal(response.status,id===152187410?302:403);
+    assert.equal(sessions.length,id===152187410?1:0);
+    if(id===152187410){assert.equal(sessions[0][1],'152187410');assert.equal(response.headers.get('location'),'https://studio.example.test/studio');assert.match(response.headers.get('set-cookie'),/__Host-quiet-session=.*HttpOnly; Secure; SameSite=Lax/);}
+    assert.doesNotMatch(await response.text(),/private-fixture-token|fixture-code/);
+    t.mock.restoreAll();
+  }
+});

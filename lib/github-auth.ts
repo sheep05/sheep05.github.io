@@ -45,22 +45,33 @@ export async function beginSignIn(env: AuthEnv): Promise<Response> {
 export function validFlowState(state: string | null, saved: string | null) {
   return !!state && /^[A-Za-z0-9_-]{43}$/.test(state) && state === saved;
 }
+class GitHubSignInError extends Error {
+  status: number;
+  constructor(message: string, status = 502) {
+    super(message);
+    this.status = status;
+  }
+}
 export async function exchangeGitHubCode(code: string, verifier: string, env: AuthEnv, fetcher: typeof fetch = fetch): Promise<StudioUser | null> {
   const tokenResponse = await fetcher("https://github.com/login/oauth/access_token", {
     method: "POST", headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ client_id: env.GITHUB_CLIENT_ID!, client_secret: env.GITHUB_CLIENT_SECRET!, code, code_verifier: verifier, redirect_uri: `${origin(env)}/auth/callback` }),
     signal: AbortSignal.timeout(10000),
   });
-  if (!tokenResponse.ok) return null;
-  const data = await tokenResponse.json() as {access_token?: string; token_type?: string};
-  if (!data.access_token || data.token_type?.toLowerCase() !== "bearer") return null;
+  const data = await tokenResponse.json() as {access_token?: string; token_type?: string; error?: string};
+  // Only fixed messages are shown. Never echo GitHub response bodies or tokens.
+  if (data.error === "incorrect_client_credentials") throw new GitHubSignInError("GitHub rejected the Studio's client ID or client secret. The website owner needs to check the GitHub OAuth app credentials stored in Cloudflare. Your Cloudflare email does not need to match your GitHub email.", 503);
+  if (data.error === "redirect_uri_mismatch") throw new GitHubSignInError("The GitHub OAuth callback address does not match the Studio configuration. The website owner needs to check the app's callback address.", 503);
+  if (data.error === "bad_verification_code") throw new GitHubSignInError("The GitHub sign-in code expired or was rejected. Return to /studio and start a new sign-in.", 400);
+  if (!tokenResponse.ok || !data.access_token || data.token_type?.toLowerCase() !== "bearer") throw new GitHubSignInError("GitHub could not complete the Studio sign-in exchange. Return to /studio and try again.");
   const userResponse = await fetcher("https://api.github.com/user", {
     headers: { Authorization: `Bearer ${data.access_token}`, Accept: "application/vnd.github+json", "User-Agent": "Quiet-Studio", "X-GitHub-Api-Version": "2022-11-28" },
     signal: AbortSignal.timeout(10000),
   });
-  if (!userResponse.ok) return null;
+  if (!userResponse.ok) throw new GitHubSignInError("GitHub could not verify your profile. Return to /studio and try again.");
   const profile = await userResponse.json() as {id?: number; login?: string};
-  if (!profile.id || String(profile.id) !== env.OWNER_GITHUB_ID || typeof profile.login !== "string") return null;
+  if (!Number.isSafeInteger(profile.id) || typeof profile.login !== "string") throw new GitHubSignInError("GitHub returned an invalid profile. Return to /studio and try again.");
+  if (String(profile.id) !== env.OWNER_GITHUB_ID) return null;
   return { userId: String(profile.id), displayName: profile.login };
 }
 export async function finishSignIn(request: Request, env: AuthEnv): Promise<Response> {
@@ -82,7 +93,8 @@ export async function finishSignIn(request: Request, env: AuthEnv): Promise<Resp
     headers.append("Set-Cookie", cookie(sessionCookieName(), token, SESSION_SECONDS));
     headers.set("Location", `${origin(env)}/studio`);
     return new Response(null, {status: 302, headers});
-  } catch {
+  } catch (error) {
+    if (error instanceof GitHubSignInError) return fail(error.message, error.status);
     return fail("GitHub sign-in is temporarily unavailable. Please try again.", 502);
   }
 }
