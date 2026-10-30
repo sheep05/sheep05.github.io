@@ -1,0 +1,71 @@
+name: Publish photography website
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '13 20 * * *'
+concurrency:
+  group: photography-publication
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Test public export boundaries
+        run: node --test tests/published-export.test.mjs
+      - name: Download the complete published library
+        run: node scripts/sync-published.mjs
+      - name: Check whether publication is needed
+        id: changes
+        run: |
+          source_hash="$(node scripts/source-fingerprint.mjs)"
+          previous_hash="$(cat docs/build-source.txt 2>/dev/null || true)"
+          if [ "$source_hash" != "$previous_hash" ] || [ -n "$(git status --porcelain -- public/published)" ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            echo 'publish=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install build dependencies
+        if: steps.changes.outputs.publish == 'true'
+        run: npm ci --include=dev --include=optional
+      - name: Build and verify the independent public website
+        if: steps.changes.outputs.publish == 'true'
+        run: |
+          npm run build:pages
+          node scripts/verify-published-build.mjs
+          node scripts/source-fingerprint.mjs > outputs/github-pages/build-source.txt
+          rsync -a --delete --exclude=README.md outputs/github-pages/ docs/
+      - uses: actions/configure-pages@v5
+        if: steps.changes.outputs.publish == 'true'
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.changes.outputs.publish == 'true'
+        with:
+          path: outputs/github-pages
+      - name: Deploy the complete website
+        id: deployment
+        if: steps.changes.outputs.publish == 'true'
+        uses: actions/deploy-pages@v4
+      - name: Save the published copy in the repository
+        if: steps.changes.outputs.publish == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/published docs
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish the latest public photographs and Studio content'
+            git push origin HEAD:main
+          fi

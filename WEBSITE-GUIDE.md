@@ -1,167 +1,140 @@
-# How to open and manage your photography website
+# Your photography website — owner guide
 
-Updated 28 October 2026 for the current repository. Use the private Studio to manage photographs and site text; use the repository to change design or functionality.
+## 1. Open the right page
 
-**[Open the website](https://sheep05.github.io/) · [Open the private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) · [Repository folder map](README.md#what-each-folder-does)**
-
-## 1 Open the website from GitHub
-
-On [your repository page](https://github.com/sheep05/sheep05.github.io), scroll below the folders and files to the README. Click **→ Open the photography website** under **Open the website**.
-
-| Entrance | What opens |
+| Purpose | Link |
 | --- | --- |
-| [Main website](https://sheep05.github.io/) | The public 3D room entrance, followed by your photography gallery. Share this address with visitors. |
-| [Direct collection](https://sheep05.github.io/?view=collection) | The public collection without going through the room entrance. |
-| [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) | Your upload and editing dashboard. Choose **Sign in with GitHub** and use `sheep05`. |
-| [Cloudflare website](https://quiet-studio-backend.sheep05.workers.dev/) | Another public entrance to the gallery, using the same published photo library. |
-| [GitHub repository](https://github.com/sheep05/sheep05.github.io) | Source files, documentation, and version history. This address opens the project rather than the photography website. |
+| Public website and 3D room | [sheep05.github.io](https://sheep05.github.io/) |
+| Public collections, skipping the room | [Browse collections](https://sheep05.github.io/?view=collection) |
+| Upload photos and edit your website | [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) |
+| Preview saved content before GitHub publishes | [Cloudflare gallery](https://quiet-studio-backend.sheep05.workers.dev/) |
+| Check or start a publication | [Publish photography website](https://github.com/sheep05/sheep05.github.io/actions/workflows/publish-gallery.yml) |
 
-The public website also has a **Studio management** link in its footer. Visitors can browse without a GitHub or ChatGPT account and do not need Blender installed; only your configured GitHub owner account can edit.
+The contact email saved in Studio is excluded from the GitHub copy by default; it is not written into the public repository.
 
-## 2 Upload and publish your photographs
+Only the GitHub account **sheep05** can edit Private Studio. Your Cloudflare account email does not need to match your GitHub email. Visitors do not need to sign in.
 
-For example, to publish a collection called **Japan at night**:
+## 2. How publishing now works
 
-1. Open the [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) and sign in as `sheep05`. On the first visit, GitHub may ask you to authorize Quiet Studio; the application uses your public profile identity without repository or private-email scopes.
-2. Choose **Collections → + New collection**. Enter **Japan at night**, add a description if you want, and click **Create collection**. New collections start as drafts.
-3. Choose **Photographs**. Set the **Upload to** dropdown to **Japan at night · Draft**.
-4. Click **Choose photographs** or drag images into the upload area. Wait for the completion notice and check for errors.
-5. Click a photograph to edit its **Title**, **Caption**, and **Image description**, then **Save changes**. The image description is for people using screen readers.
-6. Open **Collections → Arrange photographs** to set the sequence. Drag photographs or use the left/right arrows; clear any search text first.
-7. Open **Edit collection**, select a **Cover photograph**, and use **Preview collection** to review the draft while signed in.
-8. Check **Publish this collection → Save changes**. Reload the GitHub and Cloudflare websites to see it publicly.
+**Edit in Private Studio → daily GitHub publishing job → complete public website on GitHub Pages.**
 
-```mermaid
-flowchart LR
-    A[Upload in Private Studio] --> B[Arrange a draft collection]
-    B --> C[Publish and save]
-    C --> D[GitHub Pages gallery]
-    C --> E[Cloudflare gallery]
-```
+Private Studio saves your library in Cloudflare. GitHub checks the anonymous, published library once a day at **04:13 China time (Asia/Shanghai)**, downloads the published photos and thumbnails, builds the website, and deploys it. GitHub can delay scheduled runs; this is a scheduled check, not an exact delivery guarantee. Source-code commits to `main` and manual runs also trigger publication.
 
-Both websites read the same Cloudflare library. You upload once; publishing photos does **not** require editing GitHub, rebuilding the website, or making a commit. New images can take a minute or more to appear everywhere, and already open pages need to be reloaded.
+The GitHub website serves its text, albums, uploaded photographs, samples, and 3D room from GitHub. Visitors no longer call Cloudflare for gallery data or images. You can close Studio, sign out, and turn off your computer. Cloudflare is needed to edit content and to download the next publication, but not to view the last successfully published GitHub website.
 
-Supported uploads are JPG, PNG, WebP and AVIF, up to 50 MB and 100 megapixels per file. Export RAW or HEIC images as JPEG first. The browser creates a JPEG web copy up to 3200 pixels on its longest edge and an 800-pixel preview, removing EXIF/GPS metadata; keep your original files separately.
+**Saving in Studio is not an immediate GitHub publication.** The Cloudflare preview reflects saved content sooner; GitHub reflects the last successful publishing job. This is expected. No manual GitHub commit is needed for photo or text edits.
 
-## 3 Edit photos, albums, and site text
+To publish sooner:
 
-| Task | Dashboard action |
+1. Finish saving your edits in Studio. Publish any collections you want visible.
+2. Open [Actions → Publish photography website](https://github.com/sheep05/sheep05.github.io/actions/workflows/publish-gallery.yml).
+3. Click **Run workflow**, choose **main**, and click **Run workflow** again.
+4. Wait for the run to finish with a green check, then reload [the public website](https://sheep05.github.io/).
+
+A scheduled run with no changes skips building and deployment. If a download fails, validation fails, or the library changes during export, the job stops and the previous public site remains available. If a deployment succeeds but saving its repository copy fails, the site is updated; rerun the job to repair the repository copy. Scheduled workflows in public repositories may be disabled after 60 days of inactivity: check Actions and re-enable the workflow if GitHub reports this.
+
+This is **backend-independent hosting**, not offline browsing. Visitors still need internet access to GitHub; disconnected devices cannot receive new edits.
+
+## 3. Upload and publish your photographs
+
+1. Open [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) and sign in with **sheep05**.
+2. Select **Collections → + New collection**. Give it a title and description. New collections begin as drafts.
+3. Select **Photographs** and choose the collection under **Upload to**.
+4. Click **Choose photographs** or drag photographs into the upload area. Wait for upload completion and check for errors.
+5. Edit photograph titles, captions, and image descriptions as needed.
+6. In **Collections**, arrange the photographs, select a cover, and edit the collection description.
+7. Check **Publish this collection → Save changes** when ready.
+8. Wait for the daily publication or use **Run workflow** above.
+
+A photograph is public if it belongs to any published collection. Draft-only and unfiled photographs are not exported. Publishing an album also publishes its photos. Uploading directly into an already published collection makes the image eligible for the next publication.
+
+Supported uploads: JPG, PNG, WebP, and AVIF, up to 50 MB and 100 megapixels per original file. Export RAW/HEIC images as JPEG first. Studio creates a JPEG web copy up to 3200 pixels on the longest edge and an 800-pixel thumbnail, removing EXIF/GPS metadata. Keep original files separately.
+
+## 4. Change text, collections, or images
+
+| Change | Where to edit |
 | --- | --- |
-| Rename a photo or change its caption | **Photographs → click the photo → edit → Save changes** |
-| Include one photo in multiple albums | Check the albums under **Include in collections** in the photo editor |
-| Remove a photo from just one album | Uncheck that album and save; the photo stays in your library |
-| Reorder albums | Use the up/down arrows in **Collections** |
-| Change an album name, description, or cover | **Collections → Edit collection** |
-| Hide an album | Uncheck **Publish this collection**, then save |
-| Replace the image itself | Upload the revised image, assign its albums/order/cover, then delete the old image when satisfied; there is no replace-file button yet |
-| Delete an album | Use its **Delete** action; its photographs remain in your library |
-| Delete a photograph | Use the photo's **Delete** action; it is removed from every album, with no dashboard undo |
-| Rename the website or edit the opening line, biography, or contact email | **Studio settings → edit → Save changes** |
-| Hide the demonstration photographs | In **Studio settings**, uncheck **Show the sample collections**, then save |
+| Website name, opening line, biography, contact email | **Studio settings → Save changes** |
+| Hide demonstration collections | **Studio settings → Show the sample collections**, switch off and save |
+| Album title, description, cover, publication state | **Collections → Edit collection → Save changes** |
+| Photo title, caption, image description | **Photographs → open the photo editor → Save changes** |
+| Photo order | Arrange photographs within the collection |
+| Replace the image itself | Upload the revised photo, assign its collection/cover/order, then remove the old photo when satisfied |
+| Browser-tab title on GitHub Pages | Edit `frontend/index.html`, commit to `main`; the workflow builds it |
 
-A photograph is public if it belongs to **any published collection**. Hiding one album does not hide the same photo in another published album. Upload to a draft or **Unfiled photographs** when you want to review images privately first; uploading directly into a published collection makes them public.
+Turning an album back into a draft removes it from the next successful GitHub publication. A photo remains public if another published collection uses it. Removed photos can remain in Git history and browser caches; committing a public image to GitHub is not suitable for content that must later be made confidential.
 
-Changing the Studio's website name does not change `sheep05.github.io` or the GitHub application's sign-in name. The GitHub Pages browser-tab title is in `frontend/index.html`; the Cloudflare page title follows the Studio name through `app/page.tsx`.
-
-## 4 Understand the current repository
-
-There are nine top-level project folders. `frontend/` replaced the old `pages-preview/`, and migrations moved from `drizzle/` to `db/migrations/`.
+## 5. Understand the repository
 
 | Folder | Function |
 | --- | --- |
-| [`app/`](app/) | Website pages, gallery/room components, the private Studio, and API/sign-in routes. |
-| [`frontend/`](frontend/) | The GitHub Pages entry that loads published content from Cloudflare. |
-| [`lib/`](lib/) | Shared photo/album types, database queries, sample data, and owner-session helpers. |
-| [`db/`](db/) | Database schema and the SQL migration history in `db/migrations/`. |
-| [`public/`](public/) | Source assets: room model, fallback image, sample photos, and favicon. |
-| [`docs/`](docs/) | The compiled website GitHub Pages publishes from `main /docs`. |
-| [`scene-source/`](scene-source/) | Editable Blender room, textures, scene-generation scripts, and visual checks. |
-| [`tests/`](tests/) | Checks for owner sign-in, uploads, albums, and private-photo access. |
-| [`worker/`](worker/) | The Cloudflare application's request entry point. |
+| `app/` | Shared gallery, 3D room, Private Studio, and backend routes. Edit the public design or Studio behavior here. |
+| `frontend/` | GitHub Pages entry. It reads the saved public snapshot at build time, rather than asking Cloudflare in visitors' browsers. |
+| `public/published/` | Automatically generated public text, albums, and optimized photo files. Edit in Studio; the next publication replaces these files. |
+| `public/scene/` and `public/samples/` | The exported room and demonstration photos. These are source assets copied into each build. |
+| `docs/` | Generated copy of the last published website. GitHub Actions deploys the build and maintains this copy; avoid editing generated bundles. |
+| `scripts/` | The public-library exporter and checks that the built website has local photo files and no visitor API dependency. |
+| `.github/workflows/` | The daily/manual/code-change publishing job. `publish-gallery.yml` controls the schedule and deployment. |
+| `lib/` | Shared data types, database queries, samples, and sign-in helpers. |
+| `db/` | Database schema and migrations; not the uploaded image files. |
+| `scene-source/` | Blender model and room-generation tools. Export changes to `public/scene/` before publishing. |
+| `tests/` | Checks for authentication, publication privacy, complete downloads, and failure recovery. |
+| `worker/` | Cloudflare application entry. Cloudflare settings are in `wrangler.jsonc`. |
 
-Your uploaded images are in **Cloudflare KV**, and their titles, album membership and settings are in **Cloudflare D1**. They are not stored in these GitHub folders. The repository README also explains [root configuration files](README.md#important-root-files) and [local generated folders](README.md#folders-visible-only-on-your-computer).
+The live editing database and originals' web copies remain in Cloudflare D1/KV. GitHub contains only exported public copies, not your full private library. Back up Cloudflare separately before migrating or deleting it.
 
-The short summaries beside files on GitHub are their latest commit messages. They currently describe each item's purpose, but future commits will replace those labels.
+## 6. Edit the code
 
-## 5 Choose the right way to make a change
-
-| Change | Where to edit | How it goes live |
+| Change | File / folder | Publication |
 | --- | --- | --- |
-| Photos, collections, website name, biography | Private Studio | Save/publish, then reload either website |
-| Instructions or folder descriptions | Markdown files on GitHub | Commit the documentation change |
-| Gallery layout | `app/components/Portfolio.tsx` | Rebuild/publish GitHub Pages and deploy Cloudflare for both sites |
-| Colors, fonts, spacing | `app/globals.css` | Rebuild/publish both sites |
-| Walking pace or camera motion | `app/components/Room.tsx` | Rebuild/publish both sites |
-| Room furniture or geometry | `scene-source/quiet-studio.blend` and scene tools | Export to `public/scene/`, then rebuild/publish both sites; see the [scene guide](scene-source/README.md) |
-| GitHub Pages tab title or frontend connection | `frontend/index.html` or `frontend/main.tsx` | Rebuild/publish GitHub Pages |
-| Photo-management interface or upload behavior | `app/studio/Studio.tsx` or `app/api/studio/route.ts` | Build and deploy Cloudflare |
-| Database structure | `db/schema.ts` and `db/migrations/` | Generate/review migrations, apply pending changes, and deploy the backend |
+| Gallery layout | `app/components/Portfolio.tsx` | Commit to `main` for GitHub; deploy Cloudflare separately for its preview |
+| Fonts, colors, spacing | `app/globals.css` | Same as above |
+| Walk/camera/curtain motion | `app/components/Room.tsx` | Same as above |
+| Furniture or scene geometry | `scene-source/`, exported to `public/scene/` | Commit assets to `main`; see scene guide |
+| Studio upload/editing behavior | `app/studio/Studio.tsx`, `app/api/studio/route.ts` | Build and deploy Cloudflare |
+| Export policy or daily schedule | `scripts/`, `.github/workflows/publish-gallery.yml` | Commit to `main` |
+| This guide | `WEBSITE-GUIDE.md` | Commit the Markdown change |
 
-**A GitHub source-code commit alone does not rebuild or deploy the application.** There is no automatic source-build workflow configured yet. GitHub Pages publishes the files already built in `docs/`; Cloudflare is deployed separately.
+**GitHub source changes now build automatically on `main`.** Pages settings must remain **Source: GitHub Actions**. Do not switch back to “Deploy from a branch”: commits made by the workflow's built-in token do not trigger that older Pages build mechanism.
 
-## 6 Build and publish a code change
-
-These are terminal commands run in your local project folder, **quiet-studio-github**. Use Node.js 22.13 or newer. For a first-time checkout on another computer, clone the repository into that folder; on this computer, use the existing checkout.
-
-Install dependencies after cloning or when the dependency files change:
+For a local public preview, use Node.js 24:
 
 ```sh
-cd quiet-studio-github
-npm run install:ci
+npm ci --include=dev --include=optional
+npm run sync:published
+npm run dev:pages
 ```
 
-Preview the public frontend with your live photo library:
+To check a production build locally:
 
 ```sh
-VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run dev:pages
+npm run test:publish
+npm run build:pages
+npm run verify:published
 ```
 
-Open the localhost address printed in the terminal. Stop the preview with **Ctrl+C** before continuing in that terminal.
-
-### Publish the GitHub Pages frontend
-
-After editing and checking your source:
-
-```sh
-VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run build:pages
-rsync -a --delete --exclude=README.md outputs/github-pages/ docs/
-git status
-git diff --stat
-```
-
-The copy replaces generated files inside `docs/` and preserves its explanatory README. Keep this destination exactly `docs/`. If you later use a custom-domain `CNAME` file, keep its source in `public/CNAME` so the build includes it.
-
-In your Git client, select the intended source changes and generated `docs/` changes, **commit**, then **push to main**. On GitHub, check **Actions** for the Pages deployment to finish, then reload the live site. Avoid editing generated JavaScript/CSS inside `docs/assets/` directly; the next build replaces it.
-
-### Publish the Cloudflare backend
-
-With Wrangler authenticated to your Cloudflare account:
+To update the Cloudflare application itself:
 
 ```sh
 npm run build
 npx wrangler deploy --config dist/server/wrangler.json
 ```
 
-A shared gallery/style change needs **both** publishing steps to update both websites. Dashboard/API-only changes need the Cloudflare step. See [technical setup](FULL-APP.md) for Wrangler authorization, local API testing, and database migrations; keep the GitHub client secret in Cloudflare secret storage.
+Deploy matching server and static assets together. Do not deploy a newly rebuilt server while retaining unrelated old assets: that can break styling and scripts. The current Cloudflare service uses an emergency asset fallback documented in the local `work/studio-ui-repair-handoff.md`; if normal asset upload still fails, preserve the working deployment and investigate before replacing it.
 
-## 7 If an update does not appear
+## 7. Troubleshooting
 
-| Symptom | Check |
+| Symptom | What to check |
 | --- | --- |
-| Uploaded photo is missing publicly | It belongs to a collection with **Publish this collection** checked and saved; allow storage propagation, then reload |
-| Sample collections still appear | Uncheck **Show the sample collections** in Studio settings |
-| Sign-in is rejected | Use the `sheep05` GitHub account; signing into ChatGPT does not sign you into the Studio |
-| Code changed on GitHub but the website looks the same | Rebuild and commit `docs/`, or deploy Cloudflare, according to the change table above |
-| Only one website has the new design | Complete the other site's publishing step |
-| An upload fails | Check its displayed error, file type/size, connection, and free storage/operation limits |
+| Studio shows an edit but GitHub does not | Check the last successful publication; wait for the daily job or run it manually |
+| An uploaded photo is missing | Make sure it belongs to a saved, published collection; review the Actions log for download errors |
+| Red publishing run | Open the failed step, correct the reported issue, then **Re-run failed jobs**; previous public site remains available |
+| No daily runs | Check whether GitHub disabled the workflow for inactivity and re-enable it; schedules may also be delayed |
+| Old styling after deployment | In Safari choose **View → Reload Page From Origin** |
+| GitHub works but Studio does not | Studio still requires Cloudflare and owner sign-in; the public site is independent |
+| Owner sign-in rejected | Use GitHub **sheep05**, not another GitHub account; Cloudflare email does not matter |
+| Room skipped | Use `/` for the entrance; `?view=collection` deliberately skips it. Reduced-motion or unsupported 3D uses a still-image entrance |
 
-The selected free photo storage allowance is 1 GB. Keep your original photographs separately, and back up the live database/photo storage before migration; a GitHub source-code backup does not contain uploaded photos. Your GitHub and Cloudflare accounts own the website independently of your ChatGPT account.
+GitHub Pages' published-site limit is 1 GB. The exporter stops before photo copies alone reach 900 MB to leave space for the room and code. Source photos are also preserved in repository history. Store only optimized public copies here, not RAW originals. The existing Cloudflare free storage allowance is 1 GB.
 
-
-### If the entrance or photographs seem stuck
-
-Open [the main entrance](https://sheep05.github.io/) to see the room. The `?view=collection` link intentionally skips it. Select **The studio** in the navigation to return, then **Walk over to the desk**. If the room is still downloading, your click waits for it before beginning the 9.5-second walk.
-
-The entrance now loads independently of the photo service. If photographs cannot load within eight seconds, the collection offers **Retry photographs**. Try it after your connection recovers. If your network cannot reach `quiet-studio-backend.sheep05.workers.dev`, the room can still work on GitHub Pages, but uploaded photographs and owner management require access to that backend; a retry cannot override a network block.
-
-Browsers with reduced motion enabled, unsupported 3D graphics, or a failed/timed-out model download show the still-image entrance with **Open the collection**. After a new deployment, reload the page once to obtain the latest build. A real iPad/iPhone may need its old website tab closed and reopened if it still shows the previous version.
+Official references: [Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [scheduled workflow behavior](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule), [Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).

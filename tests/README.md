@@ -22,3 +22,7 @@ Set a case with `mkdir -p work` followed by `printf CASE > work/entrance-mode`, 
 | `hang-room` | A model request that never finishes falls back after 30 seconds. A queued walk proceeds to the collection. |
 
 Also check a direct `/?view=collection` link, returning to **The studio**, clicking **The studio** while already there, and a browser with reduced motion enabled. Reduced motion deliberately uses the still-image entrance. On a real iPad/iPhone, check portrait and landscape layout and tapping the walk control.
+
+## Static publication
+
+Run `npm run test:publish` for privacy, image copying, stable exports, removal, and failure preservation. Run `npm run build:pages && npm run verify:published` to ensure visitor assets are local. The GitHub entry now bundles a snapshot: the earlier API loading fixtures above apply to the retired live-fetch mode, not normal GitHub browsing. For a current browser check, set the local fixture to `hang`; the snapshot gallery and photo files must still display without a working `/api/public` endpoint.

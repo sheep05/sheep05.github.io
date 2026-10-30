@@ -1,6 +1,6 @@
 # Quiet Studio photography website
 
-A photography portfolio with a warm 3D room entrance and a private workspace for uploading photographs and publishing collections. GitHub Pages and Cloudflare display the same published photo library.
+A photography portfolio with a warm 3D room entrance and a private workspace for uploading photographs and publishing collections. Private Studio remains the editor; a daily GitHub Actions job publishes a complete copy of public content and photos to GitHub Pages. Visitors do not need to reach Cloudflare.
 
 ## Open the website
 
@@ -17,13 +17,16 @@ You are currently viewing the source-code repository. Use the links above to ent
 | Folder | Purpose |
 | --- | --- |
 | [`app/`](app/) | The website interface and backend routes: gallery, 3D room, private Studio, sign-in, and photo API. Start here to change how the website looks or behaves. |
-| [`frontend/`](frontend/) | The small entry page that runs the shared gallery on GitHub Pages and loads published photos from Cloudflare. It was previously called `pages-preview`. |
+| [`frontend/`](frontend/) | The GitHub Pages entry that bundles the saved public snapshot. Visitors load text and photographs directly from GitHub. |
 | [`lib/`](lib/) | Shared photo/album types, database queries, sample collections, and owner-session logic. Both the gallery and Studio use these helpers. |
 | [`db/`](db/) | The database schema and its migration history in `db/migrations/`. This defines album/photo metadata and sign-in records; it does not contain your uploaded image files. |
 | [`public/`](public/) | Source assets copied into website builds: the exported 3D model, fallback room image, sample photographs, and favicon. Edit or replace an asset here before rebuilding. |
-| [`docs/`](docs/) | The compiled public website served by GitHub Pages, including generated JavaScript, CSS, and copied assets. Rebuild it from the source; do not edit its generated bundles by hand. |
+| [`docs/`](docs/) | An automatically maintained copy of the published website. GitHub Actions builds and deploys the site; do not edit generated bundles by hand. |
 | [`scene-source/`](scene-source/) | The editable Blender room, its textures, generation scripts, and visual verification files. Use this for changes to the bed, furniture, lighting, or Japanese exterior. |
 | [`tests/`](tests/) | Authentication checks and local upload/album integration tests, plus a local-only sign-in fixture helper. These help verify that editing works and drafts remain private. |
+| [`scripts/`](scripts/) | Exports the public library and verifies that builds contain complete local photos. |
+| [`.github/workflows/`](.github/workflows/) | Publishes daily at 04:13 China time, on manual runs, and on main-branch source updates. |
+| [`public/published/`](public/published/) | Generated public text, albums, and optimized photographs copied from Studio; drafts are excluded. |
 | [`worker/`](worker/) | The Cloudflare Worker entry point that passes requests to the backend application. Hosting settings are in the root `wrangler.jsonc` file. |
 
 GitHub's file-list rows currently use short, purpose-specific documentation commits. Later edits replace those labels with their newer commit messages; the folder descriptions above remain the reference.
@@ -60,16 +63,17 @@ Use Node.js 22.13 or newer. Install dependencies with `npm run install:ci`.
 
 ```sh
 # Preview the public gallery using the shared photo library:
-VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run dev:pages
+npm run sync:published
+npm run dev:pages
 
 # Build GitHub Pages into outputs/github-pages/:
-VITE_STUDIO_BACKEND_URL=https://quiet-studio-backend.sheep05.workers.dev npm run build:pages
+npm run build:pages
 
 # Build the Cloudflare application into dist/:
 npm run build
 ```
 
-Copy the public build into `docs/`, then commit and push to publish through GitHub Pages. Backend changes require a separate Cloudflare deployment; see [the editing guide](WEBSITE-GUIDE.md#6-build-and-publish-a-code-change).
+Commit source changes to `main`; the publishing workflow downloads public content, builds, and deploys automatically. For content-only edits, wait for the daily run or use [Run workflow](https://github.com/sheep05/sheep05.github.io/actions/workflows/publish-gallery.yml). Backend changes still require a separate Cloudflare deployment; see [the owner guide](WEBSITE-GUIDE.md).
 
 ## Folders visible only on your computer
 

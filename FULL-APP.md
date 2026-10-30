@@ -75,3 +75,7 @@ Sample photographs are explicitly labeled and credited in `public/samples/sample
 Quiet Studio is an editable name. A custom domain can point to GitHub Pages while the backend remains on Cloudflare. Moving the backend requires updating its OAuth redirect URI, `STUDIO_ORIGIN` and the public frontend's backend URL. Moving to another provider also requires database and photo migration and equivalent secure owner authentication.
 
 The complete React/Three.js source, Blender source and assets are in this repository. Live uploads, database contents, secrets and account credentials are not. Keep ownership of the GitHub and Cloudflare accounts; their operation is independent of the ChatGPT account used to develop the site.
+
+## GitHub static publication (2026-10-30)
+
+GitHub Pages now uses `.github/workflows/publish-gallery.yml` and **Source: GitHub Actions**, not branch-based deployment. It exports the anonymous public feed and JPEG copies into `public/published/`, bundles the snapshot into the frontend, deploys a complete artifact, then commits the snapshot and `docs/` copy. Daily content checks are at 04:13 Asia/Shanghai; manual runs and pushes to main also publish. No new Cloudflare secret is required. See [the current owner guide](WEBSITE-GUIDE.md) for normal operations and failures. Earlier instructions describing live browser fetches or manually copying `docs/` are superseded by this flow.

@@ -1,3 +1,3 @@
-# Published GitHub Pages website
+# Generated public website
 
-This folder contains the compiled website and copied assets that GitHub Pages serves to visitors. Edit the source folders and rebuild rather than changing the generated JavaScript or CSS here.
+GitHub Actions builds and deploys this website, then saves a matching copy here. Edit the source or Private Studio; hand edits to these generated files are replaced by the next publication.

@@ -1,3 +1,3 @@
-# GitHub Pages frontend
+# GitHub Pages entry
 
-This is the static entry point for GitHub Pages: it loads the shared gallery from `app/components/` and fetches published content from the Cloudflare backend. Edit `index.html` for browser-tab metadata or `main.tsx` for the backend connection; build it with `npm run build:pages`.
+This frontend bundles `public/published/collection.json` at build time and uses the exported local photos. The shared gallery and room remain in `app/components/`; the Studio management link still opens Cloudflare.

@@ -15,7 +15,10 @@
     "db:generate": "drizzle-kit generate",
     "build:pages": "vite build --config vite.pages.config.ts",
     "dev:pages": "vite --config vite.pages.config.ts",
-    "test:auth": "node --experimental-strip-types --test tests/github-auth.test.mjs"
+    "test:auth": "node --experimental-strip-types --test tests/github-auth.test.mjs",
+    "sync:published": "node scripts/sync-published.mjs",
+    "test:publish": "node --test tests/published-export.test.mjs",
+    "verify:published": "node scripts/verify-published-build.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
