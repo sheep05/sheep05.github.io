@@ -1,6 +1,6 @@
-# Quiet Studio photography website
+# Sheep's photography website
 
-A photography portfolio with a warm 3D room entrance and a private workspace for uploading photographs and publishing collections. Private Studio remains the editor; a daily GitHub Actions job publishes a complete copy of public content and photos to GitHub Pages. Visitors do not need to reach Cloudflare.
+A photography portfolio with a warm room entrance and a private workspace for uploading photographs and publishing collections. Private Studio remains the editor; a daily GitHub Actions job publishes a complete copy of public content and photos to GitHub Pages. Visitors do not need to reach Cloudflare.
 
 ## Open the website
 
