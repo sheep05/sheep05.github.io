@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "contentHash": "3e92d26290436d98f6676eea7c2dfa41a5ba86da9aa1ee912f0022e340ff5bf5",
+  "publishedAt": "2026-10-30T01:46:11.538Z",
+  "collection": {
+    "settings": {
+      "name": "Sheep's Photograghy",
+      "tagline": "Hello",
+      "bio": "",
+      "email": "",
+      "showSamples": true
+    },
+    "albums": [
+      {
+        "id": "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0",
+        "title": "Sheep Tokyo",
+        "description": "",
+        "position": 0,
+        "published": true,
+        "coverId": null,
+        "photoIds": [
+          "a4668b50-fd04-4ec1-85e6-7a80efce8881"
+        ]
+      }
+    ],
+    "photos": [
+      {
+        "id": "a4668b50-fd04-4ec1-85e6-7a80efce8881",
+        "title": "Screenshot 2026-10-29 at 2.38.55 PM",
+        "caption": "",
+        "alt": "Screenshot 2026-10-29 at 2.38.55 PM",
+        "width": 752,
+        "height": 429,
+        "url": "/published/media/33a22d7a2e5cbf38f094e6c44c29b5bbb99b7b70da742aae68af0b596062443f.jpg",
+        "thumb": "/published/media/61b543205e5ec8d52b3a802b7c2e98ad2035266ce6991e4403db15543b93fd46.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      }
+    ],
+    "isOwner": false,
+    "signedIn": false
+  }
+}
