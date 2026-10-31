@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentHash": "3e92d26290436d98f6676eea7c2dfa41a5ba86da9aa1ee912f0022e340ff5bf5",
-  "publishedAt": "2026-10-30T01:46:11.538Z",
+  "contentHash": "81b8a9a75612262e0f27741408daf4ff67a8377f047d1c059d85321f0c72b9fc",
+  "publishedAt": "2026-10-31T23:21:02.444Z",
   "collection": {
     "settings": {
       "name": "Sheep's Photograghy",
@@ -13,26 +13,340 @@
     "albums": [
       {
         "id": "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0",
-        "title": "Sheep Tokyo",
-        "description": "",
+        "title": "Japan",
+        "description": "Love scences in Japan",
         "position": 0,
         "published": true,
         "coverId": null,
         "photoIds": [
-          "a4668b50-fd04-4ec1-85e6-7a80efce8881"
+          "42c356ad-7f62-4844-9e6f-a4e3163ade0c",
+          "8898e146-4b5b-41cd-a0bb-e592a7986033",
+          "2a4507db-942b-4b98-b975-bdd26a9eb3af",
+          "02f7f2ab-68a0-4541-8762-e382b2224fb6",
+          "105b663f-a573-4326-b764-5663278ac2b1",
+          "7566f219-91b0-48f6-8c06-1529b7d2aadc",
+          "74fa05d6-aecc-460c-8407-4ebea1233151"
+        ]
+      },
+      {
+        "id": "109ed9f7-3b84-43d2-8ce5-8b51a95b753d",
+        "title": "Singapore",
+        "description": "Modern, clear and pleasant",
+        "position": 1,
+        "published": true,
+        "coverId": null,
+        "photoIds": [
+          "97643d2d-580e-472b-a548-51abe19c2a7c",
+          "c02bf84e-5dc9-41dd-845a-f5004f0462cf",
+          "ce9180d9-8320-4679-899b-50ce29f7a882",
+          "e2540214-ba54-452d-8c5f-31619de4ef05",
+          "56cc2fe2-e5a9-45c1-9d53-f77b895aec39",
+          "347834bb-5d6f-4c08-bbe6-0a272a1af305"
+        ]
+      },
+      {
+        "id": "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e",
+        "title": "Malaysia",
+        "description": "Colorful",
+        "position": 2,
+        "published": true,
+        "coverId": null,
+        "photoIds": [
+          "771878c7-b9b7-459b-b98e-b909e3603379",
+          "7a687011-dca9-48bf-ab6b-e8748d081d86",
+          "ef283b02-4544-4911-8a65-2945afe7339f",
+          "5a243474-0bb4-4441-b7eb-f00c17895a9d",
+          "eb735600-d42a-44e4-b9e8-32ec8f0538d4",
+          "484e69e6-459e-4c50-b5bc-18a90bbd5bdc",
+          "1e176668-607c-4460-a999-c5cb3e918353",
+          "b3b83549-bf6b-4d4d-a05a-ea685792539e",
+          "108fb797-2938-4b90-8213-d98ca85d9911"
         ]
       }
     ],
     "photos": [
       {
-        "id": "a4668b50-fd04-4ec1-85e6-7a80efce8881",
-        "title": "Screenshot 2026-10-29 at 2.38.55 PM",
+        "id": "108fb797-2938-4b90-8213-d98ca85d9911",
+        "title": "20261002-DSCF2074",
         "caption": "",
-        "alt": "Screenshot 2026-10-29 at 2.38.55 PM",
-        "width": 752,
-        "height": 429,
-        "url": "/published/media/33a22d7a2e5cbf38f094e6c44c29b5bbb99b7b70da742aae68af0b596062443f.jpg",
-        "thumb": "/published/media/61b543205e5ec8d52b3a802b7c2e98ad2035266ce6991e4403db15543b93fd46.jpg",
+        "alt": "20261002-DSCF2074",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/86ea859df37296c1aa405e7470c74a136c9dc95029b631f1e071f6d9b55e197b.jpg",
+        "thumb": "/published/media/87e94e26b1b5f4d425ee3ab6f1a21318dd93021075d0768cc27c00c099578973.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "b3b83549-bf6b-4d4d-a05a-ea685792539e",
+        "title": "20261001-DSCF2023",
+        "caption": "",
+        "alt": "20261001-DSCF2023",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/9a93bed4cd9765aea32ce177724cb67c0259f09366d3af7a5b9fe136eb8c49a3.jpg",
+        "thumb": "/published/media/20b99d3931089d259d2f4ea7ca6893ad02ef835ceaff939cab1c64cd08b59c21.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "1e176668-607c-4460-a999-c5cb3e918353",
+        "title": "20261001-DSCF2005",
+        "caption": "",
+        "alt": "20261001-DSCF2005",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/1449794f915a85144c8b5432f66d7e42d65019fafd44a40c18013b9a846c6439.jpg",
+        "thumb": "/published/media/e0eba626e79dbaade352e5ad44751b62f18fc0715d6de0d591e6f71c9257dfd2.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "484e69e6-459e-4c50-b5bc-18a90bbd5bdc",
+        "title": "20261001-DSCF2001",
+        "caption": "",
+        "alt": "20261001-DSCF2001",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/8c4ab33312f5e7a71833eb17243b962693e75ec562a688f7975465e417b91779.jpg",
+        "thumb": "/published/media/dca5414cd965e9d65fd61bad8e71462cfbca8b41bfaa1838c30d1b5a4b648444.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "eb735600-d42a-44e4-b9e8-32ec8f0538d4",
+        "title": "20261001-DSCF1983",
+        "caption": "",
+        "alt": "20261001-DSCF1983",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/1b488ecb45af239583f2f7feb9d3746690824189bdefddf3f7fb02e973dfe14e.jpg",
+        "thumb": "/published/media/f9ba29f8178159322de6942469e04f78065ce24939780df38e6c809ed72d7dfd.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "5a243474-0bb4-4441-b7eb-f00c17895a9d",
+        "title": "20261001-DSCF1988-recover",
+        "caption": "",
+        "alt": "20261001-DSCF1988-recover",
+        "width": 1024,
+        "height": 1536,
+        "url": "/published/media/3cbdc78f5371088ef498e385b74bd5cff8620c5c118dfaab9e8a6d1c6a0ee222.jpg",
+        "thumb": "/published/media/a1bfc06878e691cb191d71f3628bed5695860da953ab34bd5424f7b79594f6fe.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "ef283b02-4544-4911-8a65-2945afe7339f",
+        "title": "20261001-DSCF1989",
+        "caption": "",
+        "alt": "20261001-DSCF1989",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/55ac91e0a1e5efd99470142319bdbb535773c43406a6d31eb07df32fb25c2403.jpg",
+        "thumb": "/published/media/eaf82edefcb54edc4c95f10e43f89309ab5cbaf5665893042f69a109e75343c1.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "7a687011-dca9-48bf-ab6b-e8748d081d86",
+        "title": "20261001-DSCF2018",
+        "caption": "",
+        "alt": "20261001-DSCF2018",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/b6486dc2495aaeb7d28711e23693aeaf94a038c6a7a74ef4881ba5878e560a2b.jpg",
+        "thumb": "/published/media/daa9e4c061a26ee707cf6f2b3e2060b36b25a0708f8f99d9c93cbd2be1c9281c.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "771878c7-b9b7-459b-b98e-b909e3603379",
+        "title": "20261001-DSCF2010",
+        "caption": "",
+        "alt": "20261001-DSCF2010",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/28acdf5bfcd0b32ce06aec86132ecd1c2f3044f2ad273aa83d05f6d11101c1fa.jpg",
+        "thumb": "/published/media/fe5604c75a13a21c28178439e4a1473ff94d0aa09b5239df914f8b1e7a97484f.jpg",
+        "albumIds": [
+          "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
+        ]
+      },
+      {
+        "id": "347834bb-5d6f-4c08-bbe6-0a272a1af305",
+        "title": "20250705-DSCF0738",
+        "caption": "",
+        "alt": "20250705-DSCF0738",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/ebcb8fc1135195e51207a347717c20716a0064151bcecf642126926736764ad4.jpg",
+        "thumb": "/published/media/51f735832f811b528eda3bd44f2b73e36b6ceca95d9ffe43634a1c1324998ff0.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "56cc2fe2-e5a9-45c1-9d53-f77b895aec39",
+        "title": "20250705-DSCF0767",
+        "caption": "",
+        "alt": "20250705-DSCF0767",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/0effaa2ae482dd447bb09ed820ad6897548d7b38f2d9181999b11c47b9c76fdd.jpg",
+        "thumb": "/published/media/1e91bba1dca9a18329a36dd130a87e89396b3435a78f5ecb5b0e6db4e4629beb.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "e2540214-ba54-452d-8c5f-31619de4ef05",
+        "title": "20250712-DSCF0843",
+        "caption": "",
+        "alt": "20250712-DSCF0843",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/2897a303b7a4de93d77d96f21b8368121849b0e5d121bf998a5007f67a20737b.jpg",
+        "thumb": "/published/media/7cd252d16c9aa1f0d79cb66a45a9539ba98ecf80f4c1e242805204e1ba98a0ac.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "ce9180d9-8320-4679-899b-50ce29f7a882",
+        "title": "20250712-DSCF0881",
+        "caption": "",
+        "alt": "20250712-DSCF0881",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/4ca5448bdd5214260a061de48b3a14a82ec893a6de8972dad5eef1233efeb9bb.jpg",
+        "thumb": "/published/media/7e6353b1a026c346d8764ddecd304d0402febb9647edb87af184ee5230349b0f.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "c02bf84e-5dc9-41dd-845a-f5004f0462cf",
+        "title": "20250712-DSCF0851",
+        "caption": "",
+        "alt": "20250712-DSCF0851",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/906d64d4f9784f2921a359d85dda5036fe74f18d75c7d4178e2cb24adf5ac7ad.jpg",
+        "thumb": "/published/media/6fd3c0eb1ca106fbbad9b4bc9112dbf3ed4ff9cce0b7bbe527e51549275cae76.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "97643d2d-580e-472b-a548-51abe19c2a7c",
+        "title": "20250712-DSCF0875",
+        "caption": "",
+        "alt": "20250712-DSCF0875",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/dace46fe4af43d9524bd0c025f931958f4a585a1f9b11a6e4e9ceac08e73eab2.jpg",
+        "thumb": "/published/media/ea3b6de7e566c0f3b18c3b36994ff88e6149ddc2bd16464179ff1ff51c09a06e.jpg",
+        "albumIds": [
+          "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
+        ]
+      },
+      {
+        "id": "74fa05d6-aecc-460c-8407-4ebea1233151",
+        "title": "DSCF0429",
+        "caption": "",
+        "alt": "DSCF0429",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/6e4dad91195d7fdf0727e2f477c131b155918ed87353d51ffbe659c98e23d7b0.jpg",
+        "thumb": "/published/media/d69ffb45b2ef98198c1f286fb9c59697b2aed49452def52a4f360aa6f8450a1c.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "7566f219-91b0-48f6-8c06-1529b7d2aadc",
+        "title": "DSCF0406",
+        "caption": "",
+        "alt": "DSCF0406",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/ecca3e373154b775a508f97aa847be46ce4f75fa6f3f04ef993c3573bc67c6f2.jpg",
+        "thumb": "/published/media/06b540f3b9a9afb28c9699670804269ab86f797cb08018f06deb108301dae4f9.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "105b663f-a573-4326-b764-5663278ac2b1",
+        "title": "20250525-DSCF0487",
+        "caption": "",
+        "alt": "20250525-DSCF0487",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/7ef36dfce82541b134953b34eb8de120ba823a56c05214728338c5d82ce537d6.jpg",
+        "thumb": "/published/media/43d1a9325dd1f45d0a3cfb4204a1cac507da0247d3224811899ad59c6615d7b8.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "02f7f2ab-68a0-4541-8762-e382b2224fb6",
+        "title": "DSCF0655",
+        "caption": "",
+        "alt": "DSCF0655",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/82bbb47a0c23a2c7e562282fa8acc446a8ec0f12a08ff60a2f2b66d1199ee8c7.jpg",
+        "thumb": "/published/media/559e37f7a2d1a7797b7b30d1c3650a3518d913c596fdf6ee26c0b819dadbf85d.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "2a4507db-942b-4b98-b975-bdd26a9eb3af",
+        "title": "DSCF0636",
+        "caption": "",
+        "alt": "DSCF0636",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/b1628010e05a508e706d42769f008514fef6e28f8def214ac4f7d0ee1508d7d6.jpg",
+        "thumb": "/published/media/d92eaa7bdc3219a2c4f611aaf9c95769648a909bd6b360f09301cfa732aa00d8.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "8898e146-4b5b-41cd-a0bb-e592a7986033",
+        "title": "DSCF0533",
+        "caption": "",
+        "alt": "DSCF0533",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/708a446cf3eee1add807a44a265016ec17408b49413fb54401e2ba7736128a7e.jpg",
+        "thumb": "/published/media/9372bb662cbed7a8b4402800392edddb6541ac3b058aaee2c087fa8dc499cfda.jpg",
+        "albumIds": [
+          "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
+        ]
+      },
+      {
+        "id": "42c356ad-7f62-4844-9e6f-a4e3163ade0c",
+        "title": "DSCF0384",
+        "caption": "",
+        "alt": "DSCF0384",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/321811097d3dc85129972d42f89d0418e16bd4ab63a7519f71521984a70543e9.jpg",
+        "thumb": "/published/media/6a98ae6328fb3ac534ff30b00e92db6a39d59dc1461c460af52a21ca5575c372.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
         ]
