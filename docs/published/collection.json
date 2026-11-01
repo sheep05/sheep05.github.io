@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "contentHash": "81b8a9a75612262e0f27741408daf4ff67a8377f047d1c059d85321f0c72b9fc",
-  "publishedAt": "2026-10-31T23:21:02.444Z",
+  "contentHash": "ff364dd1f71126e218e02cc75c7c750c3a5b30b94b23eb957aeff0549635d2a7",
+  "publishedAt": "2026-11-01T23:33:33.169Z",
   "collection": {
     "settings": {
       "name": "Sheep's Photograghy",
       "tagline": "Hello",
       "bio": "",
       "email": "",
-      "showSamples": true
+      "showSamples": false
     },
     "albums": [
       {
@@ -62,9 +62,145 @@
           "b3b83549-bf6b-4d4d-a05a-ea685792539e",
           "108fb797-2938-4b90-8213-d98ca85d9911"
         ]
+      },
+      {
+        "id": "0f0a6e25-182b-4b2f-b001-40d77f218909",
+        "title": "Lovely cars",
+        "description": "",
+        "position": 3,
+        "published": true,
+        "coverId": null,
+        "photoIds": [
+          "e2cd14b6-5d20-41a2-a535-5d5963c299dc",
+          "b5990ed7-245d-405b-870a-71056cbd84da",
+          "6b221665-2cdc-4c02-88f8-4281af7f7522",
+          "9712d2da-401a-465e-8039-a6352151c0e8",
+          "d17480dd-1c4e-4cad-9385-f818e536b019",
+          "ca11aa4a-736b-46d4-99e0-5103942b601f",
+          "812b22e4-8d35-4961-bf43-077e82fb63a9",
+          "b2e74558-8ee5-4b20-855f-09df5a7ffa20",
+          "93d9571a-3628-44d8-91e7-96ed7880187b"
+        ]
       }
     ],
     "photos": [
+      {
+        "id": "93d9571a-3628-44d8-91e7-96ed7880187b",
+        "title": "20240830-DSCF7826",
+        "caption": "",
+        "alt": "20240830-DSCF7826",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/433678231e15fa9f02314d174ac9a71e1b7d07fc097b878612aa579881bb02b0.jpg",
+        "thumb": "/published/media/401f2dff53daa8eb9ecb49e3bb94ae593c42153c74ebff45e4da3266a8b48a9d.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "b2e74558-8ee5-4b20-855f-09df5a7ffa20",
+        "title": "20240830-DSCF7792",
+        "caption": "",
+        "alt": "20240830-DSCF7792",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/4e56825fce67bace445b7fec20f76f38ab7fc865862f1d6b77c11ba3eae6dd51.jpg",
+        "thumb": "/published/media/2c045bf3463d918dedfd904af4f74ba6e8ca74d1936b771c0b5f2daccbeea5e4.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "812b22e4-8d35-4961-bf43-077e82fb63a9",
+        "title": "20240830-DSCF7802",
+        "caption": "",
+        "alt": "20240830-DSCF7802",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/7ffe06fa0ec503ca97529d6a1e5ca4c587782984c76958d27a27096a2f1bfded.jpg",
+        "thumb": "/published/media/2df5a62e3652bc6bcefa8ff5aaf9e392a0ea39324c5b9ce717a0c1be6c4bab5d.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "ca11aa4a-736b-46d4-99e0-5103942b601f",
+        "title": "20241117-DSCF1552",
+        "caption": "",
+        "alt": "20241117-DSCF1552",
+        "width": 2133,
+        "height": 3200,
+        "url": "/published/media/6407822ab955bc29b8f86f7ad03db101fe9e69d7c50bcc7ea0257a3239afe1c0.jpg",
+        "thumb": "/published/media/2e0282ddb0f423072dc569b856f43465657b8b5c78244bba80866f78968112ee.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "d17480dd-1c4e-4cad-9385-f818e536b019",
+        "title": "20241117-DSCF1624",
+        "caption": "",
+        "alt": "20241117-DSCF1624",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/0c4555a7b032016ca1bd7c9d201b27e15ceb4e1bc6268678a3299261b4fc6de6.jpg",
+        "thumb": "/published/media/49e0c164c655bcb31cb96340b3bd5e6b2464e1ba032090ab11daf6da2d8fb2b5.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "9712d2da-401a-465e-8039-a6352151c0e8",
+        "title": "20241117-DSCF1608",
+        "caption": "",
+        "alt": "20241117-DSCF1608",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/59028cf45d1001a3cb582edd92d44b9e918d466cf901f814af02e01730fb03ba.jpg",
+        "thumb": "/published/media/840a79d8fa1b4ddf77ef7557516645d7a81e69eda16fb5a01478d12376eb059b.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "6b221665-2cdc-4c02-88f8-4281af7f7522",
+        "title": "20241117-DSCF1417",
+        "caption": "",
+        "alt": "20241117-DSCF1417",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/22b3e62f1a254d49f4d0dc72bdec8f814b0b06ebe3e4e3ee56a9fce92f1f9481.jpg",
+        "thumb": "/published/media/32d52431e9e1ed4db81cbb7c8d6e371757f7dc79dd7d4f19c17067a876d9f08b.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "b5990ed7-245d-405b-870a-71056cbd84da",
+        "title": "20241117-DSCF1396",
+        "caption": "",
+        "alt": "20241117-DSCF1396",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/53de202921a9fc3e60943c6915f5d81bfe7151f01774ffa60253a5c780adba01.jpg",
+        "thumb": "/published/media/35e17a9436fdd1405b55313832d7e6e31cb1a444ecaee833ad1e66d3cc60576a.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
+      {
+        "id": "e2cd14b6-5d20-41a2-a535-5d5963c299dc",
+        "title": "20241117-DSCF1372",
+        "caption": "",
+        "alt": "20241117-DSCF1372",
+        "width": 3200,
+        "height": 2133,
+        "url": "/published/media/2ea74fbafe599b3bb029829df05bd3e725922f7cd40490fad91b50e5ac9f4c2d.jpg",
+        "thumb": "/published/media/fb37441ea2aa61fe59a962e4904aa2d53ad88ac8e4939da67ba737272a31a6ca.jpg",
+        "albumIds": [
+          "0f0a6e25-182b-4b2f-b001-40d77f218909"
+        ]
+      },
       {
         "id": "108fb797-2938-4b90-8213-d98ca85d9911",
         "title": "20261002-DSCF2074",
