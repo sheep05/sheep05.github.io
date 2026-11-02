@@ -1,3 +1,4 @@
+import { normalizeAssignment } from "@/lib/catalog";
 import { env } from "cloudflare:workers";
 import { collection, identity, validText, existingAlbum } from "@/lib/store";
 export const dynamic = "force-dynamic";
@@ -44,13 +45,16 @@ export async function POST(request: Request) {
     } else if (action === "createAlbum") {
       const title = validText(body.title, 100);
       if (!title) throw new Error("Give this album a title.");
+      const assignment = normalizeAssignment(body);
       await env.DB.prepare(
-        "INSERT INTO albums(id,title,description,position,published) VALUES(?,?,?,(SELECT COALESCE(MAX(position),-1)+1 FROM albums),0)",
+        "INSERT INTO albums(id,title,description,position,published,chapters,regions) VALUES(?,?,?,(SELECT COALESCE(MAX(position),-1)+1 FROM albums),0,?,?)",
       )
         .bind(
           crypto.randomUUID(),
           title,
           validText(body.description ?? "", 1000),
+          JSON.stringify(assignment.chapters),
+          JSON.stringify(assignment.regions),
         )
         .run();
     } else if (action === "album") {
@@ -67,14 +71,17 @@ export async function POST(request: Request) {
           .first())
       )
         throw new Error("The cover must be a photograph in this album.");
+      const assignment = normalizeAssignment(body);
       await env.DB.prepare(
-        "UPDATE albums SET title=?,description=?,published=?,cover_id=? WHERE id=?",
+        "UPDATE albums SET title=?,description=?,published=?,cover_id=?,chapters=COALESCE(?,chapters),regions=COALESCE(?,regions) WHERE id=?",
       )
         .bind(
           title,
           validText(body.description, 1000),
           body.published ? 1 : 0,
           body.coverId || null,
+          body.chapters === undefined ? null : JSON.stringify(assignment.chapters),
+          body.regions === undefined ? null : JSON.stringify(assignment.regions),
           body.id,
         )
         .run();

@@ -3,12 +3,21 @@ import {createHash} from 'node:crypto';
 import {mkdir, readFile, writeFile, rename, rm, mkdtemp} from 'node:fs/promises';
 import {dirname, join, resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-export const ORIGIN = 'https://quiet-studio-backend.sheep05.workers.dev';
+import { normalizeAssignment } from '../lib/catalog.ts';
+const backend = JSON.parse(await readFile(new URL('../config/backend.json', import.meta.url), 'utf8'));
+export const ORIGIN = process.env.PUBLISH_ORIGIN || backend.publicOrigin;
+function publicOrigin(value) {
+  const url = new URL(value);
+  if (url.protocol !== 'https:' || url.username || url.password || url.pathname !== '/' || url.search || url.hash)
+    throw new Error('Configure a public HTTPS backend origin without a path or credentials');
+  return url.origin;
+}
 const hash = value => createHash('sha256').update(value).digest('hex');
 const check = (ok, message) => { if (!ok) throw new Error(message); };
 const text = value => { check(typeof value === 'string', 'Invalid public text'); return value; };
 const id = value => { check(typeof value === 'string' && /^[\w-]{1,100}$/.test(value), 'Invalid public ID'); return value; };
-export function publicCollection(feed) {
+export function publicCollection(feed, origin = ORIGIN) {
+  origin = publicOrigin(origin);
   check(feed && feed.isOwner === false && feed.signedIn === false, 'Refusing an authenticated feed');
   check(Array.isArray(feed.albums) && Array.isArray(feed.photos), 'Invalid public library');
   const s = feed.settings;
@@ -21,7 +30,7 @@ export function publicCollection(feed) {
     check(a.published === true && Array.isArray(a.photoIds), 'Refusing draft or malformed album');
     check(Number.isFinite(a.position), 'Invalid album order');
     return {id:id(a.id), title:text(a.title), description:text(a.description), position:a.position,
-      published:true, coverId:a.coverId === null ? null : id(a.coverId), photoIds:a.photoIds.map(id)};
+      ...normalizeAssignment(a), published:true, coverId:a.coverId === null ? null : id(a.coverId), photoIds:a.photoIds.map(id)};
   });
   check(new Set(albums.map(a => a.id)).size === albums.length, 'Duplicate album ID');
   const allowed = new Set(albums.flatMap(a => a.photoIds));
@@ -29,7 +38,7 @@ export function publicCollection(feed) {
     check(allowed.has(p.id), 'Refusing an unfiled/private photo');
     check(Number.isFinite(p.width) && p.width > 0 && Number.isFinite(p.height) && p.height > 0, 'Invalid image dimensions');
     return {id:id(p.id), title:text(p.title), caption:text(p.caption), alt:text(p.alt),
-      width:p.width, height:p.height, url:mediaURL(p.url), thumb:mediaURL(p.thumb),
+      width:p.width, height:p.height, url:mediaURL(p.url, origin), thumb:mediaURL(p.thumb, origin),
       albumIds:albums.filter(a => a.photoIds.includes(p.id)).map(a => a.id)};
   });
   const photoIDs = new Set(photos.map(p => p.id));
@@ -38,9 +47,9 @@ export function publicCollection(feed) {
   check(albums.every(a => a.coverId === null || a.photoIds.includes(a.coverId)), 'Invalid cover');
   return {settings, albums, photos, isOwner:false, signedIn:false};
 }
-function mediaURL(value) {
-  const u = new URL(text(value), ORIGIN);
-  check(u.origin === ORIGIN && !u.username && !u.password && !u.hash &&
+function mediaURL(value, origin) {
+  const u = new URL(text(value), origin);
+  check(u.origin === origin && !u.username && !u.password && !u.hash &&
     /^\/api\/media\/[\w-]+$/.test(u.pathname) && ['', '?size=small'].includes(u.search), 'Unexpected media source');
   return u.href;
 }
@@ -56,10 +65,11 @@ async function download(url, fetcher, limit) {
   }
   return Buffer.concat(chunks);
 }
-export async function syncPublished({directory = 'public/published', fetcher = fetch} = {}) {
+export async function syncPublished({directory = 'public/published', fetcher = fetch, origin = ORIGIN} = {}) {
+  origin = publicOrigin(origin);
   const target = resolve(directory);
-  const raw = await download(`${ORIGIN}/api/public`, fetcher, 5 * 1024 * 1024);
-  const collection = publicCollection(JSON.parse(raw));
+  const raw = await download(`${origin}/api/public`, fetcher, 5 * 1024 * 1024);
+  const collection = publicCollection(JSON.parse(raw), origin);
   let previous;
   try { previous = JSON.parse(await readFile(join(target, 'collection.json'), 'utf8')); } catch {}
   await mkdir(dirname(target), {recursive:true});
@@ -81,8 +91,8 @@ export async function syncPublished({directory = 'public/published', fetcher = f
         photo[key] = '/published/media/' + filename;
       }
     }
-    const after = publicCollection(JSON.parse(await download(`${ORIGIN}/api/public`, fetcher, 5 * 1024 * 1024)));
-    check(JSON.stringify(publicCollection(JSON.parse(raw))) === JSON.stringify(after), 'Library changed during export; retry on the next run');
+    const after = publicCollection(JSON.parse(await download(`${origin}/api/public`, fetcher, 5 * 1024 * 1024)), origin);
+    check(JSON.stringify(publicCollection(JSON.parse(raw), origin)) === JSON.stringify(after), 'Library changed during export; retry on the next run');
     const contentHash = hash(JSON.stringify(collection));
     const snapshot = {schemaVersion:1, contentHash,
       publishedAt:previous?.contentHash === contentHash ? previous.publishedAt : new Date().toISOString(), collection};

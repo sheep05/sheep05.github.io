@@ -90,3 +90,7 @@ These are ignored by Git and do not clutter the GitHub repository.
 | `.git/` | Repository history and Git's internal bookkeeping. |
 
 Your live uploaded photographs are stored in Cloudflare KV; their titles and album memberships are in Cloudflare D1. They are not files in this repository. Keep original photographs and database/image backups separately.
+
+## Gallery chapters and atlas
+
+The gallery begins with Scenes, Portraits, and Street. Assign collections to one or more chapters in Private Studio; Scenes also supports optional country assignments for its interactive Earth. Unassigned albums remain available in All collections. See [the website guide](WEBSITE-GUIDE.md) and [the backend contract](BACKEND-CONTRACT.md).

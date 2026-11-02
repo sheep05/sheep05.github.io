@@ -76,3 +76,26 @@ test('a concurrent edit stops publication instead of mixing revisions',async t=>
   }}),/changed during export/);
   await assert.rejects(readFile(join(directory,'collection.json')),{code:'ENOENT'});
 });
+
+test('chapter assignments survive publication through a different backend origin',async t=>{
+  const directory=await setup(t), origin='https://studio.example.org';
+  const feed=fixture();
+  feed.albums[0].chapters=['scenes','street']; feed.albums[0].regions=['JP','SG'];
+  await syncPublished({directory,origin,fetcher:async url=>{
+    assert.equal(new URL(url).origin,origin);
+    return url.endsWith('/api/public')?Response.json(feed):new Response(jpeg);
+  }});
+  const exported=JSON.parse(await readFile(join(directory,'collection.json'))).collection;
+  assert.deepEqual(exported.albums[0].chapters,['scenes','street']);
+  assert.deepEqual(exported.albums[0].regions,['JP','SG']);
+  assert.equal(JSON.stringify(exported).includes(ORIGIN),false);
+});
+test('legacy feeds stay unassigned; malformed classifications never replace the public copy',async t=>{
+  assert.deepEqual(publicCollection(fixture()).albums[0].chapters,[]);
+  const directory=await setup(t);
+  await syncPublished({directory,fetcher:service(fixture())});
+  const previous=await readFile(join(directory,'collection.json'),'utf8');
+  const feed=fixture(); feed.albums[0].chapters=['not-a-chapter'];
+  await assert.rejects(syncPublished({directory,fetcher:service(feed)}));
+  assert.equal(await readFile(join(directory,'collection.json'),'utf8'),previous);
+});

@@ -1,3 +1,4 @@
+import backend from "../config/backend.json";
 import { createRoot } from "react-dom/client";
 import Portfolio from "../app/components/Portfolio";
 import type { Collection } from "../lib/types";
@@ -8,5 +9,5 @@ import "../app/globals.css";
 createRoot(document.getElementById("root")!).render(
   <Portfolio initial={snapshot.collection as Collection}
     assetBase={import.meta.env.BASE_URL}
-    managementUrl="https://quiet-studio-backend.sheep05.workers.dev/studio" />,
+    managementUrl={backend.studioUrl} />,
 );

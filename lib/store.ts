@@ -1,3 +1,4 @@
+import { readAssignment } from "./catalog";
 import { env } from "cloudflare:workers";
 import { getStudioUser } from "./auth";
 import { defaults, type Collection, type Photo, type Album } from "./types";
@@ -65,6 +66,7 @@ export async function collection(includeDrafts = false, publicOnly = false): Pro
     position: x.position,
     published: !!x.published,
     coverId: x.cover_id,
+    ...readAssignment(x.chapters, x.regions),
     photoIds: rel.results
       .filter((r) => r.album_id === x.id)
       .map((r) => r.photo_id),

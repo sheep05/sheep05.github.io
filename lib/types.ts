@@ -1,3 +1,4 @@
+import type { ChapterId } from "./catalog";
 export type Photo = {
   id: string;
   title: string;
@@ -20,6 +21,8 @@ export type Album = {
   coverId: string | null;
   photoIds: string[];
   sample?: boolean;
+  chapters?: ChapterId[];
+  regions?: string[];
 };
 export type Settings = {
   name: string;

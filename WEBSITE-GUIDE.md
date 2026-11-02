@@ -5,7 +5,9 @@
 | Purpose | Link |
 | --- | --- |
 | Public website and 3D room | [sheep05.github.io](https://sheep05.github.io/) |
-| Public collections, skipping the room | [Browse collections](https://sheep05.github.io/?view=collection) |
+| Gallery chapters, skipping the room | [Scenes / Portraits / Street](https://sheep05.github.io/?view=collection) |
+| Scenes globe | [A personal atlas](https://sheep05.github.io/?view=scenes) |
+| Every published collection | [All collections](https://sheep05.github.io/?view=all) |
 | Upload photos and edit your website | [Private Studio](https://quiet-studio-backend.sheep05.workers.dev/studio) |
 | Preview saved content before GitHub publishes | [Cloudflare gallery](https://quiet-studio-backend.sheep05.workers.dev/) |
 | Check or start a publication | [Publish photography website](https://github.com/sheep05/sheep05.github.io/actions/workflows/publish-gallery.yml) |
@@ -52,6 +54,20 @@ A photograph is public if it belongs to any published collection. Draft-only and
 
 Supported uploads: JPG, PNG, WebP, and AVIF, up to 50 MB and 100 megapixels per original file. Export RAW/HEIC images as JPEG first. Studio creates a JPEG web copy up to 3200 pixels on the longest edge and an 800-pixel thumbnail, removing EXIF/GPS metadata. Keep original files separately.
 
+### Assign collections to Scenes, Portraits, and Street
+
+In **Private Studio → Collections → Edit**, check any of the three **Gallery chapters**. A collection can appear in more than one chapter, and you can change or clear these selections whenever you like. Existing collections start unassigned and stay visible under **All collections**; no titles are used to guess a category.
+
+For Scenes, optionally check its countries under **Places on the Scenes atlas**. Choose more than one for a trip across several countries. Select **Save changes**, then wait for the daily GitHub publication or run the publishing workflow manually. Unpublished albums never appear on the public globe.
+
+The gallery opens with three entrances. **Scenes** opens a Three.js Earth: drag or use arrow keys to rotate, select a country pin or list entry, then select a collection below the globe. **All Scenes collections** also includes Scenes albums without a country. **Portraits** and **Street** currently lead to their assigned collections; their more detailed entrance designs can be developed separately. **All collections** includes every published album, assigned or not.
+
+Country markers are representative country locations, not precise photo locations. Japan, Singapore, Malaysia, and China are initially configured. To add another marker and its Studio checkbox, add its ISO code, label, latitude, and longitude to `lib/catalog.ts`; no gallery rewrite or database migration is needed. If a region has no assigned collection, the site says so instead of inventing an association.
+
+### Future backend hosting
+
+The gallery, classification data, and published photos are independent of Cloudflare. `config/backend.json` holds the current API origin and Studio link. A future Oracle backend can supply the same JSON/media contract; the existing Cloudflare storage and authentication adapters still need to be migrated separately. See [BACKEND-CONTRACT.md](BACKEND-CONTRACT.md) for the exact fields and migration checks. Changing that file alone does not migrate the editing server or its data.
+
 ## 4. Change text, collections, or images
 
 | Change | Where to edit |
@@ -79,6 +95,9 @@ Turning an album back into a draft removes it from the next successful GitHub pu
 | `.github/workflows/` | The daily/manual/code-change publishing job. `publish-gallery.yml` controls the schedule and deployment. |
 | `lib/` | Shared data types, database queries, samples, and sign-in helpers. |
 | `db/` | Database schema and migrations; not the uploaded image files. |
+| `config/backend.json` | The publishing API origin and owner Studio URL; change these only after a replacement backend is ready. |
+| `lib/catalog.ts` | Gallery chapters, country marker coordinates, and portable assignment validation. |
+| `public/atlas/` | Locally hosted Earth texture and its source/license credit. |
 | `scene-source/` | Blender model and room-generation tools. Export changes to `public/scene/` before publishing. |
 | `tests/` | Checks for authentication, publication privacy, complete downloads, and failure recovery. |
 | `worker/` | Cloudflare application entry. Cloudflare settings are in `wrangler.jsonc`. |
@@ -92,7 +111,10 @@ The live editing database and originals' web copies remain in Cloudflare D1/KV. 
 | Gallery layout | `app/components/Portfolio.tsx` | Commit to `main` for GitHub; deploy Cloudflare separately for its preview |
 | Fonts, colors, spacing | `app/globals.css` | Same as above |
 | Walk/camera/curtain motion | `app/components/Room.tsx` | Same as above |
-| Furniture or scene geometry | `scene-source/`, exported to `public/scene/` | Commit assets to `main`; see scene guide |
+| Furniture or scene geometry | `config/backend.json` | The publishing API origin and owner Studio URL; change these only after a replacement backend is ready. |
+| `lib/catalog.ts` | Gallery chapters, country marker coordinates, and portable assignment validation. |
+| `public/atlas/` | Locally hosted Earth texture and its source/license credit. |
+| `scene-source/`, exported to `public/scene/` | Commit assets to `main`; see scene guide |
 | Studio upload/editing behavior | `app/studio/Studio.tsx`, `app/api/studio/route.ts` | Build and deploy Cloudflare |
 | Export policy or daily schedule | `scripts/`, `.github/workflows/publish-gallery.yml` | Commit to `main` |
 | This guide | `WEBSITE-GUIDE.md` | Commit the Markdown change |

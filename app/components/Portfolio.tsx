@@ -1,7 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
+import ChapterIndex from "./ChapterIndex";
+import { chapters, inChapter } from "@/lib/catalog";
+const Atlas = lazy(() => import("./Atlas"));
 import { sampleCollection } from "@/lib/samples";
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <span aria-hidden="true">{diagonal ? "↗" : "↗"}</span>;
@@ -38,6 +41,10 @@ export default function Portfolio({
       photos: Photo[];
       index: number;
     } | null>(null);
+  const [region, setRegion] = useState<string | null>(null);
+  const [albumContext, setAlbumContext] = useState({ view: "collection", region: null as string | null });
+  const listedAlbums = view === "portraits" || view === "street" ? albums.filter(a => inChapter(a, view)) : albums;
+  const chapter = chapters.find(c => c.id === view);
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const main = useRef<HTMLElement>(null);
@@ -48,6 +55,9 @@ export default function Portfolio({
       const p = new URLSearchParams(location.search);
       setView(p.has("album") ? "album" : p.get("view") || "studio");
       setActiveId(p.get("album"));
+      setRegion(p.get("region"));
+      const from = p.get("from") || "collection";
+      setAlbumContext({ view: ["scenes","portraits","street","all"].includes(from) ? from : "collection", region: p.get("region") });
       setEntering(false);
       setWalkRequested(false);
       if (p.has("album") || (p.get("view") && p.get("view") !== "studio")) setSceneState("loading");
@@ -71,21 +81,24 @@ export default function Portfolio({
   useEffect(() => {
     if (view !== "studio") main.current?.focus({ preventScroll: true });
   }, [view]);
-  function navigate(next: string, id?: string) {
+  function navigate(next: string, id?: string, country: string | null = null) {
+    const params = new URLSearchParams();
+    if (id) {
+      params.set("album", id);
+      params.set("from", view);
+      setAlbumContext({ view, region });
+      if (region) params.set("region", region);
+    } else {
+      if (next !== "studio") params.set("view", next);
+      if (country) params.set("region", country);
+    }
+    setRegion(country);
     setView(next);
     setActiveId(id || null);
     setEntering(false);
     setWalkRequested(false);
     if (next !== "studio") setSceneState("loading");
-    history.pushState(
-      {},
-      "",
-      id
-        ? `${assetBase}?album=${encodeURIComponent(id)}`
-        : next === "studio"
-          ? assetBase
-          : `${assetBase}?view=${next}`,
-    );
+    history.pushState({}, "", assetBase + (params.size ? `?${params}` : ""));
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   function albumPhotos(a: Album) {
@@ -141,7 +154,7 @@ export default function Portfolio({
             <nav aria-label="Main navigation">
               <button
                 className={
-                  view === "collection" || view === "album" ? "active" : ""
+                  ["collection","all","scenes","portraits","street","album"].includes(view) ? "active" : ""
                 }
                 onClick={() => navigate("collection")}
               >
@@ -243,25 +256,30 @@ export default function Portfolio({
             )}
           </section>
         )}
-        {view === "collection" && (
+        {view === "collection" && <ChapterIndex albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />}
+        {view === "scenes" && <>
+          <button className="atlas-back" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
+          <Suspense fallback={<section className="atlas-loading" role="status">Opening the atlas…</section>}>
+            <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />
+          </Suspense>
+        </>}
+        {["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
+            <button className="text-link back-link" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
             <div className="collection-heading">
               <p className="eyebrow">THE PHOTOGRAPHIC ARCHIVE</p>
               <h1>
-                Collected
-                <br />
-                <em>moments.</em>
-                <sup>{String(albums.length).padStart(2, "0")}</sup>
+                {chapter ? chapter.title : "Collected"}
+                {!chapter && <><br /><em>moments.</em></>}
+                <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
               <p>
-                Different places. Different rhythms.
-                <br />
-                Each collection, a way of looking.
+                {chapter ? chapter.note : "Different places. Different rhythms. Each collection, a way of looking."}
               </p>
             </div>
             <div className="collection-list">
-              {albums.map((a, i) => (
+              {listedAlbums.map((a, i) => (
                 <button
                   className="collection-row"
                   key={a.id}
@@ -293,7 +311,7 @@ export default function Portfolio({
                 </button>
               ))}
             </div>
-            {albums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
+            {listedAlbums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
           </section>
         )}
         {view === "album" &&
@@ -301,9 +319,9 @@ export default function Portfolio({
             <section className="album-page">
               <button
                 className="text-link back-link"
-                onClick={() => navigate("collection")}
+                onClick={() => navigate(albumContext.view, undefined, albumContext.region)}
               >
-                ← All collections
+                ← Back to {albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? "all collections" : albumContext.view}
               </button>
               <div className="album-heading">
                 <div>

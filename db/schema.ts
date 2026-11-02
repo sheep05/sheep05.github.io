@@ -21,6 +21,8 @@ export const albums = sqliteTable("albums", {
   position: integer("position").notNull().default(0),
   published: integer("published").notNull().default(0),
   coverId: text("cover_id"),
+  chapters: text("chapters").notNull().default("[]"),
+  regions: text("regions").notNull().default("[]"),
 });
 export const photos = sqliteTable("photos", {
   id: text("id").primaryKey(),

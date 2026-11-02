@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { chapters, regions } from "@/lib/catalog";
 import type { Collection, Album, Photo } from "@/lib/types";
 type Modal =
   | { kind: "album"; album?: Album }
@@ -84,6 +85,8 @@ export default function Studio({ initial }: { initial: Collection }) {
           description: f.get("description"),
           published: f.get("published") === "on",
           coverId: f.get("coverId") || null,
+          chapters: f.getAll("chapters"),
+          regions: f.getAll("regions"),
         },
         modal.album
           ? "Collection updated"
@@ -583,7 +586,7 @@ export default function Studio({ initial }: { initial: Collection }) {
                           {a.description ||
                             "Add a few words about this collection."}
                         </p>
-                        <small>{a.photoIds.length} photographs</small>
+                        <small>{a.photoIds.length} photographs · {a.chapters?.length ? a.chapters.map(id => chapters.find(c => c.id === id)?.title).join(" / ") : "Not assigned to a chapter"}</small>
                       </div>
                       <div className="admin-album-actions">
                         <button
@@ -889,6 +892,25 @@ export default function Studio({ initial }: { initial: Collection }) {
                         placeholder="What brings these photographs together?"
                       />
                     </label>
+                    <fieldset className="catalog-assignment">
+                      <legend>Gallery chapters</legend>
+                      <p>A collection can appear in several chapters. Leave all unchecked to keep it in All collections only.</p>
+                      {chapters.map(chapter => <label className="check-label" key={chapter.id}>
+                        <input type="checkbox" name="chapters" value={chapter.id} defaultChecked={modal.album?.chapters?.includes(chapter.id)} />
+                        <span>{chapter.title}</span>
+                      </label>)}
+                    </fieldset>
+                    <fieldset className="catalog-assignment">
+                      <legend>Places on the Scenes atlas</legend>
+                      <p>Optional. Select every country represented. Pins appear when this collection is also assigned to Scenes.</p>
+                      {regions.map(region => <label className="check-label" key={region.id}>
+                        <input type="checkbox" name="regions" value={region.id} defaultChecked={modal.album?.regions?.includes(region.id)} />
+                        <span>{region.name}</span>
+                      </label>)}
+                      {modal.album?.regions?.filter(id => !regions.some(r => r.id === id)).map(id => <label className="check-label" key={id}>
+                        <input type="checkbox" name="regions" value={id} defaultChecked /><span>{id}</span>
+                      </label>)}
+                    </fieldset>
                     {modal.album && (
                       <>
                         <label>

@@ -160,11 +160,16 @@ try {
     id: albums[0],
     title: "Published integration",
     description: "Published fixture",
+    chapters: ["scenes", "street"],
+    regions: ["JP", "SG"],
     published: true,
     coverId: photos[0],
   });
   const publicFeed = await (await fetch(`${origin}/api/public`)).json();
   assert.ok(publicFeed.albums.some((a) => a.id === albums[0]), "Public feed includes published collection");
+  assert.deepEqual(publicFeed.albums.find(a => a.id === albums[0]).chapters, ["scenes", "street"]);
+  assert.deepEqual(publicFeed.albums.find(a => a.id === albums[0]).regions, ["JP", "SG"]);
+  assert.equal((await post({action:"album",id:albums[0],title:"Invalid",description:"",chapters:["typo"]})).status,400);
   const publicImage = await fetch(`${origin}/api/media/${photos[0]}`);
   assert.equal(publicImage.headers.get("access-control-allow-origin"), "*", "Published image can be used in cross-origin WebGL");
   state = await get();
@@ -200,6 +205,12 @@ try {
     404,
     "Unpublishing revokes image access",
   );
+  const preserved=(await get(true)).albums.find(a=>a.id===albums[0]);
+  assert.deepEqual(preserved.chapters,["scenes","street"],"Older client edits preserve assignments");
+  await ok({action:"album",id:albums[0],title:"Reassigned",description:"",published:false,chapters:["portraits"],regions:[]});
+  const reassigned=(await get(true)).albums.find(a=>a.id===albums[0]);
+  assert.deepEqual(reassigned.chapters,["portraits"]); assert.deepEqual(reassigned.regions,[]);
+
   await ok({
     action: "settings",
     ...saved,

@@ -26,3 +26,9 @@ Also check a direct `/?view=collection` link, returning to **The studio**, click
 ## Static publication
 
 Run `npm run test:publish` for privacy, image copying, stable exports, removal, and failure preservation. Run `npm run build:pages && npm run verify:published` to ensure visitor assets are local. The GitHub entry now bundles a snapshot: the earlier API loading fixtures above apply to the retired live-fetch mode, not normal GitHub browsing. For a current browser check, set the local fixture to `hang`; the snapshot gallery and photo files must still display without a working `/api/public` endpoint.
+
+## Chapters, atlas, and portability
+
+`node --test tests/catalog.test.mjs tests/published-export.test.mjs` tests multi-chapter/country assignment, empty and legacy data, rejection of malformed assignments, plain SQLite migration safety, globe coordinate orientation, and publication from a different HTTPS backend origin. Local `integration.mjs` also verifies actual save/read persistence, assignment changes, legacy-client preservation, and public/draft boundaries.
+
+Browser checks: enter the three-chapter gallery, open Scenes, select every country, drag and keyboard-rotate Earth, zoom/reset, open an assigned album and return, follow a direct region URL, and navigate Back/Forward. Check mobile portrait/landscape, reduced motion, a failed Earth texture/WebGL context, and the visible country-list fallback. Existing production albums are deliberately unassigned; use local-only fixtures for populated chapter tests.
