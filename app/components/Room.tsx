@@ -105,7 +105,6 @@ export default function Room({
         let raf = 0,
           zoomStart = 0,
           animationDone = false,
-          hover = false,
           visible = true;
         let object: any = null;
         const curtains: {
@@ -115,8 +114,6 @@ export default function Room({
           bottom: number;
           phase: number;
         }[] = [];
-        const pointer = new THREE.Vector2(),
-          raycaster = new THREE.Raycaster();
         const resize = () => {
           const w = container.clientWidth,
             h = container.clientHeight;
@@ -129,20 +126,6 @@ export default function Room({
         const ro = new ResizeObserver(resize);
         ro.observe(container);
         resize();
-        const move = (e: PointerEvent) => {
-          if (!object || zoomStart) return;
-          const b = container.getBoundingClientRect();
-          pointer.set(
-            ((e.clientX - b.left) / b.width) * 2 - 1,
-            (-(e.clientY - b.top) / b.height) * 2 + 1,
-          );
-          raycaster.setFromCamera(pointer, camera);
-          const hit = raycaster
-            .intersectObjects(object.children, true)
-            .find((hit) => !/shadow/i.test(hit.object.name));
-          hover = !!hit && /Laptop/i.test(hit.object.name);
-          container.style.cursor = hover ? "pointer" : "default";
-        };
         const zoom = () => {
           if (!zoomStart) {
             zoomStart = performance.now();
@@ -150,12 +133,6 @@ export default function Room({
           }
         };
         go.current = zoom;
-        const click = () => {
-          if (hover) zoom();
-        };
-        container.addEventListener("pointermove", move);
-        container.addEventListener("pointerdown", move);
-        container.addEventListener("click", click);
         const observer = new IntersectionObserver((entries) => {
           visible = entries[0].isIntersecting;
         });
@@ -223,9 +200,6 @@ export default function Room({
           ro.disconnect();
           observer.disconnect();
           cancelAnimationFrame(raf);
-          container.removeEventListener("pointermove", move);
-          container.removeEventListener("pointerdown", move);
-          container.removeEventListener("click", click);
           scene.traverse((obj: any) => {
             obj.geometry?.dispose();
             const mats = Array.isArray(obj.material)

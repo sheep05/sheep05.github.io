@@ -2197,4 +2197,85 @@ select {
   }
 }
 
+/* The room is its own viewport, with a single deliberate entrance gesture. */
+.view-studio {
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.view-studio .entrance {
+  height: 100svh;
+  height: 100dvh;
+  min-height: 0;
+}
+.entrance-brand {
+  position: absolute;
+  z-index: 3;
+  top: max(32px, env(safe-area-inset-top));
+  left: 4.3%;
+  right: 4.3%;
+  color: #ede3d2;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+.entrance-start {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+}
+.entrance-start:focus-visible {
+  outline: 2px solid #d5bc88;
+  outline-offset: -8px;
+}
+.view-studio .enter-laptop {
+  pointer-events: none;
+}
+.is-entering .entrance-brand { opacity: 0; }
+.walk-controls {
+  position: absolute;
+  z-index: 6;
+  left: 4.3%;
+  right: 4.3%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #f1e5d1;
+}
+.walk-controls p {
+  font-size: 12px;
+  text-shadow: 0 1px 8px #000;
+}
+.skip-walk {
+  min-height: 44px;
+  padding: 12px 18px;
+  border: 1px solid #d5bc8870;
+  background: #282018e6;
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.skip-walk span { margin-left: 12px; }
+.skip-walk:hover { background: #493a2a; }
+.skip-walk:focus-visible { outline-color: #f1e5d1; }
+@media (max-width: 760px) {
+  .entrance-brand { left: 6%; right: 6%; top: max(24px, env(safe-area-inset-top)); }
+  .view-studio .entrance-copy { top: 18%; }
+  .view-studio .entrance h1 { font-size: clamp(36px, 8vw, 54px); }
+  .view-studio .enter-laptop { bottom: max(100px, 17%); }
+  .walk-controls { left: 6%; right: 6%; }
+}
+@media (max-height: 500px) {
+  .view-studio .entrance-copy { top: 26%; bottom: auto; }
+  .view-studio .entrance h1 { font-size: 36px; margin: 10px 0; }
+  .view-studio .entrance-note { display: none; }
+  .view-studio .enter-laptop { bottom: 24%; right: 6%; transform: none; }
+  .view-studio .entrance-bottom { bottom: 16px; padding-top: 12px; }
+}
+
 .admin-storage-note { font-size: 12px; color: var(--muted); margin: 0 0 18px; line-height: 1.6; }

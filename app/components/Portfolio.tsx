@@ -40,6 +40,8 @@ export default function Portfolio({
     } | null>(null);
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  const main = useRef<HTMLElement>(null);
+  const skipWalk = useRef<HTMLButtonElement>(null);
   const active = albums.find((a) => a.id === activeId);
   useEffect(() => {
     const read = () => {
@@ -55,17 +57,20 @@ export default function Portfolio({
     return () => window.removeEventListener("popstate", read);
   }, []);
   useEffect(() => {
-    if (lightbox) {
-      dialog.current?.showModal();
-      document.body.style.overflow = "hidden";
-    } else {
-      dialog.current?.close();
-      document.body.style.overflow = "";
-    }
+    const previousOverflow = document.body.style.overflow;
+    if (lightbox) dialog.current?.showModal();
+    else dialog.current?.close();
+    if (view === "studio" || lightbox) document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
-  }, [!!lightbox]);
+  }, [view, !!lightbox]);
+  useEffect(() => {
+    if (walkRequested) skipWalk.current?.focus({ preventScroll: true });
+  }, [walkRequested]);
+  useEffect(() => {
+    if (view !== "studio") main.current?.focus({ preventScroll: true });
+  }, [view]);
   function navigate(next: string, id?: string) {
     setView(next);
     setActiveId(id || null);
@@ -105,10 +110,10 @@ export default function Portfolio({
         : null,
     );
   const contact = settings.email ? `mailto:${settings.email}` : null;
-  let entranceLabel = "Walk over to the desk.";
+  let entranceLabel = "Click anywhere to begin.";
   if (entering) entranceLabel = "Entering the collection…";
   else if (walkRequested) entranceLabel = "Preparing your walk…";
-  else if (sceneState === "fallback") entranceLabel = "Open the collection.";
+  else if (sceneState === "fallback") entranceLabel = "Click anywhere to enter.";
   const collectionNotice = collectionStatus && (
           <div className="collection-status" role="status">
             <p>{collectionStatus === "loading"
@@ -119,168 +124,124 @@ export default function Portfolio({
   );
   return (
     <div className={`portfolio view-${view}`}>
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <header className="site-header">
-        <button
-          className="brand"
-          onClick={() => navigate("studio")}
-          aria-label={`${settings.name}, home`}
-        >
-          <span className="brand-symbol">▣</span>
-          <span>{settings.name}</span>
-        </button>
-        <nav aria-label="Main navigation">
-          <button
-            className={
-              view === "collection" || view === "album" ? "active" : ""
-            }
-            onClick={() => navigate("collection")}
-          >
-            The collection
-          </button>
-          <button
-            className={view === "about" ? "active" : ""}
-            onClick={() => navigate("about")}
-          >
-            About
-          </button>
-          <button className="studio-nav" onClick={() => navigate("studio")}>
-            <span className="status-dot" />
-            The studio
-          </button>
-        </nav>
-      </header>
-      <main id="main">
-        {view === "studio" && (
-          <>
-            <section
-              className={`entrance ${entering ? "is-entering" : ""}`}
-              aria-label="Enter the photography studio"
+      {view !== "studio" && (
+        <>
+          <a className="skip-link" href="#main">
+            Skip to content
+          </a>
+          <header className="site-header">
+            <button
+              className="brand"
+              onClick={() => navigate("studio")}
+              aria-label={`${settings.name}, home`}
             >
-              <div className="entrance-copy">
-                <p className="eyebrow">MAKE YOURSELF AT HOME</p>
-                <h1>
-                  {settings.tagline === "A space for seeing slowly." ? (
-                    <>
-                      A space for
-                      <br />
-                      seeing <em>slowly.</em>
-                    </>
-                  ) : (
-                    settings.tagline
-                  )}
-                </h1>
-                <p className="entrance-note">
-                  Places, passing light,
-                  <br />
-                  and the moments in between.
-                </p>
-                <button
-                  className="text-link"
-                  onClick={() => navigate("collection")}
-                >
-                  Explore the photographs <Arrow />
-                </button>
-              </div>
-              <div className="scene-wrap">
-                <Room
-                  assetBase={assetBase}
-                  featured={albums
-                    .map((a) => ({
-                      url: cover(a)?.thumb || "",
-                      title: a.title,
-                    }))
-                    .filter((p) => p.url)}
-                  title={settings.name}
-                  entering={walkRequested}
-                  onEnter={() => navigate("collection")}
-                  onBegin={() => {
-                    window.scrollTo({ top: 0, behavior: "instant" });
-                    setEntering(true);
-                    setWalkRequested(true);
-                  }}
-                  onReady={() => setSceneState("ready")}
-                  onUnavailable={() => setSceneState("fallback")}
-                />
-              </div>
+              <span className="brand-symbol">▣</span>
+              <span>{settings.name}</span>
+            </button>
+            <nav aria-label="Main navigation">
               <button
-                className="enter-laptop"
-                onClick={() => setWalkRequested(true)}
-                disabled={walkRequested}
+                className={
+                  view === "collection" || view === "album" ? "active" : ""
+                }
+                onClick={() => navigate("collection")}
               >
-                <span className="enter-ring">↗</span>
-                <span>
-                  {entranceLabel}
-                  <small>
-                    {sceneState === "ready"
-                      ? "STAND UP · WALK · EXPLORE"
-                      : sceneState === "loading" ? "THE ROOM IS LOADING"
-                      : "STILL-IMAGE ENTRANCE"}
-                  </small>
-                </span>
+                The collection
               </button>
-              <div className="entrance-bottom">
-                <span>01 / THE STUDIO</span>
-                <span>From my room, into the world.</span>
-                <button
-                  onClick={() =>
-                    document.querySelector("#selected")?.scrollIntoView({
-                      behavior: matchMedia("(prefers-reduced-motion: reduce)")
-                        .matches
-                        ? "instant"
-                        : "smooth",
-                    })
-                  }
-                >
-                  SCROLL TO EXPLORE ↓
-                </button>
-              </div>
-            </section>
-            <section id="selected" className="selected-section">
-              {collectionNotice}
-              <div className="section-heading">
-                <div>
-                  <p className="eyebrow">A FEW WAYS OF SEEING</p>
-                  <h2>
-                    Selected collections
-                    <span className="count">
-                      ({String(albums.length).padStart(2, "0")})
-                    </span>
-                  </h2>
-                </div>
-                <button
-                  className="text-link"
-                  onClick={() => navigate("collection")}
-                >
-                  View all collections <Arrow />
-                </button>
-              </div>
-              <div className="album-grid">
-                {albums.slice(0, 3).map((a, i) => (
-                  <AlbumCard
-                    key={a.id}
-                    album={a}
-                    cover={cover(a)}
-                    index={i}
-                    onClick={() => navigate("album", a.id)}
-                  />
-                ))}
-              </div>
-              {albums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
-            </section>
-            <section className="closing-note">
-              <p>
-                Photography begins
+              <button
+                className={view === "about" ? "active" : ""}
+                onClick={() => navigate("about")}
+              >
+                About
+              </button>
+              <button className="studio-nav" onClick={() => navigate("studio")}>
+                <span className="status-dot" />
+                The studio
+              </button>
+            </nav>
+          </header>
+        </>
+      )}
+      <main id="main" ref={main} tabIndex={-1}>
+        {view === "studio" && (
+          <section
+            className={`entrance ${entering ? "is-entering" : ""}`}
+            aria-label="Enter the photography studio"
+          >
+            <div className="entrance-brand brand">
+              <span className="brand-symbol" aria-hidden="true">▣</span>
+              <span>{settings.name}</span>
+            </div>
+            <div className="entrance-copy">
+              <p className="eyebrow">MAKE YOURSELF AT HOME</p>
+              <h1>
+                {settings.tagline === "A space for seeing slowly." ? (
+                  <>
+                    A space for
+                    <br />
+                    seeing <em>slowly.</em>
+                  </>
+                ) : (
+                  settings.tagline
+                )}
+              </h1>
+              <p className="entrance-note">
+                Places, passing light,
                 <br />
-                with <em>paying attention.</em>
+                and the moments in between.
               </p>
-              <button className="text-link" onClick={() => navigate("about")}>
-                A note from the studio <Arrow />
-              </button>
-            </section>
-          </>
+            </div>
+            <div className="scene-wrap">
+              <Room
+                assetBase={assetBase}
+                featured={albums
+                  .map((a) => ({
+                    url: cover(a)?.thumb || "",
+                    title: a.title,
+                  }))
+                  .filter((p) => p.url)}
+                title={settings.name}
+                entering={walkRequested}
+                onEnter={() => navigate("collection")}
+                onBegin={() => {
+                  window.scrollTo({ top: 0, behavior: "instant" });
+                  setEntering(true);
+                  setWalkRequested(true);
+                }}
+                onReady={() => setSceneState("ready")}
+                onUnavailable={() => setSceneState("fallback")}
+              />
+            </div>
+            {!walkRequested && (
+              <button
+                className="entrance-start"
+                aria-label={sceneState === "fallback" ? "Enter the collection" : "Start the walk to the gallery"}
+                aria-describedby="entrance-instruction"
+                onClick={() => setWalkRequested(true)}
+              />
+            )}
+            <div className="enter-laptop" aria-hidden="true">
+              <span className="enter-ring">↗</span>
+              <span>
+                {entranceLabel}
+                <small>
+                  {sceneState === "fallback" ? "STILL-IMAGE ENTRANCE" : "STAND UP · WALK · EXPLORE"}
+                </small>
+              </span>
+            </div>
+            <div className="entrance-bottom">
+              <span>01 / THE STUDIO</span>
+              <span>From my room, into the world.</span>
+              <span id="entrance-instruction">CLICK OR TAP ANYWHERE TO BEGIN</span>
+            </div>
+            {walkRequested && (
+              <div className="walk-controls">
+                <p role="status">{entering ? "On the way to the collection…" : "Preparing your walk…"}</p>
+                <button ref={skipWalk} className="skip-walk" onClick={() => navigate("collection")}>
+                  Skip animation <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            )}
+          </section>
         )}
         {view === "collection" && (
           <section className="collection-page">
@@ -443,13 +404,13 @@ export default function Portfolio({
           </section>
         )}
       </main>
-      <footer className="site-footer">
+      {view !== "studio" && <footer className="site-footer">
         <button className="brand" onClick={() => navigate("studio")}>
           {settings.name}
         </button>
         <span>PHOTOGRAPHS, WITH ROOM TO BREATHE.</span>
         {managementUrl && <a href={managementUrl}>Studio management ↗</a>}
-      </footer>
+      </footer>}
       <dialog
         className="lightbox"
         ref={dialog}
@@ -528,44 +489,6 @@ export default function Portfolio({
         )}
       </dialog>
     </div>
-  );
-}
-function AlbumCard({
-  album,
-  cover,
-  index,
-  onClick,
-}: {
-  album: Album;
-  cover?: Photo;
-  index: number;
-  onClick: () => void;
-}) {
-  return (
-    <button className="album-card" onClick={onClick}>
-      <div className="album-card-image">
-        {cover ? (
-          <img
-            src={cover.thumb}
-            alt={cover.alt || cover.title}
-            loading="lazy"
-          />
-        ) : (
-          <span>Awaiting photographs</span>
-        )}
-        <span className="card-open">↗</span>
-      </div>
-      <div className="card-meta">
-        <span className="eyebrow">
-          {String(index + 1).padStart(2, "0")} /{" "}
-          {album.sample
-            ? "SAMPLE SERIES"
-            : `${album.photoIds.length} PHOTOGRAPHS`}
-        </span>
-        <h3>{album.title}</h3>
-        <p>{album.description}</p>
-      </div>
-    </button>
   );
 }
 function Empty({ owner, managementUrl }: {

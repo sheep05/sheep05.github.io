@@ -14,6 +14,8 @@ The contact email saved in Studio is excluded from the GitHub copy by default; i
 
 Only the GitHub account **sheep05** can edit Private Studio. Your Cloudflare account email does not need to match your GitHub email. Visitors do not need to sign in.
 
+The homepage is a separate, full-screen room entrance; photographs cannot be reached by scrolling down. Click or tap anywhere once (or focus the start button and press Enter/Space) to begin the walk. The gallery opens when the walk finishes. **Skip animation** appears as soon as the walk is requested and also works while the room is loading. Reduced-motion preferences or unavailable 3D use the still-image entrance and open the gallery after that first click. Direct collection and album links still open their destination immediately.
+
 ## 2. How publishing now works
 
 **Edit in Private Studio → daily GitHub publishing job → complete public website on GitHub Pages.**
