@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { studyWalkPosition, easeStudy, WALK_SECONDS, ENTER_SECONDS, overviewPosition, overviewTarget, deskPosition, deskTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
 
 type Props = {
-  gallerySurface: RefObject<HTMLDivElement | null>; entering: boolean; onEnter: () => void; onReady: () => void;
+  gallerySurface: RefObject<HTMLDivElement | null>; interact: RefObject<((x:number,y:number)=>boolean)|null>; entering: boolean; onEnter: () => void; onReady: () => void;
   onUnavailable: () => void; onBegin: () => void; onStage?: (stage: StudyStage) => void;
   featured: { url: string; title: string }[];
 };
@@ -12,12 +12,11 @@ export default function Room(props: Props) {
   const live=useRef(props);live.current=props;
   const [ready,setReady]=useState(false),[failed,setFailed]=useState(false);
   const [stage,setStage]=useState<StudyStage>('overview');
-  const [day,setDay]=useState(false),[lamp,setLamp]=useState(true);
   const state=useRef({stage:'overview' as StudyStage,day:false,lamp:true});
   const commands=useRef({begin:()=>{},redraw:()=>{}});
   const changeStage=(next:StudyStage)=>{state.current.stage=next;setStage(next);live.current.onStage?.(next);};
-  const toggleLamp=()=>{state.current.lamp=!state.current.lamp;setLamp(state.current.lamp);};
-  const toggleDay=()=>{state.current.day=!state.current.day;setDay(state.current.day);};
+  const toggleLamp=()=>{state.current.lamp=!state.current.lamp;};
+  const toggleDay=()=>{state.current.day=!state.current.day;};
   useEffect(()=>{commands.current.redraw();},[JSON.stringify(props.featured)]);
   useEffect(()=>{
     let disposed=false, cleanup=()=>{};
@@ -50,7 +49,7 @@ export default function Room(props: Props) {
         try{environment=pmrem.fromScene(environmentScene,.05);scene.environment=environment.texture;scene.environmentIntensity=.22;}finally{environmentScene.dispose();pmrem.dispose();}
         study=buildStudy(scene);
         const room=study;
-        batchStatic(scene,[room.screen,...room.keys,room.lampTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
+        batchStatic(scene,[room.screen,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
         let artworkVersion=0;
         const updateArtwork=()=>{
           const version=++artworkVersion;
@@ -85,15 +84,17 @@ export default function Room(props: Props) {
         const ro=new ResizeObserver(resize);ro.observe(container);resize();
         const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(container);
         const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
-        const hit=(e:PointerEvent)=>{
-          const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);
-          return raycaster.intersectObjects([room.lampTarget],false)[0]?.object;
+        const hit=(x:number,y:number)=>{
+          const rect=renderer.domElement.getBoundingClientRect();pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);
+          return raycaster.intersectObjects([room.lampTarget,room.windowTarget],true)[0]?.object;
         };
-        const click=(e:PointerEvent)=>{const object=hit(e);if(object===room.lampTarget)toggleLamp();};
-        const hover=(e:PointerEvent)=>{renderer.domElement.style.cursor=hit(e)?'pointer':'default';};
+        const interact=(x:number,y:number)=>{if(state.current.stage==='entering')return false;const object=hit(x,y);if(!object)return false;if(object===room.windowTarget)toggleDay();else toggleLamp();return true;};
+        live.current.interact.current=interact;
+        const click=(e:PointerEvent)=>{interact(e.clientX,e.clientY);};
+        const hover=(e:PointerEvent)=>{renderer.domElement.style.cursor=hit(e.clientX,e.clientY)?'pointer':'default';};
         const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);live.current.onUnavailable();cleanup();};
         renderer.domElement.addEventListener('pointerup',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
-        cleanup=()=>{ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('pointerup',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
+        cleanup=()=>{live.current.interact.current=null;ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('pointerup',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
         const warm=new THREE.Color('#ffbd77'),daySky=new THREE.Color('#9bb5c3'),nightSky=new THREE.Color('#101c36');
         const frame=(now:number)=>{
           raf=requestAnimationFrame(frame);const dt=Math.min((now-previous)/1000,.05);previous=now;
@@ -144,9 +145,5 @@ export default function Room(props: Props) {
     <div ref={mount} className="room-canvas" />
     {!ready&&!failed&&<span className="room-loading">Opening the study…</span>}
     {failed&&<p className="study-unavailable">The 3D study is unavailable on this device. You can enter the gallery directly.</p>}
-    {ready&&stage!=='entering'&&<div className="study-switches" aria-label="Room lighting">
-      <button onClick={toggleLamp} aria-pressed={lamp}>Lamp <span>{lamp?'on':'off'}</span></button>
-      <button onClick={toggleDay} aria-pressed={day}>{day?'Daylight':'Night'} <span aria-hidden="true">{day?'☀':'☾'}</span></button>
-    </div>}
   </div>;
 }

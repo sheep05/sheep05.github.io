@@ -36,11 +36,32 @@ test('walk goes straight down the centre aisle with bounded sway and no sideways
  assert.equal(WALK_SECONDS+ENTER_SECONDS,10.5);
 });
 
+test('lamp clears the monitor and the chair turns in place toward it',()=>{
+ const shade=new THREE.Box3().setFromObject(scene.getObjectByName('Lamp shade'));
+ const monitor=new THREE.Box3().setFromObject(scene.getObjectByName('Monitor frame'));
+ assert.ok(shade.min.y>monitor.max.y);
+ const chair=scene.getObjectByName('Desk chair');assert.deepEqual(chair.position.toArray(),[-1.1,0,-.65]);
+ const forward=new THREE.Vector3(0,0,-1).applyQuaternion(chair.quaternion);
+ const direction=new THREE.Vector3(screenPosition[0]-chair.position.x,0,screenPosition[2]-chair.position.z).normalize();
+ assert.ok(forward.dot(direction)>.99999);
+});
+test('whole lamp and hidden window surface are hit-testable from the opening camera',()=>{
+ const camera=new THREE.PerspectiveCamera(70,16/10,.035,65);camera.position.fromArray(overviewPosition);camera.lookAt(new THREE.Vector3(...overviewTarget));camera.updateMatrixWorld();
+ const targets=[room.lampTarget,room.windowTarget];
+ for(const target of [scene.getObjectByName('Lamp shade'),scene.getObjectByName('Lamp base'),room.windowTarget]){
+  const position=target.getWorldPosition(new THREE.Vector3());
+  const projected=position.clone().project(camera);assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,target.name+' is outside the opening view');
+  const ray=new THREE.Raycaster(camera.position.clone(),position.sub(camera.position).normalize());
+  const hit=ray.intersectObjects(targets,true)[0];assert.ok(hit,'Object should be clickable');
+  assert.equal(hit.object===room.windowTarget,target===room.windowTarget);
+ }
+});
+
 let meshes=0,triangles=0;scene.traverse(o=>{if(o.isMesh){meshes++;triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);}});
 test('scene stays within a bounded geometry budget',()=>{assert.ok(triangles<200000);console.log(`Study geometry: ${meshes} meshes, ${Math.round(triangles)} triangles`);});
 test('static batching reduces draw objects without losing keyboard detail',async()=>{
  const {batchStatic}=await import('../lib/scene/batch-static.ts');
- batchStatic(scene,[room.screen,...room.keys,room.lampTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
+ batchStatic(scene,[room.screen,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
  let count=0;scene.traverse(o=>{if(o.isMesh)count++;});
  console.log(`Batched study: ${count} draw objects`);assert.ok(count<220);
  for(const key of room.keys)assert.ok(key.parent);

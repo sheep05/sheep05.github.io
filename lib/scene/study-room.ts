@@ -75,6 +75,8 @@ export function buildStudy(scene: THREE.Scene) {
   }
   for(const z of [-3,2.6]) {cyl('Utility pole',.055,5,[4.3,2,z],walnut);box('Utility crossarm',[.2,.08,1.2],[4.3,4.2,z],charcoal);}
   for(const offset of [-.3,0,.3])line([[4.3,4.2,-3+offset],[4.3,3.75,-.2+offset],[4.3,4.2,2.6+offset]],.008,charcoal);
+  const windowTarget=new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.75),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+  windowTarget.name='Window day and night control';windowTarget.position.set(2.99,1.825,-.5);windowTarget.rotation.y=-Math.PI/2;windowTarget.visible=false;scene.add(windowTarget);
   // Pleated curtains remain inside the enclosure and move only at their free ends.
   const curtains: {mesh:THREE.Mesh,base:Float32Array}[]=[];
   for(const z of [-1.99,.98]) {
@@ -115,18 +117,19 @@ export function buildStudy(scene: THREE.Scene) {
   box('Workstation tower',[.28,.57,.48],[1.2,.3,-2.05],charcoal,.025);
   for(let i=0;i<14;i++)box('Tower ventilation',[.18,.008,.005],[1.2,.2+i*.023,-1.805],black);
   // The chair is pulled to the left so the walking route stays clear.
-  const chair=new THREE.Group();chair.position.set(-1.1,0,-.65);chair.rotation.y=.32;scene.add(chair);
+  const chair=new THREE.Group();chair.name='Desk chair';chair.position.set(-1.1,0,-.65);chair.rotation.y=Math.atan2(chair.position.x-screenPosition[0],chair.position.z-screenPosition[2]);scene.add(chair);
   box('Chair cushion',[.51,.09,.47],[0,.47,0],mat('#5c5143'),.06,chair);
   box('Chair back',[.52,.5,.09],[0,.8,.2],walnut,.055,chair);
   for(const x of [-.2,.2])for(const z of [-.17,.17])box('Chair leg',[.035,.44,.035],[x,.22,z],charcoal,.005,chair);
-  // Adjustable brass desk lamp: hit target and illumination share the same state.
-  cyl('Lamp base',.15,.035,[-1.05,.94,-2.12],brass);
-  line([[-1.05,.96,-2.12],[-1.05,1.26,-2.12],[-.83,1.57,-2.1]],.022,brass);
-  const shade=new THREE.Mesh(new THREE.ConeGeometry(.17,.18,40,1,true),brass);shade.position.set(-.83,1.52,-2.1);shade.castShadow=true;scene.add(shade);
+  // Every visible lamp part is clickable; its shade sits above the monitor.
+  const lampTarget=new THREE.Group();lampTarget.name='Desk lamp';scene.add(lampTarget);
+  cyl('Lamp base',.15,.035,[-1.05,.94,-2.12],brass,lampTarget);
+  line([[-1.05,.96,-2.12],[-1.05,1.55,-2.12],[-.83,2.13,-2.1]],.022,brass,lampTarget);
+  const shade=new THREE.Mesh(new THREE.ConeGeometry(.17,.18,40,1,true),brass);shade.name='Lamp shade';shade.position.set(-.83,2.08,-2.1);shade.castShadow=true;lampTarget.add(shade);
   const bulbMaterial=new THREE.MeshStandardMaterial({color:'#ffe6b1',emissive:'#ffc16a',emissiveIntensity:2});
-  cyl('Lamp diffuser',.13,.008,[-.83,1.435,-2.1],bulbMaterial);
-  const lampTarget=box('Lamp switch',[.14,.04,.14],[-1.05,.965,-2.12],brass,.02);lampTarget.userData.action='lamp';
-  const lamp=new THREE.PointLight('#ffbd77',9,4,2);lamp.position.set(-.83,1.41,-2.1);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.025;lamp.shadow.bias=-.001;scene.add(lamp);
+  cyl('Lamp diffuser',.13,.008,[-.83,1.995,-2.1],bulbMaterial,lampTarget);
+  box('Lamp switch',[.14,.04,.14],[-1.05,.965,-2.12],brass,.02,lampTarget);
+  const lamp=new THREE.PointLight('#ffbd77',9,4,2);lamp.position.set(-.83,1.97,-2.1);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.025;lamp.shadow.bias=-.001;scene.add(lamp);
   const hemi=new THREE.HemisphereLight('#819cbe','#55412e',.6);scene.add(hemi);
   const sun=new THREE.DirectionalLight('#b4c6df',.65);sun.position.set(2.8,2.6,.4);sun.target.position.set(-1,.5,-1.7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:.1,far:12});sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;scene.add(sun,sun.target);
   const monitorLight=new THREE.PointLight('#b1cacc',.5,2.5,2);monitorLight.position.set(0,1.4,-1.95);scene.add(monitorLight);
@@ -163,5 +166,5 @@ export function buildStudy(scene: THREE.Scene) {
   for(const x of [-2.3,-1.2])box('Linen cushion',[.45,.22,.43],[x,.55,1.94],paper,.07);
   box('Closed door',[.92,2.3,.055],[.5,1.15,2.79],walnut,.014);
   cyl('Door handle',.025,.13,[.84,1.05,2.72],brass).rotation.z=Math.PI/2;
-  return {screen,keys,lampTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
+  return {screen,keys,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
 }

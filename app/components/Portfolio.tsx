@@ -51,6 +51,7 @@ export default function Portfolio({
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const main = useRef<HTMLElement>(null);
+  const roomInteraction = useRef<((x:number,y:number)=>boolean)|null>(null);
   const gallerySurface = useRef<HTMLDivElement>(null);
   const skipWalk = useRef<HTMLButtonElement>(null);
   useLayoutEffect(() => {
@@ -231,6 +232,7 @@ export default function Portfolio({
             </div>
             <div className="scene-wrap">
               <Room
+                interact={roomInteraction}
                 gallerySurface={gallerySurface}
                 featured={albums
                   .map((a) => ({
@@ -255,7 +257,10 @@ export default function Portfolio({
                 className="entrance-start"
                 aria-label={sceneState === "fallback" ? "Enter the collection" : "Start the walk to the gallery"}
                 aria-describedby="entrance-instruction"
-                onClick={() => setWalkRequested(true)}
+                onClick={e => {
+                  if (e.detail && roomInteraction.current?.(e.clientX,e.clientY)) return;
+                  setWalkRequested(true);
+                }}
               />
             )}
             <div className="enter-laptop" aria-hidden="true">

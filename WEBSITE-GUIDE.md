@@ -20,7 +20,7 @@ The homepage is a separate, full-screen programmer’s study. The viewpoint star
 
 The monitor uses the visitor’s real screen proportions within its physical frame, so the gallery keeps the same responsive layout before and after entry. Its text, images, and navigation remain mounted throughout the animation. Reduced-motion mode opens the gallery directly after the first click; if 3D is unavailable, a direct entry remains available. Collection and album links bypass the study.
 
-The upper-right controls switch the lamp and day/night lighting independently. The room retains its camera, photography books, curtains, and public collection covers in the picture frames. Edit geometry in `lib/scene/study-room.ts`, camera timing in `lib/scene/study-state.ts`, projection in `lib/scene/gallery-projection.ts`, and animation in `app/components/Room.tsx`. The gallery itself is shared by the monitor and page in `app/components/Portfolio.tsx`; its chapters live in `app/components/ChapterIndex.tsx`. The old Blender room export is retained for reference but is no longer loaded.
+Click the lamp itself to switch it on or off. Click the window to change day/night. These controls have no visible buttons or labels; using them before the walk does not start the entrance animation. The room retains its camera, photography books, curtains, and public collection covers in the picture frames. Edit geometry in `lib/scene/study-room.ts`, camera timing in `lib/scene/study-state.ts`, projection in `lib/scene/gallery-projection.ts`, and animation in `app/components/Room.tsx`. The gallery itself is shared by the monitor and page in `app/components/Portfolio.tsx`; its chapters live in `app/components/ChapterIndex.tsx`. The old Blender room export is retained for reference but is no longer loaded.
 
 ## 2. How publishing now works
 
@@ -29,6 +29,10 @@ The upper-right controls switch the lamp and day/night lighting independently. T
 Private Studio saves your library in Cloudflare. GitHub checks the anonymous, published library once a day at **04:13 China time (Asia/Shanghai)**, downloads the published photos and thumbnails, builds the website, and deploys it. GitHub can delay scheduled runs; this is a scheduled check, not an exact delivery guarantee. Source-code commits to `main` and manual runs also trigger publication.
 
 The GitHub website serves its text, albums, uploaded photographs, samples, and 3D room from GitHub. Visitors no longer call Cloudflare for gallery data or images. You can close Studio, sign out, and turn off your computer. Cloudflare is needed to edit content and to download the next publication, but not to view the last successfully published GitHub website.
+
+**Internet and device requirements:** GitHub serves the public website without contacting the editing backend, but the first visit still downloads the website and photos. There is currently no service worker or dedicated offline cache, so offline reopening is not guaranteed by ordinary browser caching. The room is rendered locally using WebGL; visitors do not install Blender. It has a capped rendering resolution, batched geometry, static shadow maps, hidden-tab pausing, and direct-gallery fallback, but smooth performance on every device has not been measured.
+
+A future offline version could download and cache the entrance, gallery, and chosen public photos after one online visit. That would reduce repeat network use, not the GPU work required for 3D. Adaptive graphics quality or a lightweight still-image entrance would address slower devices separately. This is a proposed next step, not an enabled feature.
 
 **Saving in Studio is not an immediate GitHub publication.** The Cloudflare preview reflects saved content sooner; GitHub reflects the last successful publishing job. This is expected. No manual GitHub commit is needed for photo or text edits.
 
