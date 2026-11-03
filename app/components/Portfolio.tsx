@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
+import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
 import { chapters, inChapter } from "@/lib/catalog";
 const Atlas = lazy(() => import("./Atlas"));
@@ -41,6 +42,7 @@ export default function Portfolio({
       photos: Photo[];
       index: number;
     } | null>(null);
+  const [studyStage, setStudyStage] = useState<StudyStage>("overview");
   const [region, setRegion] = useState<string | null>(null);
   const [albumContext, setAlbumContext] = useState({ view: "collection", region: null as string | null });
   const listedAlbums = view === "portraits" || view === "street" ? albums.filter(a => inChapter(a, view)) : albums;
@@ -60,6 +62,7 @@ export default function Portfolio({
       setAlbumContext({ view: ["scenes","portraits","street","all"].includes(from) ? from : "collection", region: p.get("region") });
       setEntering(false);
       setWalkRequested(false);
+      setStudyStage("overview");
       if (p.has("album") || (p.get("view") && p.get("view") !== "studio")) setSceneState("loading");
     };
     read();
@@ -97,6 +100,7 @@ export default function Portfolio({
     setActiveId(id || null);
     setEntering(false);
     setWalkRequested(false);
+    setStudyStage("overview");
     if (next !== "studio") setSceneState("loading");
     history.pushState({}, "", assetBase + (params.size ? `?${params}` : ""));
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -177,7 +181,7 @@ export default function Portfolio({
       <main id="main" ref={main} tabIndex={-1}>
         {view === "studio" && (
           <section
-            className={`entrance ${entering ? "is-entering" : ""}`}
+            className={`entrance programmer-entrance ${entering ? "is-entering" : ""}`}
             aria-label="Enter the photography studio"
           >
             <div className="entrance-brand brand">
@@ -215,6 +219,7 @@ export default function Portfolio({
                 title={settings.name}
                 entering={walkRequested}
                 onEnter={() => navigate("collection")}
+                onStage={setStudyStage}
                 onBegin={() => {
                   window.scrollTo({ top: 0, behavior: "instant" });
                   setEntering(true);
@@ -237,7 +242,7 @@ export default function Portfolio({
               <span>
                 {entranceLabel}
                 <small>
-                  {sceneState === "fallback" ? "STILL-IMAGE ENTRANCE" : "STAND UP · WALK · EXPLORE"}
+                  {sceneState === "fallback" ? "DIRECT GALLERY ENTRANCE" : "STEP INSIDE · TAKE A SEAT · EXPLORE"}
                 </small>
               </span>
             </div>
@@ -246,11 +251,11 @@ export default function Portfolio({
               <span>From my room, into the world.</span>
               <span id="entrance-instruction">CLICK OR TAP ANYWHERE TO BEGIN</span>
             </div>
-            {walkRequested && (
+            {(walkRequested || sceneState === "fallback") && (
               <div className="walk-controls">
-                <p role="status">{entering ? "On the way to the collection…" : "Preparing your walk…"}</p>
+                <p role="status">{sceneState === "fallback" ? "The photographs are still available." : studyStage === "desk" ? "A little introduction, before the photographs." : studyStage === "entering" ? "Opening the gallery…" : entering ? "Walking to the desk…" : "Preparing your walk…"}</p>
                 <button ref={skipWalk} className="skip-walk" onClick={() => navigate("collection")}>
-                  Skip animation <span aria-hidden="true">↗</span>
+                  {studyStage === "desk" ? "Skip to gallery" : "Skip animation"} <span aria-hidden="true">↗</span>
                 </button>
               </div>
             )}
