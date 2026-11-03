@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentHash": "690bfb077bdf5c45caeab6f8d35dd9470bcf236eb43face616b0586e00351a02",
-  "publishedAt": "2026-11-02T09:36:33.424Z",
+  "contentHash": "a39f4fc3ee5f445d00bfd8b47a974ce65a2720d71120e5072fe053b5a9ba2670",
+  "publishedAt": "2026-11-03T09:10:22.897Z",
   "collection": {
     "settings": {
       "name": "Sheep's Photograghy",
@@ -16,8 +16,12 @@
         "title": "Japan",
         "description": "Love scences in Japan",
         "position": 0,
-        "chapters": [],
-        "regions": [],
+        "chapters": [
+          "scenes"
+        ],
+        "regions": [
+          "JP"
+        ],
         "published": true,
         "coverId": null,
         "photoIds": [
@@ -35,8 +39,12 @@
         "title": "Singapore",
         "description": "Modern, clear and pleasant",
         "position": 1,
-        "chapters": [],
-        "regions": [],
+        "chapters": [
+          "scenes"
+        ],
+        "regions": [
+          "SG"
+        ],
         "published": true,
         "coverId": null,
         "photoIds": [
@@ -53,8 +61,12 @@
         "title": "Malaysia",
         "description": "Colorful",
         "position": 2,
-        "chapters": [],
-        "regions": [],
+        "chapters": [
+          "scenes"
+        ],
+        "regions": [
+          "MY"
+        ],
         "published": true,
         "coverId": null,
         "photoIds": [
@@ -74,7 +86,9 @@
         "title": "Lovely cars",
         "description": "",
         "position": 3,
-        "chapters": [],
+        "chapters": [
+          "street"
+        ],
         "regions": [],
         "published": true,
         "coverId": null,
