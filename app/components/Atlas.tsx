@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
+import { atlasPixelRatio, atlasTextureFile } from "@/lib/atlas-quality";
 import type { Album, Photo } from "@/lib/types";
 
 export default function Atlas({ albums, photos, assetBase, selected, onSelect, onAlbum, onAll }: {
@@ -30,8 +31,8 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         const T = await import('three');
         if (disposed || !mount.current) return;
         const host = mount.current;
-        const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
-        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+        const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+        renderer.setPixelRatio(atlasPixelRatio(host.clientWidth,host.clientHeight,devicePixelRatio));
         renderer.outputColorSpace = T.SRGBColorSpace;
         renderer.setClearColor(0x080e13, 0);
         host.appendChild(renderer.domElement);
@@ -41,28 +42,19 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         camera.position.z = 4.6;
         const earth = new T.Group();
         scene.add(earth);
-        const geometry = new T.SphereGeometry(1.25, 80, 48);
-        const material = new T.MeshPhongMaterial({ color: 0xffffff, shininess: 9, specular: 0x192c35 });
+        const geometry = new T.SphereGeometry(1.25, 160, 96);
+        const material = new T.MeshPhongMaterial({ color: 0xffffff, shininess: 5, specular: 0x071018 });
         earth.add(new T.Mesh(geometry, material));
-        scene.add(new T.AmbientLight(0xa6b9ce, 1.4));
-        const sun = new T.DirectionalLight(0xfff0db, 2.5);
+        scene.add(new T.AmbientLight(0xd4e2f2, .85));
+        const sun = new T.DirectionalLight(0xfff7ed, 1.7);
         sun.position.set(-3, 3, 5);
         scene.add(sun);
         const rim = new T.Mesh(new T.SphereGeometry(1.285, 64, 40), new T.ShaderMaterial({
           transparent: true, depthWrite: false, blending: T.AdditiveBlending,
           vertexShader: 'varying vec3 n; varying vec3 v; void main(){ vec4 p=modelViewMatrix*vec4(position,1.0); n=normalize(normalMatrix*normal); v=normalize(-p.xyz); gl_Position=projectionMatrix*p; }',
-          fragmentShader: 'varying vec3 n; varying vec3 v; void main(){ float rim=pow(1.0-max(0.0,dot(normalize(n),normalize(v))),3.8); gl_FragColor=vec4(0.28,0.52,0.72,rim*0.55); }',
+          fragmentShader: 'varying vec3 n; varying vec3 v; void main(){ float rim=pow(1.0-max(0.0,dot(normalize(n),normalize(v))),3.8); gl_FragColor=vec4(0.28,0.52,0.72,rim*0.32); }',
         }));
         scene.add(rim);
-        // Deterministic star positions; no extra texture or remote runtime requests.
-        const stars = new Float32Array(210 * 3);
-        for (let i = 0; i < 210; i++) {
-          const u = ((i * 0.61803398875) % 1), v = ((i * 0.41421356237) % 1);
-          stars[i*3] = (u - .5) * 20; stars[i*3+1] = (v - .5) * 14; stars[i*3+2] = -5 - (i % 7);
-        }
-        const starGeometry = new T.BufferGeometry();
-        starGeometry.setAttribute('position', new T.BufferAttribute(stars, 3));
-        scene.add(new T.Points(starGeometry, new T.PointsMaterial({ color: 0xbbb7a5, size: .014, transparent: true, opacity: .55 })));
         const reduced = matchMedia('(prefers-reduced-motion: reduce)');
         const destination = new T.Quaternion();
         let turning = false, dragging = false, pointerId = -1, px = 0, py = 0, last = 0, visible = true, needsRender = true;
@@ -79,6 +71,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         const resize = () => {
           const w = host.clientWidth, h = host.clientHeight;
           if (!w || !h) return;
+          renderer.setPixelRatio(atlasPixelRatio(w,h,devicePixelRatio));
           renderer.setSize(w, h);
           camera.aspect = w / h;
           camera.fov = camera.aspect < .85 ? 48 : 40;
@@ -121,17 +114,30 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           });
           material.map?.dispose(); renderer.dispose(); renderer.domElement.remove();
         };
-        const timeout = setTimeout(() => abort.abort(), 15000);
-        let bitmap: ImageBitmap;
-        try {
-          const response = await fetch(`${assetBase}atlas/earth-day.jpg`, { signal: abort.signal });
-          if (!response.ok) throw new Error('Earth texture unavailable');
-          bitmap = await createImageBitmap(await response.blob(), { imageOrientation: 'flipY' });
-        } finally { clearTimeout(timeout); }
-        if (disposed) { bitmap.close(); return; }
-        const texture = new T.CanvasTexture(bitmap);
-        texture.colorSpace = T.SRGBColorSpace; material.map = texture; material.needsUpdate = true;
-        const release = cleanup; cleanup = () => { release(); bitmap.close(); };
+        let activeBitmap:ImageBitmap|null=null;
+        const release=cleanup;cleanup=()=>{release();activeBitmap?.close();activeBitmap=null;};
+        const memory=(navigator as Navigator & {deviceMemory?:number}).deviceMemory;
+        const preferred=atlasTextureFile(renderer.capabilities.maxTextureSize,innerWidth,memory);
+        // If a large texture cannot load, retain an accessible Earth using a smaller local asset.
+        for(const filename of [...new Set([preferred,'earth-day-4k.jpg','earth-day.jpg'])]){
+          const request=new AbortController(),cancel=()=>request.abort();
+          abort.signal.addEventListener('abort',cancel,{once:true});
+          const timeout=setTimeout(cancel,20000);
+          try{
+            const response=await fetch(`${assetBase}atlas/${filename}`,{signal:request.signal});
+            if(!response.ok)throw new Error('Earth texture unavailable');
+            const bitmap=await createImageBitmap(await response.blob(),{imageOrientation:'flipY'});
+            if(disposed){bitmap.close();return;}
+            activeBitmap=bitmap;break;
+          }catch(error){if(disposed)return;if(filename==='earth-day.jpg')throw error;}
+          finally{clearTimeout(timeout);abort.signal.removeEventListener('abort',cancel);}
+        }
+        if(!activeBitmap)throw new Error('Earth texture unavailable');
+        const texture=new T.CanvasTexture(activeBitmap);
+        texture.colorSpace=T.SRGBColorSpace;
+        texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+        texture.minFilter=T.LinearMipmapLinearFilter;texture.magFilter=T.LinearFilter;
+        material.map=texture;material.needsUpdate=true;
         const point = new T.Vector3();
         renderer.setAnimationLoop((now: number) => {
           const dt = Math.min((now-last)/1000,.05); last=now;
@@ -177,7 +183,6 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       <button className="atlas-all-link" onClick={()=>onSelect(null)}>All Scenes collections ↗</button>
     </div>
     <div className={`atlas-world atlas-${state}`}>
-      <div className="atlas-orbit orbit-one" aria-hidden="true"/><div className="atlas-orbit orbit-two" aria-hidden="true"/>
       {state !== 'ready' && <div className="atlas-flat-earth" aria-hidden="true" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>}
       <div ref={mount} className="atlas-canvas" role="group" aria-label="Interactive Earth. Drag to rotate, or use the arrow keys. Country buttons are also available in the list." tabIndex={state==='ready'?0:-1}/>
       {state==='ready' && <div className="atlas-pins">
@@ -205,6 +210,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       </div>
       <span className="atlas-coordinate" aria-hidden="true">{activeRegion ? `${activeRegion.lat.toFixed(2)}° N / ${activeRegion.lon.toFixed(2)}° E` : 'A WORLD TO RETURN TO'}</span>
     </div>
+    <p className="atlas-image-credit">Earth imagery: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Solar System Scope</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
     <div id="atlas-collections" className="atlas-collections" aria-live="polite">
       <div className="atlas-collections-heading"><div><p className="eyebrow">{selected?'THE PLACES IN BETWEEN':'THE SCENES ARCHIVE'}</p><h2 id="atlas-collection-title" tabIndex={-1}>{activeRegion?.name || selected || 'Across the atlas'}<sup>{shown.length.toString().padStart(2,'0')}</sup></h2></div>
         <button onClick={onAll}>All collections ↗</button>

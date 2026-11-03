@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
+import SpaceBackdrop from "./SpaceBackdrop";
 import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
 import { chapters, inChapter } from "@/lib/catalog";
@@ -50,7 +51,14 @@ export default function Portfolio({
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const main = useRef<HTMLElement>(null);
+  const gallerySurface = useRef<HTMLDivElement>(null);
   const skipWalk = useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    if (view === "studio" && gallerySurface.current) {
+      gallerySurface.current.style.visibility = "hidden";
+      gallerySurface.current.style.transform = "";
+    }
+  }, [view]);
   const active = albums.find((a) => a.id === activeId);
   useEffect(() => {
     const read = () => {
@@ -139,13 +147,14 @@ export default function Portfolio({
             {collectionStatus === "error" && <button className="text-link" onClick={onRetry}>Retry photographs ↗</button>}
           </div>
   );
-  return (
-    <div className={`portfolio view-${view}`}>
-      {view !== "studio" && (
-        <>
-          <a className="skip-link" href="#main">
-            Skip to content
-          </a>
+  const galleryFooter = (<footer className="site-footer">
+        <button className="brand" onClick={() => navigate("studio")}>
+          {settings.name}
+        </button>
+        <span>PHOTOGRAPHS, WITH ROOM TO BREATHE.</span>
+        {managementUrl && <a href={managementUrl}>Studio management ↗</a>}
+      </footer>);
+  const galleryHeader = (
           <header className="site-header">
             <button
               className="brand"
@@ -158,7 +167,7 @@ export default function Portfolio({
             <nav aria-label="Main navigation">
               <button
                 className={
-                  ["collection","all","scenes","portraits","street","album"].includes(view) ? "active" : ""
+                  ["studio","collection","all","scenes","portraits","street","album"].includes(view) ? "active" : ""
                 }
                 onClick={() => navigate("collection")}
               >
@@ -176,9 +185,22 @@ export default function Portfolio({
               </button>
             </nav>
           </header>
-        </>
-      )}
+  );
+  return (
+    <div className={`portfolio view-${view}`}>
+      {view === "scenes" && <SpaceBackdrop/>}
+      {view !== "studio" && view !== "collection" && <><a className="skip-link" href="#main">Skip to content</a>{galleryHeader}</>}
       <main id="main" ref={main} tabIndex={-1}>
+        {(view === "studio" || view === "collection") && <div
+          ref={gallerySurface}
+          className={`gallery-surface view-collection ${view === "studio" ? "gallery-in-monitor" : "gallery-live"}`}
+          inert={view === "studio"}
+          aria-hidden={view === "studio" ? true : undefined}
+        >
+          {galleryHeader}
+          <ChapterIndex albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
+          {galleryFooter}
+        </div>}
         {view === "studio" && (
           <section
             className={`entrance programmer-entrance ${entering ? "is-entering" : ""}`}
@@ -209,14 +231,13 @@ export default function Portfolio({
             </div>
             <div className="scene-wrap">
               <Room
-                assetBase={assetBase}
+                gallerySurface={gallerySurface}
                 featured={albums
                   .map((a) => ({
                     url: cover(a)?.thumb || "",
                     title: a.title,
                   }))
                   .filter((p) => p.url)}
-                title={settings.name}
                 entering={walkRequested}
                 onEnter={() => navigate("collection")}
                 onStage={setStudyStage}
@@ -252,16 +273,15 @@ export default function Portfolio({
               <span id="entrance-instruction">CLICK OR TAP ANYWHERE TO BEGIN</span>
             </div>
             {(walkRequested || sceneState === "fallback") && (
-              <div className="walk-controls">
-                <p role="status">{sceneState === "fallback" ? "The photographs are still available." : studyStage === "desk" ? "A little introduction, before the photographs." : studyStage === "entering" ? "Opening the gallery…" : entering ? "Walking to the desk…" : "Preparing your walk…"}</p>
+              <div className={`walk-controls ${studyStage === "entering" ? "walk-controls-finishing" : ""}`}>
+                <p role="status">{sceneState === "fallback" ? "The photographs are still available." : studyStage === "entering" ? "Opening the gallery…" : entering ? "Walking to the desk…" : "Preparing your walk…"}</p>
                 <button ref={skipWalk} className="skip-walk" onClick={() => navigate("collection")}>
-                  {studyStage === "desk" ? "Skip to gallery" : "Skip animation"} <span aria-hidden="true">↗</span>
+                  Skip animation <span aria-hidden="true">↗</span>
                 </button>
               </div>
             )}
           </section>
         )}
-        {view === "collection" && <ChapterIndex albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />}
         {view === "scenes" && <>
           <button className="atlas-back" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
           <Suspense fallback={<section className="atlas-loading" role="status">Opening the atlas…</section>}>
@@ -427,13 +447,7 @@ export default function Portfolio({
           </section>
         )}
       </main>
-      {view !== "studio" && <footer className="site-footer">
-        <button className="brand" onClick={() => navigate("studio")}>
-          {settings.name}
-        </button>
-        <span>PHOTOGRAPHS, WITH ROOM TO BREATHE.</span>
-        {managementUrl && <a href={managementUrl}>Studio management ↗</a>}
-      </footer>}
+      {view !== "studio" && view !== "collection" && galleryFooter}
       <dialog
         className="lightbox"
         ref={dialog}

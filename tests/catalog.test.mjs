@@ -40,3 +40,14 @@ test('coordinates match the Earth texture and each country rotates to the visibl
     assert.ok(point.distanceTo(new Vector3(0,0,1))<1e-10,r.name);
   }
 });
+
+const {atlasTextureFile,atlasPixelRatio}=await import('../lib/atlas-quality.ts');
+test('Earth quality follows GPU capacity and preserves sharp high-density rendering',()=>{
+ assert.equal(atlasTextureFile(16384,1440,8),'earth-day-8k.jpg');
+ assert.equal(atlasTextureFile(8192,390,8),'earth-day-4k.jpg');
+ assert.equal(atlasTextureFile(8192,1440,4),'earth-day-4k.jpg');
+ assert.equal(atlasTextureFile(4096,1440,8),'earth-day-4k.jpg');
+ assert.equal(atlasTextureFile(2048,1440,8),'earth-day.jpg');
+ assert.equal(atlasPixelRatio(800,600,2),2);
+ assert.ok(atlasPixelRatio(2000,1500,3)**2*2000*1500<=6000001);
+});

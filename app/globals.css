@@ -2441,18 +2441,9 @@ select {
 .study-fallback span { font:11px monospace;letter-spacing:.25em; }
 .study-fallback strong { font:clamp(30px,6vw,76px)/1.15 Georgia,serif;margin-top:24px; }
 .room-ready .study-fallback { opacity:0; }
-.study-room .room-canvas:after {content:"";position:absolute;inset:0;background:#0b1116;opacity:var(--screen-fade,0);pointer-events:none;}
 .study-switches { position:absolute;z-index:8;top:max(30px,env(safe-area-inset-top));right:4.3%;display:flex;gap:8px;pointer-events:auto; }
 .study-switches button { border:1px solid #b8ad9255;border-radius:3px;background:#111c20c9;color:#e1dacd;backdrop-filter:blur(12px);padding:10px 13px;min-height:44px;font:11px monospace; }
 .study-switches button span { margin-left:10px;color:#c4a477; }
-.study-switches button:focus-visible,.study-prompt button:focus-visible {outline:2px solid #dcc196;outline-offset:3px;}
-.study-prompt { position:absolute;z-index:8;bottom:100px;left:50%;transform:translateX(-50%);width:min(490px,90%);padding:18px 22px 13px;display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;background:#10191eed;backdrop-filter:blur(14px);border:1px solid #b3a48a55;box-shadow:0 12px 45px #0004;color:#e9e4d9;pointer-events:auto; }
-.study-prompt label { display:flex;align-items:baseline;gap:10px;flex:1;font:24px Georgia,serif;white-space:nowrap; }
-.study-answer {width:115px;}
-.study-prompt input {width:100%;padding:3px 0 6px;border:0;border-bottom:1px solid #8b9696;border-radius:0;background:transparent;color:#ece7dc;font:24px monospace;outline-offset:5px;}
-.study-prompt input::placeholder {color:#7c8589;opacity:1;}
-.study-prompt button {font:12px monospace;padding:12px;border:1px solid #a39c88;color:#e9e4d9;min-height:44px;}
-.study-prompt p {flex-basis:100%;font-size:11px;color:#b3babe;margin:0;line-height:1.5;}
 .study-unavailable {position:absolute;z-index:4;bottom:125px;left:6%;right:6%;font-size:13px;color:#e1dacd;}
 .programmer-entrance .walk-controls {pointer-events:none;}
 .programmer-entrance .walk-controls button {pointer-events:auto;}
@@ -2463,16 +2454,30 @@ select {
   .study-switches button span {margin-left:5px;}
   .programmer-entrance .entrance-copy {top:auto;bottom:27%;max-width:80%;}
   .programmer-entrance .walk-controls p {max-width:45%;font-size:10px;}
-  .study-prompt {bottom:max(96px,calc(env(safe-area-inset-bottom) + 76px));padding:14px;}
-  .study-prompt label,.study-prompt input {font-size:21px;}
-  .study-answer {width:98px;}
 }
 @media(max-height:500px){
-  .study-prompt {left:20px;bottom:78px;transform:none;width:340px;padding:10px 14px;}
-  .study-prompt label,.study-prompt input {font-size:20px;}
-  .study-prompt p {display:none;}
   .programmer-entrance .entrance-copy {bottom:26%;}
 }
 @media(prefers-reduced-motion:reduce){.study-room *{transition:none!important;}}
 /* Let lighting controls sit above the full-page start gesture. */
 .programmer-entrance .scene-wrap { z-index:auto; }
+
+/* The monitor and full-page gallery are the same mounted DOM surface. */
+html { scrollbar-gutter: stable; }
+.gallery-surface { background:#0b1116;color:#e6e3d9; }
+.gallery-surface .site-header { position:relative;inset:auto;color:#e6e3d9;border-color:#bfc9cd25; }
+.gallery-surface .site-header nav button.active:after {background:#d6c39a;}
+.gallery-surface .eyebrow {color:#a8b4b9;}
+.gallery-in-monitor { position:fixed;left:0;top:0;z-index:2;min-height:0;visibility:hidden;overflow:hidden;transform-origin:0 0;pointer-events:none;contain:layout paint;will-change:transform; }
+.gallery-live { position:relative;width:auto!important;height:auto!important;visibility:visible!important;transform:none!important; }
+.walk-controls-finishing {opacity:0;transition:opacity .8s;}
+.walk-controls-finishing:focus-within {opacity:1;}
+
+/* Deep-space backdrop stays behind the entire Scenes page and its sharp globe. */
+.view-scenes {isolation:isolate;background:#02050b;}
+.space-backdrop {position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+.view-scenes .site-header {background:linear-gradient(#02050be8,#02050b60);}
+.atlas-world {background:radial-gradient(ellipse at 50% 45%,#29486412,transparent 62%);}
+.atlas-image-credit {grid-column:1/-1;text-align:right;font-size:9px;color:#8493a3;margin-top:10px;}
+.atlas-image-credit a {text-decoration:underline;text-underline-offset:3px;}
+.view-scenes .atlas-region-list > button {text-shadow:0 1px 8px #02050b;}

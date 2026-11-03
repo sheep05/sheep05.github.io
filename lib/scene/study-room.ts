@@ -92,9 +92,7 @@ export function buildStudy(scene: THREE.Scene) {
   box('Monitor base',[.48,.025,.28],[0,.934,-2.2],black,.02);
   box('Monitor stem',[.06,.28,.055],[0,1.08,-2.23],charcoal,.015);
   box('Monitor frame',[1.36,.88,.07],[0,1.47,-2.16],black,.025);
-  const screenCanvas=document.createElement('canvas');screenCanvas.width=1280;screenCanvas.height=800;
-  const screenTexture=new THREE.CanvasTexture(screenCanvas);screenTexture.colorSpace=THREE.SRGBColorSpace;textures.push(screenTexture);
-  const screen=new THREE.Mesh(new THREE.PlaneGeometry(...screenSize),new THREE.MeshBasicMaterial({map:screenTexture,toneMapped:false}));
+  const screen=new THREE.Mesh(new THREE.PlaneGeometry(...screenSize),new THREE.MeshBasicMaterial({color:'#0b1116',toneMapped:false}));
   screen.name='Interactive monitor';screen.position.fromArray(screenPosition);scene.add(screen);
   const power=new THREE.Mesh(new THREE.SphereGeometry(.008,8,8),new THREE.MeshBasicMaterial({color:'#bbcfad'}));power.position.set(.6,1.06,-2.11);scene.add(power);
   box('Keyboard case',[1.03,.045,.35],[0,.947,-1.58],mat('#b3ada1',.36,.25),.025);
@@ -103,9 +101,9 @@ export function buildStudy(scene: THREE.Scene) {
   const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
   rows.forEach((row,r)=>{[...row].forEach((key,c)=>{
     const x=(c-(row.length-1)/2)*.088,z=-1.695+r*.081;
-    const m=box(`Key ${key}`,[.076,.033,.069],[x,.986,z],key==='S'||key==='H'||key==='E'||key==='P'?accent:keycap,.007);
+    const m=box(`Key ${key}`,[.076,.033,.069],[x,.986,z],keycap,.007);
     m.userData.key=key.toLowerCase();m.userData.restY=m.position.y;keys.push(m);
-    const glyph=label(key,.048,.026,[x,1.004,z],'#343630',key==='S'||key==='H'||key==='E'||key==='P'?'#ad6e43':'#d6cdbb',m);
+    const glyph=label(key,.048,.026,[x,1.004,z],'#343630','#d6cdbb',m);
     glyph.position.set(0,.018,0);glyph.rotation.x=-Math.PI/2;
   });});
   for(const [key,text,x,w] of [['Backspace','⌫',-.34,.23],['Enter','ENTER',.25,.42]] as const){
@@ -165,5 +163,5 @@ export function buildStudy(scene: THREE.Scene) {
   for(const x of [-2.3,-1.2])box('Linen cushion',[.45,.22,.43],[x,.55,1.94],paper,.07);
   box('Closed door',[.92,2.3,.055],[.5,1.15,2.79],walnut,.014);
   cyl('Door handle',.025,.13,[.84,1.05,2.72],brass).rotation.z=Math.PI/2;
-  return {screenCanvas,screenTexture,screen,keys,lampTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
+  return {screen,keys,lampTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
 }

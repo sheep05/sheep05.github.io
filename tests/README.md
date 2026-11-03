@@ -33,4 +33,4 @@ Run `npm run test:publish` for privacy, image copying, stable exports, removal, 
 
 Browser checks: enter the three-chapter gallery, open Scenes, select every country, drag and keyboard-rotate Earth, zoom/reset, open an assigned album and return, follow a direct region URL, and navigate Back/Forward. Check mobile portrait/landscape, reduced motion, a failed Earth texture/WebGL context, and the visible country-list fallback. Existing production albums are deliberately unassigned; use local-only fixtures for populated chapter tests.
 
-`study.test.mjs` checks the “sheep” input rules, key visibility and raycasting against the actual room geometry, enclosure, camera corridor, monitor framing, and geometry batching. It does not simulate browser rendering or replace visual/mobile checks.
+`study.test.mjs` checks enclosure, camera corridor, geometry batching, live-gallery projection across desktop/mobile aspect ratios, and exact viewport alignment at handoff. It does not simulate browser rendering or replace visual/mobile checks.

@@ -16,11 +16,11 @@ The contact email saved in Studio is excluded from the GitHub copy by default; i
 
 Only the GitHub account **sheep05** can edit Private Studio. Your Cloudflare account email does not need to match your GitHub email. Visitors do not need to sign in.
 
-The homepage is a separate, full-screen programmer’s study; photographs cannot be reached by scrolling down. It opens from a high viewpoint inside a closed room. Click or tap once to take a slow walk to the desk. At the monitor, **Who is sheep?** appears with a gray “sheep” hint: click the 3D keyboard keys or type into the matching field, then press **Enter**. This is a playful introduction, not a password or sign-in; the text is never sent to a server. Backspace corrects a letter, and Escape clears the field. **Skip animation / Skip to gallery** opens the gallery immediately.
+The homepage is a separate, full-screen programmer’s study. Click or tap once to begin the walk. The monitor already displays the **actual gallery entrance**. The camera approaches it automatically, and the same interface expands to fill your screen and becomes interactive. There is no typing puzzle, second click, copied preview, black fade, or page reload. **Skip animation** opens that same gallery immediately.
 
-The upper-right controls switch the desk lamp and day/night lighting independently. At the desk, the lamp-base switch is also clickable. Lighting fades gradually, and the curtains move gently. Reduced-motion mode goes straight to the desk after the first click and removes the walk, zoom, and curtain movement; the keyboard remains usable. If WebGL is unavailable, the fallback entrance links directly to the gallery. Direct collection and album URLs also bypass the study.
+The monitor uses the visitor’s real screen proportions within its physical frame, so the gallery keeps the same responsive layout before and after entry. Its text, images, and navigation remain mounted throughout the animation. Reduced-motion mode opens the gallery directly after the first click; if 3D is unavailable, a direct entry remains available. Collection and album links bypass the study.
 
-The room displays public collection covers in its picture frames. It includes an original Fujifilm X-T5-inspired camera prop with an illustrative lens, photography books, and a contact sheet. The first three public covers may appear in the monitor transition as a visual preview; they do not assign collections to chapters. Edit the room geometry in `lib/scene/study-room.ts`, camera/input constants in `lib/scene/study-state.ts`, the X-T5 prop in `lib/scene/fujifilm-xt5.ts`, and interaction/display behavior in `app/components/Room.tsx`. The old Blender room export is retained for reference but is no longer loaded by the entrance.
+The upper-right controls switch the lamp and day/night lighting independently. The room retains its camera, photography books, curtains, and public collection covers in the picture frames. Edit geometry in `lib/scene/study-room.ts`, camera timing in `lib/scene/study-state.ts`, projection in `lib/scene/gallery-projection.ts`, and animation in `app/components/Room.tsx`. The gallery itself is shared by the monitor and page in `app/components/Portfolio.tsx`; its chapters live in `app/components/ChapterIndex.tsx`. The old Blender room export is retained for reference but is no longer loaded.
 
 ## 2. How publishing now works
 
@@ -65,6 +65,8 @@ In **Private Studio → Collections → Edit**, check any of the three **Gallery
 For Scenes, optionally check its countries under **Places on the Scenes atlas**. Choose more than one for a trip across several countries. Select **Save changes**, then wait for the daily GitHub publication or run the publishing workflow manually. Unpublished albums never appear on the public globe.
 
 The gallery opens with three entrances. **Scenes** opens a Three.js Earth: drag or use arrow keys to rotate, select a country pin or list entry, then select a collection below the globe. **All Scenes collections** also includes Scenes albums without a country. **Portraits** and **Street** currently lead to their assigned collections; their more detailed entrance designs can be developed separately. **All collections** includes every published album, assigned or not.
+
+The Scenes globe uses a locally hosted 8K Earth surface on capable desktop devices and a 4K version on mobile or lower-memory devices. Texture filtering and high-density rendering preserve coastline detail. A full-page star field twinkles gently; reduced-motion preferences keep it still. Image credits are linked below the globe. No external imagery service is needed for visitors.
 
 Country markers are representative country locations, not precise photo locations. Japan, Singapore, Malaysia, and China are initially configured. To add another marker and its Studio checkbox, add its ISO code, label, latitude, and longitude to `lib/catalog.ts`; no gallery rewrite or database migration is needed. If a region has no assigned collection, the site says so instead of inventing an association.
 
@@ -161,7 +163,7 @@ Deploy matching server and static assets together. Do not deploy a newly rebuilt
 | Old styling after deployment | In Safari choose **View → Reload Page From Origin** |
 | GitHub works but Studio does not | Studio still requires Cloudflare and owner sign-in; the public site is independent |
 | Owner sign-in rejected | Use GitHub **sheep05**, not another GitHub account; Cloudflare email does not matter |
-| Room skipped | Use `/` for the entrance; `?view=collection` deliberately skips it. Reduced motion goes directly to the desk; unsupported 3D offers direct gallery access |
+| Room skipped | Use `/` for the entrance; `?view=collection` deliberately skips it. Reduced motion opens the gallery directly; unsupported 3D offers direct gallery access |
 
 GitHub Pages' published-site limit is 1 GB. The exporter stops before photo copies alone reach 900 MB to leave space for the room and code. Source photos are also preserved in repository history. Store only optimized public copies here, not RAW originals. The existing Cloudflare free storage allowance is 1 GB.
 

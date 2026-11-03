@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {registerHooks} from 'node:module';
 import * as THREE from 'three';
-import {typeStudyKey,canEnterStudy,screenFillDistance,deskPosition,deskTarget,overviewPosition,overviewTarget,screenPosition,screenSize} from '../lib/scene/study-state.ts';
+import {screenFillDistance,deskPosition,deskTarget,overviewPosition,overviewTarget,screenPosition,screenSize} from '../lib/scene/study-state.ts';
 // Native Node type stripping needs explicit extensions for these bundled-only imports.
 registerHooks({resolve(specifier,context,next){try{return next(specifier,context);}catch(error){if(specifier.startsWith('.')&&!specifier.match(/\.[a-z]+$/i))return next(specifier+'.ts',context);throw error;}}});
 const {buildStudy}=await import('../lib/scene/study-room.ts');
@@ -11,26 +11,6 @@ const drawing=new Proxy({}, {get:(_t,k)=>k==='measureText'?s=>({width:s.length*1
 globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>drawing})};
 const scene=new THREE.Scene(),room=buildStudy(scene);scene.updateMatrixWorld(true);
 
-test('keyboard supports correction and exact sheep entry; unrelated keys cannot unlock',()=>{
- let text='';for(const k of 'shex')text=typeStudyKey(text,k);
- text=typeStudyKey(text,'Backspace');for(const k of 'ep')text=typeStudyKey(text,k);
- assert.equal(text,'sheep');assert.equal(canEnterStudy(text),true);
- assert.equal(canEnterStudy('sheepx'),false);assert.equal(typeStudyKey(text,'Enter'),text);
- assert.equal(typeStudyKey(text,'ArrowLeft'),text);assert.equal(typeStudyKey(text,'Escape'),'');
- assert.equal(typeStudyKey('abcdefghijklmnop','z'),'abcdefghijklmnop');
-});
-test('all desk keys can be raycast from the seated viewpoint without monitor obstruction',()=>{
- for(const aspect of [16/10,390/844,844/390]){
- const camera=new THREE.PerspectiveCamera(aspect<.8?70:55,aspect,.035,65);camera.position.fromArray(deskPosition);camera.lookAt(new THREE.Vector3(...deskTarget));camera.updateMatrixWorld();
- for(const key of room.keys){
-  const target=key.getWorldPosition(new THREE.Vector3());target.y+=.019;
-  const projected=target.clone().project(camera);assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,key.name+' is outside the view');
-  const ray=new THREE.Raycaster(camera.position.clone(),target.sub(camera.position).normalize());
-  const hits=ray.intersectObjects(scene.children,true).filter(h=>h.object.isMesh);
-  const hit=hits[0]?.object;assert.ok(hit===key||hit?.parent===key,`${key.name} blocked by ${hit?.name}`);
- }
- }
-});
 test('room has all enclosing surfaces and start camera sits inside them',()=>{
  for(const name of ['Floor','Back wall','Left wall','Front wall','Ceiling','Window wall below','Window wall above'])assert.ok(scene.getObjectByName(name),name);
  assert.ok(Math.abs(overviewPosition[0])<3&&Math.abs(overviewPosition[2])<2.8&&overviewPosition[1]<3.3);
@@ -49,10 +29,41 @@ test('camera remains inside free walking corridor',()=>{
 });
 let meshes=0,triangles=0;scene.traverse(o=>{if(o.isMesh){meshes++;triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3*(o.isInstancedMesh?o.count:1);}});
 test('scene stays within a bounded geometry budget',()=>{assert.ok(triangles<200000);console.log(`Study geometry: ${meshes} meshes, ${Math.round(triangles)} triangles`);});
-test('static batching reduces draw objects without merging interactive keys',async()=>{
+test('static batching reduces draw objects without losing keyboard detail',async()=>{
  const {batchStatic}=await import('../lib/scene/batch-static.ts');
  batchStatic(scene,[room.screen,...room.keys,room.lampTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
  let count=0;scene.traverse(o=>{if(o.isMesh)count++;});
  console.log(`Batched study: ${count} draw objects`);assert.ok(count<220);
  for(const key of room.keys)assert.ok(key.parent);
+});
+
+const {galleryProjection,monitorContentSize}=await import('../lib/scene/gallery-projection.ts');
+test('projected live gallery matches monitor corners throughout the approach',()=>{
+ for(const [width,height] of [[1440,900],[390,844],[844,390]]){
+  const camera=new THREE.PerspectiveCamera(55,width/height,.035,65);
+  const [w,h]=monitorContentSize(width/height);
+  const screen=new THREE.Vector3(...screenPosition);
+  for(let i=0;i<=20;i++){
+   const p=i/20;camera.position.lerpVectors(new THREE.Vector3(...overviewPosition),screen.clone().add(new THREE.Vector3(0,0,screenFillDistance(width/height,55))),p);
+   camera.lookAt(new THREE.Vector3(...overviewTarget).lerp(screen,p));
+   const matrix=galleryProjection(camera,width,height);assert.ok(Math.abs(matrix.determinant())>1e-10);
+   for(const [x,y] of [[0,0],[width,0],[width,height],[0,height],[width/2,height/2]]){
+    const actual=new THREE.Vector3(x,y,0).applyMatrix4(matrix);
+    const expected=new THREE.Vector3(screen.x+(x/width-.5)*w,screen.y+(.5-y/height)*h,screen.z).project(camera);
+    assert.ok(Math.abs(actual.x-(expected.x+1)*width/2)<1e-6);
+    assert.ok(Math.abs(actual.y-(1-expected.y)*height/2)<1e-6);
+   }
+  }
+ }
+});
+test('last animated frame equals the untransformed gallery viewport exactly',()=>{
+ for(const [width,height] of [[1440,900],[390,844],[844,390],[2560,1080]]){
+  const camera=new THREE.PerspectiveCamera(55,width/height,.035,65);
+  camera.position.fromArray(screenPosition);camera.position.z+=screenFillDistance(width/height,55);camera.lookAt(new THREE.Vector3(...screenPosition));
+  const matrix=galleryProjection(camera,width,height);
+  for(const [x,y] of [[0,0],[width,0],[width,height],[0,height],[width*.3,height*.7]]){
+   const point=new THREE.Vector3(x,y,0).applyMatrix4(matrix);
+   assert.ok(Math.abs(point.x-x)<1e-6&&Math.abs(point.y-y)<1e-6,'No translation, scale or crop jump at handoff');
+  }
+ }
 });
