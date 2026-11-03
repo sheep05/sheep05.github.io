@@ -95,7 +95,7 @@ export default function Room(props: Props) {
         const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);live.current.onUnavailable();cleanup();};
         renderer.domElement.addEventListener('pointerup',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
         cleanup=()=>{live.current.interact.current=null;ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('pointerup',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
-        const warm=new THREE.Color('#ffbd77'),daySky=new THREE.Color('#9bb5c3'),nightSky=new THREE.Color('#101c36');
+        const warm=room.lamp.color.clone(),daySky=new THREE.Color('#9bb5c3'),nightSky=new THREE.Color('#101c36');
         const frame=(now:number)=>{
           raf=requestAnimationFrame(frame);const dt=Math.min((now-previous)/1000,.05);previous=now;
           if(!visible||document.hidden)return;

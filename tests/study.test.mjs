@@ -36,10 +36,11 @@ test('walk goes straight down the centre aisle with bounded sway and no sideways
  assert.equal(WALK_SECONDS+ENTER_SECONDS,10.5);
 });
 
-test('lamp clears the monitor and the chair turns in place toward it',()=>{
+test('lamp crown is level with the monitor and the chair turns in place toward it',()=>{
  const shade=new THREE.Box3().setFromObject(scene.getObjectByName('Lamp shade'));
  const monitor=new THREE.Box3().setFromObject(scene.getObjectByName('Monitor frame'));
- assert.ok(shade.min.y>monitor.max.y);
+ assert.ok(Math.abs(shade.max.y-monitor.max.y)<.001);
+ assert.ok(shade.max.x<monitor.min.x,'Lamp stays beside the monitor without covering its screen');
  const chair=scene.getObjectByName('Desk chair');assert.deepEqual(chair.position.toArray(),[-1.1,0,-.65]);
  const forward=new THREE.Vector3(0,0,-1).applyQuaternion(chair.quaternion);
  const direction=new THREE.Vector3(screenPosition[0]-chair.position.x,0,screenPosition[2]-chair.position.z).normalize();

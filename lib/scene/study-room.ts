@@ -121,15 +121,23 @@ export function buildStudy(scene: THREE.Scene) {
   box('Chair cushion',[.51,.09,.47],[0,.47,0],mat('#5c5143'),.06,chair);
   box('Chair back',[.52,.5,.09],[0,.8,.2],walnut,.055,chair);
   for(const x of [-.2,.2])for(const z of [-.17,.17])box('Chair leg',[.035,.44,.035],[x,.22,z],charcoal,.005,chair);
-  // Every visible lamp part is clickable; its shade sits above the monitor.
+  // A broad enamel dome and slender stem, with its crown level with the monitor.
+  // Every visible part remains clickable.
   const lampTarget=new THREE.Group();lampTarget.name='Desk lamp';scene.add(lampTarget);
-  cyl('Lamp base',.15,.035,[-1.05,.94,-2.12],brass,lampTarget);
-  line([[-1.05,.96,-2.12],[-1.05,1.55,-2.12],[-.83,2.13,-2.1]],.022,brass,lampTarget);
-  const shade=new THREE.Mesh(new THREE.ConeGeometry(.17,.18,40,1,true),brass);shade.name='Lamp shade';shade.position.set(-.83,2.08,-2.1);shade.castShadow=true;lampTarget.add(shade);
-  const bulbMaterial=new THREE.MeshStandardMaterial({color:'#ffe6b1',emissive:'#ffc16a',emissiveIntensity:2});
-  cyl('Lamp diffuser',.13,.008,[-.83,1.995,-2.1],bulbMaterial,lampTarget);
-  box('Lamp switch',[.14,.04,.14],[-1.05,.965,-2.12],brass,.02,lampTarget);
-  const lamp=new THREE.PointLight('#ffbd77',9,4,2);lamp.position.set(-.83,1.97,-2.1);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.025;lamp.shadow.bias=-.001;scene.add(lamp);
+  const lampBronze=mat('#665849',.4,.65),lampEnamel=mat('#e3d8c3',.38,.08);
+  lampEnamel.side=THREE.DoubleSide;
+  const lampX=-1.07,lampZ=-2.12,shadeY=1.91-.31*.72;
+  const baseProfile=[[0,0],[.175,0],[.194,.008],[.2,.02],[.194,.033],[.17,.044],[.06,.049],[0,.049]].map(([r,y])=>new THREE.Vector2(r,y));
+  const lampBase=new THREE.Mesh(new THREE.LatheGeometry(baseProfile,48),lampBronze);lampBase.name='Lamp base';lampBase.position.set(lampX,.91,lampZ);lampBase.castShadow=lampBase.receiveShadow=true;lampTarget.add(lampBase);
+  cyl('Lamp stem',.013,shadeY-.95,[lampX,(shadeY+.95)/2,lampZ],lampBronze,lampTarget);
+  cyl('Lamp stem collar',.025,.03,[lampX,.969,lampZ],lampBronze,lampTarget);
+  const shade=new THREE.Mesh(new THREE.SphereGeometry(.31,48,20,0,Math.PI*2,0,Math.PI/2),lampEnamel);shade.name='Lamp shade';shade.scale.y=.72;shade.position.set(lampX,shadeY,lampZ);shade.castShadow=shade.receiveShadow=true;lampTarget.add(shade);
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(.306,.006,8,64),lampEnamel);rim.name='Rounded shade edge';rim.rotation.x=Math.PI/2;rim.position.set(lampX,shadeY,lampZ);rim.castShadow=true;lampTarget.add(rim);
+  const bulbMaterial=new THREE.MeshStandardMaterial({color:'#fff0d3',emissive:'#ffd49a',emissiveIntensity:2});
+  cyl('Lamp diffuser',.294,.008,[lampX,shadeY,lampZ],bulbMaterial,lampTarget);
+  cyl('Lamp switch',.016,.009,[lampX+.105,.96,lampZ+.075],lampBronze,lampTarget);
+  line([[lampX,.92,lampZ-.12],[lampX-.08,.92,-2.45],[lampX-.08,.85,-2.6],[lampX-.08,.15,-2.65]],.004,black,lampTarget);
+  const lamp=new THREE.PointLight('#ffcd94',9,4,2);lamp.position.set(lampX,shadeY-.025,lampZ);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.025;lamp.shadow.bias=-.001;scene.add(lamp);
   const hemi=new THREE.HemisphereLight('#819cbe','#55412e',.6);scene.add(hemi);
   const sun=new THREE.DirectionalLight('#b4c6df',.65);sun.position.set(2.8,2.6,.4);sun.target.position.set(-1,.5,-1.7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:.1,far:12});sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;scene.add(sun,sun.target);
   const monitorLight=new THREE.PointLight('#b1cacc',.5,2.5,2);monitorLight.position.set(0,1.4,-1.95);scene.add(monitorLight);
