@@ -51,3 +51,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+## Gallery entrance portrait
+
+`earth-card.webp` is a 1400 × 1400 transparent Earth portrait rendered from `earth-day-8k.jpg`, centred on Asia. It replaces the flat-map circle on the Scenes entrance card. Texture: Solar System Scope, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); changes: 3D sphere projection, lighting, and WebP compression. Source script: `scene-source/render-earth-card.py` (Blender). Convert its ignored `work/earth-card.png` output with Sharp `.webp({quality:90,alphaQuality:100})`.

@@ -10,7 +10,7 @@ export default function ChapterIndex({albums,photos,assetBase,onChapter,onAll}:{
       const cover=first&&photos.find(p=>p.id===(first.coverId||first.photoIds[0]));
       return <button className={`chapter-portal portal-${chapter.id}`} key={chapter.id} onClick={()=>onChapter(chapter.id)}>
         <div className="chapter-art" aria-hidden="true">
-          {chapter.id==='scenes'?<div className="chapter-earth" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>:cover?<img src={cover.thumb} alt=""/>:<div className={`chapter-study study-${chapter.id}`}><i/><i/><i/></div>}
+          {chapter.id==='scenes'?<div className="chapter-earth" style={{backgroundImage:`url(${assetBase}atlas/earth-card.webp)`}}/>:cover?<img src={cover.thumb} alt=""/>:<div className={`chapter-study study-${chapter.id}`}><i/><i/><i/></div>}
         </div>
         <div className="chapter-portal-top"><span>0{i+1}</span><span>{chapter.id==='scenes'?'EXPLORE THE ATLAS':`${assigned.length.toString().padStart(2,'0')} COLLECTIONS`}</span></div>
         <div className="chapter-portal-copy"><p>{chapter.subtitle}</p><h2>{chapter.title}</h2><div><span>{chapter.note}</span><span className="chapter-arrow">↗</span></div></div>

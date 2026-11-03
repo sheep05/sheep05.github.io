@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { easeStudy, WALK_SECONDS, ENTER_SECONDS, overviewPosition, overviewTarget, deskPosition, deskTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
+import { studyWalkPosition, easeStudy, WALK_SECONDS, ENTER_SECONDS, overviewPosition, overviewTarget, deskPosition, deskTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
 
 type Props = {
   gallerySurface: RefObject<HTMLDivElement | null>; entering: boolean; onEnter: () => void; onReady: () => void;
@@ -32,7 +32,7 @@ export default function Room(props: Props) {
         renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
         renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
         renderer.domElement.setAttribute('aria-hidden','true');container.appendChild(renderer.domElement);
-        const camera=new THREE.PerspectiveCamera(76,1,.035,65);
+        const camera=new THREE.PerspectiveCamera(70,1,.035,65);
         camera.position.fromArray(overviewPosition);camera.lookAt(new THREE.Vector3(...overviewTarget));
         let environment:import('three').WebGLRenderTarget|undefined;
         let raf=0;let study:ReturnType<typeof buildStudy>|undefined;
@@ -67,8 +67,7 @@ export default function Room(props: Props) {
           });
         };
         commands.current.redraw=updateArtwork;updateArtwork();
-        const start=new THREE.Vector3(...overviewPosition),end=new THREE.Vector3(...deskPosition);
-        const walk=new THREE.CatmullRomCurve3([start,new THREE.Vector3(1.35,1.85,1.2),new THREE.Vector3(.25,1.63,.75),end]);
+        const end=new THREE.Vector3(...deskPosition);
         const focusStart=new THREE.Vector3(...overviewTarget),focusEnd=new THREE.Vector3(...deskTarget),screenAt=new THREE.Vector3(...screenPosition);
         let elapsed=0, previous=performance.now(),visible=true, daylight=0,lamplight=1;
         let galleryStart=end.clone(),galleryGaze=focusEnd.clone();
@@ -82,7 +81,7 @@ export default function Room(props: Props) {
           elapsed=0;galleryStart=camera.position.clone();galleryGaze=focusEnd.clone();changeStage('entering');
         };
         commands.current.begin=begin;
-        const resize=()=>{const w=container.clientWidth,h=container.clientHeight;if(!w||!h)return;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=state.current.stage==='overview'?(w<h?90:76):(w/h<.8?70:55);camera.updateProjectionMatrix();};
+        const resize=()=>{const w=container.clientWidth,h=container.clientHeight;if(!w||!h)return;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=state.current.stage==='overview'?(w<h?84:70):(w/h<.8?70:55);camera.updateProjectionMatrix();};
         const ro=new ResizeObserver(resize);ro.observe(container);resize();
         const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(container);
         const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
@@ -101,10 +100,10 @@ export default function Room(props: Props) {
           if(!visible||document.hidden)return;
           const current=state.current.stage;
           if(current==='walking'){
-            elapsed+=dt;const t=Math.min(elapsed/WALK_SECONDS,1),e=easeStudy(t);camera.position.copy(walk.getPointAt(e));
-            const gait=Math.sin(Math.PI*t);camera.position.x+=Math.sin(t*Math.PI*12)*.014*gait;camera.position.y+=Math.sin(t*Math.PI*24)*.009*gait;
+            elapsed+=dt;const t=Math.min(elapsed/WALK_SECONDS,1),e=easeStudy(t);camera.position.fromArray(studyWalkPosition(t));
+            const gait=Math.sin(Math.PI*t);
             camera.lookAt(focusStart.clone().lerp(focusEnd,easeStudy(Math.min(t*1.8,1))));camera.rotateZ(Math.sin(t*Math.PI*12)*.002*gait);
-            camera.fov=(camera.aspect<1?90:76)*(1-e)+(camera.aspect<.8?70:55)*e;camera.updateProjectionMatrix();
+            camera.fov=(camera.aspect<1?84:70)*(1-e)+(camera.aspect<.8?70:55)*e;camera.updateProjectionMatrix();
             if(t===1)enter();
           }else if(current==='entering'){
             elapsed+=dt;const t=Math.min(elapsed/ENTER_SECONDS,1),e=easeStudy(t);

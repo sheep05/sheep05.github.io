@@ -2481,3 +2481,7 @@ html { scrollbar-gutter: stable; }
 .atlas-image-credit {grid-column:1/-1;text-align:right;font-size:9px;color:#8493a3;margin-top:10px;}
 .atlas-image-credit a {text-decoration:underline;text-underline-offset:3px;}
 .view-scenes .atlas-region-list > button {text-shadow:0 1px 8px #02050b;}
+
+/* A rendered sphere from the 8K atlas map, rather than a cropped flat map. */
+.chapter-earth {width:min(90%,340px);top:10%;background-size:100% 100%;background-position:center;box-shadow:0 0 48px #46778a18;transform:translateX(-50%);}
+.chapter-portal:hover .chapter-earth {transform:translateX(-50%) scale(1.035);}

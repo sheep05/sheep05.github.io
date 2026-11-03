@@ -16,7 +16,7 @@ The contact email saved in Studio is excluded from the GitHub copy by default; i
 
 Only the GitHub account **sheep05** can edit Private Studio. Your Cloudflare account email does not need to match your GitHub email. Visitors do not need to sign in.
 
-The homepage is a separate, full-screen programmer’s study. Click or tap once to begin the walk. The monitor already displays the **actual gallery entrance**. The camera approaches it automatically, and the same interface expands to fill your screen and becomes interactive. There is no typing puzzle, second click, copied preview, black fade, or page reload. **Skip animation** opens that same gallery immediately.
+The homepage is a separate, full-screen programmer’s study. The viewpoint starts near standing eye level. Click or tap once for a straight approach to the desk with gentle footsteps; the walk and gallery transition take about 10.5 seconds in total. The monitor already displays the **actual gallery entrance**. The camera approaches it automatically, and the same interface expands to fill your screen and becomes interactive. There is no typing puzzle, second click, copied preview, black fade, or page reload. **Skip animation** opens that same gallery immediately.
 
 The monitor uses the visitor’s real screen proportions within its physical frame, so the gallery keeps the same responsive layout before and after entry. Its text, images, and navigation remain mounted throughout the animation. Reduced-motion mode opens the gallery directly after the first click; if 3D is unavailable, a direct entry remains available. Collection and album links bypass the study.
 
@@ -66,7 +66,7 @@ For Scenes, optionally check its countries under **Places on the Scenes atlas**.
 
 The gallery opens with three entrances. **Scenes** opens a Three.js Earth: drag or use arrow keys to rotate, select a country pin or list entry, then select a collection below the globe. **All Scenes collections** also includes Scenes albums without a country. **Portraits** and **Street** currently lead to their assigned collections; their more detailed entrance designs can be developed separately. **All collections** includes every published album, assigned or not.
 
-The Scenes globe uses a locally hosted 8K Earth surface on capable desktop devices and a 4K version on mobile or lower-memory devices. Texture filtering and high-density rendering preserve coastline detail. A full-page star field twinkles gently; reduced-motion preferences keep it still. Image credits are linked below the globe. No external imagery service is needed for visitors.
+The Scenes entrance card uses a 1400-pixel Earth portrait rendered from the 8K map. The interactive Scenes globe uses a locally hosted 8K Earth surface on capable desktop devices and a 4K version on mobile or lower-memory devices. Texture filtering and high-density rendering preserve coastline detail. A full-page star field twinkles gently; reduced-motion preferences keep it still. Image credits are linked below the globe. No external imagery service is needed for visitors.
 
 Country markers are representative country locations, not precise photo locations. Japan, Singapore, Malaysia, and China are initially configured. To add another marker and its Studio checkbox, add its ISO code, label, latitude, and longitude to `lib/catalog.ts`; no gallery rewrite or database migration is needed. If a region has no assigned collection, the site says so instead of inventing an association.
 
