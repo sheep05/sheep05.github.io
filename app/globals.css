@@ -2289,11 +2289,9 @@ select {
 .view-collection button:focus-visible, .view-scenes button:focus-visible, .atlas-canvas:focus-visible { outline: 2px solid #d8bd84; outline-offset: 5px; }
 .chapter-index { padding: 64px 4.3% 28px; max-width: 1800px; margin: auto; }
 .chapter-index-heading { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; align-items: end; margin-bottom: 54px; }
-.chapter-index-heading > .eyebrow { grid-column: 1 / -1; margin-bottom: 22px; }
 .chapter-index-heading h1 { font: 400 clamp(58px, 6.5vw, 100px)/.98 var(--serif); letter-spacing: -.055em; }
 .chapter-index-heading h1 em { color: #c7b99b; }
 .chapter-index-heading > div { justify-self: end; padding: 0 0 5px; }
-.chapter-index-heading p:not(.eyebrow) { color: #a5b0b5; line-height: 1.8; font-size: 13px; }
 .chapter-index-heading button { margin-top: 24px; padding-bottom: 7px; border-bottom: 1px solid #67716f; font-size: 12px; }
 .chapter-index-heading button span { margin-left: 44px; }
 .chapter-portals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -2305,10 +2303,8 @@ select {
 .chapter-portal:hover .chapter-earth { transform: translateX(-50%) rotate(-4deg) scale(1.04); }
 .chapter-portal:hover .chapter-art > img { transform: scale(1.04); }
 .chapter-portal-top { position: absolute; inset: 24px 24px auto; display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .15em; color: #c2cbc9; }
-.chapter-portal-copy { position: absolute; inset: auto 26px 28px; }
-.chapter-portal-copy > p { color: #c3bba9; font: italic 15px var(--serif); margin-bottom: 8px; }
+.chapter-portal-copy { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; position: absolute; inset: auto 26px 28px; }
 .chapter-portal-copy h2 { font: 400 clamp(40px,4vw,65px)/1.1 var(--serif); letter-spacing: -.045em; }
-.chapter-portal-copy > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: #aeb7b8; font-size: 11px; }
 .chapter-arrow { font-size: 25px; color: #e1d2b4; }
 .chapter-study { position: absolute; inset: 0; background: #272a29; }
 .study-portraits { background: radial-gradient(ellipse at 35% 30%, #b19c7c50, transparent 68%), #282928; }
@@ -2319,7 +2315,7 @@ select {
 .study-street i { position: absolute; width: 120%; border-top: 1px solid #a9b4b14d; top: 28%; left: -10%; transform: rotate(-20deg); }
 .study-street i:nth-child(2) { top: 43%; }
 .study-street i:nth-child(3) { top: 58%; }
-.chapter-index-foot { display: flex; justify-content: space-between; padding-top: 28px; color: #8c9b9e; font-size: 9px; letter-spacing: .13em; }
+.chapter-index-foot { display: flex; justify-content: flex-end; padding-top: 28px; color: #8c9b9e; font-size: 9px; letter-spacing: .13em; }
 .chapter-index-foot span:last-child { font: italic 14px var(--serif); letter-spacing: 0; }
 .atlas-back { margin: 28px 4.3% 0; font-size: 11px; color: #a5b1b6; }
 .atlas-loading { min-height: 70svh; padding: 12vh 6%; font: italic 36px var(--serif); }
@@ -2387,13 +2383,11 @@ select {
   .atlas-kicker span:last-child { display: none; }
   .chapter-portal { min-height: 410px; }
   .chapter-portal-copy { left: 20px; right: 20px; }
-  .chapter-portal-copy > div { align-items: end; line-height: 1.7; }
   .chapter-earth { width: 250px; }
 }
 @media (max-width: 760px) {
   .chapter-index { padding: 42px 6% 26px; }
   .chapter-index-heading { grid-template-columns: 1fr; gap: 24px; margin-bottom: 32px; }
-  .chapter-index-heading > .eyebrow { margin-bottom: 0; }
   .chapter-index-heading > div { justify-self: start; }
   .chapter-index-heading h1 { font-size: 68px; }
   .chapter-portals { grid-template-columns: 1fr; gap: 18px; }
