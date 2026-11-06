@@ -6,6 +6,7 @@ import Room from "./Room";
 import SpaceBackdrop from "./SpaceBackdrop";
 import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
+import StreetStrip from "./StreetStrip";
 import { chapters, inChapter } from "@/lib/catalog";
 const Atlas = lazy(() => import("./Atlas"));
 import { sampleCollection } from "@/lib/samples";
@@ -185,7 +186,7 @@ export default function Portfolio({
           inert={view === "studio"}
           aria-hidden={view === "studio" ? true : undefined}
         >
-          {view === "studio" && <div className="monitor-standby" aria-hidden="true"><span>▣</span></div>}
+          {view === "studio" && <div className="monitor-standby" aria-hidden="true" />}
           {galleryHeader}
           <ChapterIndex live={showGallery} albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
           {galleryFooter}
@@ -245,7 +246,9 @@ export default function Portfolio({
                 <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
             </div>
-            <div className="collection-list">
+            {view === "street" ? listedAlbums.map(album => (
+              <StreetStrip key={album.id} album={album} photos={albumPhotos(album)} onOpen={() => navigate("album", album.id)} />
+            )) : <div className="collection-list">
               {listedAlbums.map((a, i) => (
                 <button
                   ref={observeScrollReveal}
@@ -278,7 +281,7 @@ export default function Portfolio({
                   </div>
                 </button>
               ))}
-            </div>
+            </div>}
             {listedAlbums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
           </section>
         )}

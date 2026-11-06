@@ -2487,8 +2487,8 @@ html { scrollbar-gutter: stable; }
 /* The standby display and the gallery share one projected monitor surface. */
 .monitor-idle > :not(.monitor-standby) { visibility: hidden; }
 .monitor-standby {
-  position: absolute; inset: 0; display: grid; place-content: center;
-  background: #0b1116; color: #d1c3a9; font: 90px Georgia, serif;
+  position: absolute; inset: 0;
+  background: #0b1116;
   pointer-events: none; z-index: 2; transition: opacity .65s;
 }
 .monitor-awake .monitor-standby { opacity: 0; }
@@ -2504,4 +2504,32 @@ html { scrollbar-gutter: stable; }
 .study-actions button:focus-visible { outline: 2px solid #dbcaa7; }
 @media (prefers-reduced-motion: reduce) {
   .monitor-standby { transition: none; }
+}
+
+.view-street main:focus { outline: none; }
+.view-street .back-link { margin-bottom: 10px; }
+.view-street .collection-page { padding: 24px 4.3% 60px; }
+.view-street .collection-heading { padding-bottom: 16px; border: 0; }
+.view-street .collection-heading h1 { margin-top: 12px; }
+.street-series { margin-bottom: 40px; }
+.street-series-heading, .street-controls { display: flex; align-items: center; }
+.street-series-heading { gap: 14px; justify-content: space-between; margin: 0 0 12px; }
+.street-series-heading h2 { font: italic clamp(20px, 2vw, 30px)/1.2 var(--serif); }
+.street-series-heading h2 span { font: 15px var(--sans); }
+.street-controls { gap: 5px; }
+.street-controls span { margin-right: 10px; font-size: 12px; color: #616259; }
+.street-controls button { width: 44px; height: 44px; font-size: 19px; }
+.street-controls button:disabled { cursor: default; opacity: .28; }
+.street-strip {
+  position: relative; display: flex; gap: clamp(6px, .8vw, 14px);
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin;
+  scrollbar-color: #99988d transparent; padding-bottom: 8px;
+  user-select: none; -webkit-user-select: none;
+}
+.street-strip a { display: block; flex: none; cursor: grab; }
+.street-strip a:active, .street-strip:active { cursor: grabbing; }
+.street-strip a:focus-visible { outline-offset: -4px; }
+.street-strip img {
+  height: clamp(180px, min(54svh, 50vw), 680px); width: auto; max-width: none;
+  background: #e6e2d8; pointer-events: none;
 }
