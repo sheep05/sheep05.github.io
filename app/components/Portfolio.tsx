@@ -152,7 +152,6 @@ export default function Portfolio({
         <button className="brand" onClick={() => navigate("studio")}>
           {settings.name}
         </button>
-        <span>PHOTOGRAPHS, WITH ROOM TO BREATHE.</span>
         {managementUrl && <a href={managementUrl}>Studio management ↗</a>}
       </footer>);
   const galleryHeader = (
@@ -212,7 +211,6 @@ export default function Portfolio({
               <span>{settings.name}</span>
             </div>
             <div className="entrance-copy">
-              <p className="eyebrow">MAKE YOURSELF AT HOME</p>
               <h1>
                 {settings.tagline === "A space for seeing slowly." ? (
                   <>
@@ -224,11 +222,6 @@ export default function Portfolio({
                   settings.tagline
                 )}
               </h1>
-              <p className="entrance-note">
-                Places, passing light,
-                <br />
-                and the moments in between.
-              </p>
             </div>
             <div className="scene-wrap">
               <Room
@@ -267,14 +260,10 @@ export default function Portfolio({
               <span className="enter-ring">↗</span>
               <span>
                 {entranceLabel}
-                <small>
-                  {sceneState === "fallback" ? "DIRECT GALLERY ENTRANCE" : "STEP INSIDE · TAKE A SEAT · EXPLORE"}
-                </small>
+                {sceneState === "fallback" && <small>DIRECT GALLERY ENTRANCE</small>}
               </span>
             </div>
             <div className="entrance-bottom">
-              <span>01 / THE STUDIO</span>
-              <span>From my room, into the world.</span>
               <span id="entrance-instruction">CLICK OR TAP ANYWHERE TO BEGIN</span>
             </div>
             {(walkRequested || sceneState === "fallback") && (
@@ -298,15 +287,11 @@ export default function Portfolio({
             {collectionNotice}
             <button className="text-link back-link" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
             <div className="collection-heading">
-              <p className="eyebrow">THE PHOTOGRAPHIC ARCHIVE</p>
               <h1>
                 {chapter ? chapter.title : "Collected"}
                 {!chapter && <><br /><em>moments.</em></>}
                 <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
-              <p>
-                {chapter ? chapter.note : "Different places. Different rhythms. Each collection, a way of looking."}
-              </p>
             </div>
             <div className="collection-list">
               {listedAlbums.map((a, i) => (
@@ -356,10 +341,8 @@ export default function Portfolio({
               <div className="album-heading">
                 <div>
                   <p className="eyebrow">
-                    {active.sample
-                      ? "SAMPLE COLLECTION"
-                      : "PHOTOGRAPHIC SERIES"}{" "}
-                    / {String(active.photoIds.length).padStart(2, "0")} FRAMES
+                    {active.sample && "SAMPLE COLLECTION / "}
+                    {String(active.photoIds.length).padStart(2, "0")} FRAMES
                   </p>
                   <h1>{active.title}</h1>
                 </div>
@@ -403,7 +386,6 @@ export default function Portfolio({
                 </p>
               )}
               <div className="album-end">
-                <p className="eyebrow">END OF COLLECTION</p>
                 <button onClick={() => navigate("collection")}>
                   Keep looking ↗
                 </button>
@@ -423,7 +405,6 @@ export default function Portfolio({
           ))}
         {view === "about" && (
           <section className="about-page">
-            <p className="eyebrow">A NOTE FROM THE STUDIO</p>
             <h1>
               To notice.
               <br />
@@ -540,7 +521,6 @@ function Empty({ owner, managementUrl }: {
   return (
     <div className="empty">
       <h2>A collection is taking shape.</h2>
-      <p>New photographs will appear here.</p>
       {owner && managementUrl && (
         <a className="text-link" href={managementUrl}>
           Add your first photographs ↗

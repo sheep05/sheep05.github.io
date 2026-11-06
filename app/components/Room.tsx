@@ -141,7 +141,7 @@ export default function Room(props: Props) {
   },[]);
   useEffect(()=>{if(props.entering){if(ready)commands.current.begin();else if(failed)live.current.onEnter();}},[props.entering,ready,failed]);
   return <div className={`room study-room ${ready?'room-ready':''} study-${stage}`}>
-    <div className="study-fallback" aria-hidden="true"><span>THE STUDY</span><strong>Between code<br />and photographs.</strong></div>
+    <div className="study-fallback" aria-hidden="true"><strong>Between code<br />and photographs.</strong></div>
     <div ref={mount} className="room-canvas" />
     {!ready&&!failed&&<span className="room-loading">Opening the study…</span>}
     {failed&&<p className="study-unavailable">The 3D study is unavailable on this device. You can enter the gallery directly.</p>}

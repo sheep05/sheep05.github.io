@@ -22,6 +22,5 @@ export default function ChapterIndex({albums,photos,assetBase,onChapter,onAll}:{
         </div>
       </button>;
     })}</div>
-    <div className="chapter-index-foot"><span>Follow your curiosity.</span></div>
   </section>;
 }

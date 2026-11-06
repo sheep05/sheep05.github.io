@@ -170,9 +170,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
 
   return <section className="atlas-page">
     <div className="atlas-intro">
-      <div className="atlas-kicker"><span>01 / SCENES</span><span>FIELD NOTES FROM EARTH</span></div>
       <h1>A personal<br/><em>atlas.</em></h1>
-      <p>Some places become part of us.<br/>These are a few of mine.</p>
       <div className="atlas-region-list" aria-label="Choose a country">
         {regions.map((region,i) => <button key={region.id} aria-pressed={selected === region.id} onClick={()=>onSelect(region.id)}>
           <span className="region-number">0{i+1}</span><span>{region.name}</span>
@@ -208,11 +206,11 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           <button aria-label="Reset Earth view" onClick={()=>focusRegion.current(null)}>↺</button>
         </div>}
       </div>
-      <span className="atlas-coordinate" aria-hidden="true">{activeRegion ? `${activeRegion.lat.toFixed(2)}° N / ${activeRegion.lon.toFixed(2)}° E` : 'A WORLD TO RETURN TO'}</span>
+      {activeRegion && <span className="atlas-coordinate" aria-hidden="true">{activeRegion.lat.toFixed(2)}° N / {activeRegion.lon.toFixed(2)}° E</span>}
     </div>
     <p className="atlas-image-credit">Earth imagery: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Solar System Scope</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
     <div id="atlas-collections" className="atlas-collections" aria-live="polite">
-      <div className="atlas-collections-heading"><div><p className="eyebrow">{selected?'THE PLACES IN BETWEEN':'THE SCENES ARCHIVE'}</p><h2 id="atlas-collection-title" tabIndex={-1}>{activeRegion?.name || selected || 'Across the atlas'}<sup>{shown.length.toString().padStart(2,'0')}</sup></h2></div>
+      <div className="atlas-collections-heading"><div><h2 id="atlas-collection-title" tabIndex={-1}>{activeRegion?.name || selected || 'Across the atlas'}<sup>{shown.length.toString().padStart(2,'0')}</sup></h2></div>
         <button onClick={onAll}>All collections ↗</button>
       </div>
       {shown.length ? <div className="atlas-album-grid">{shown.map(album=>{
@@ -221,7 +219,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           <div>{photo?<img src={photo.thumb} alt={photo.alt||photo.title} loading="lazy"/>:<span>Photographs to come</span>}</div>
           <small>{album.photoIds.length} PHOTOGRAPHS <span>↗</span></small><h3>{album.title}</h3><p>{album.description}</p>
         </button>;
-      })}</div> : <div className="atlas-empty"><p>No collections here yet.</p><span>{selected ? 'This part of the journey is still taking shape.' : 'New places will appear here as the archive grows.'}</span><button onClick={onAll}>Explore all collections ↗</button></div>}
+      })}</div> : <div className="atlas-empty"><p>No collections here yet.</p><button onClick={onAll}>Explore all collections ↗</button></div>}
     </div>
   </section>;
 }
