@@ -2472,7 +2472,8 @@ html { scrollbar-gutter: stable; }
 
 @media (prefers-reduced-motion: no-preference) {
   [data-reveal] {
-    transition: opacity 650ms ease-out, translate 650ms ease-out;
+    transition: opacity 1100ms ease-out, translate 1100ms ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
   }
   [data-reveal="below"]:not(:focus-within),
   [data-reveal="above"]:not(:focus-within) {
@@ -2481,4 +2482,26 @@ html { scrollbar-gutter: stable; }
   [data-reveal="below"]:not(:focus-within) { translate: 0 10px; }
   [data-reveal="above"]:not(:focus-within) { translate: 0 -10px; }
   [data-reveal]:focus-within { transition: none; }
+}
+
+/* The standby display and the gallery share one projected monitor surface. */
+.monitor-idle > :not(.monitor-standby) { visibility: hidden; }
+.monitor-standby {
+  position: absolute; inset: 0; display: grid; place-content: center;
+  background: #0b1116; color: #d1c3a9; font: 90px Georgia, serif;
+  pointer-events: none; z-index: 2; transition: opacity .65s;
+}
+.monitor-awake .monitor-standby { opacity: 0; }
+.study-actions {
+  position: absolute; z-index: 5; right: 5%; bottom: max(5%, env(safe-area-inset-bottom));
+  display: flex; align-items: center; gap: 16px; color: #f1e6d4;
+  font: 12px var(--sans); text-shadow: 0 1px 5px #000;
+}
+.study-actions button {
+  min-height: 44px; padding: 0 12px; border-bottom: 1px solid #b0a694;
+  background: #191715d6; color: inherit;
+}
+.study-actions button:focus-visible { outline: 2px solid #dbcaa7; }
+@media (prefers-reduced-motion: reduce) {
+  .monitor-standby { transition: none; }
 }

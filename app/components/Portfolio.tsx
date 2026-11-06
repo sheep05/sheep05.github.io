@@ -37,9 +37,7 @@ export default function Portfolio({
     }));
   const [view, setView] = useState("studio"),
     [activeId, setActiveId] = useState<string | null>(null),
-    [entering, setEntering] = useState(false),
-    [walkRequested, setWalkRequested] = useState(false),
-    [sceneState, setSceneState] = useState<"loading" | "ready" | "fallback">("loading"),
+    [monitorAwake, setMonitorAwake] = useState(false),
     [lightbox, setLightbox] = useState<{
       photos: Photo[];
       index: number;
@@ -52,9 +50,7 @@ export default function Portfolio({
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const main = useRef<HTMLElement>(null);
-  const roomInteraction = useRef<((x:number,y:number)=>boolean)|null>(null);
   const gallerySurface = useRef<HTMLDivElement>(null);
-  const skipWalk = useRef<HTMLButtonElement>(null);
   useLayoutEffect(() => {
     if (view === "studio" && gallerySurface.current) {
       gallerySurface.current.style.visibility = "hidden";
@@ -70,10 +66,8 @@ export default function Portfolio({
       setRegion(p.get("region"));
       const from = p.get("from") || "collection";
       setAlbumContext({ view: ["scenes","portraits","street","all"].includes(from) ? from : "collection", region: p.get("region") });
-      setEntering(false);
-      setWalkRequested(false);
+      setMonitorAwake(false);
       setStudyStage("overview");
-      if (p.has("album") || (p.get("view") && p.get("view") !== "studio")) setSceneState("loading");
     };
     read();
     window.addEventListener("popstate", read);
@@ -88,9 +82,6 @@ export default function Portfolio({
       document.body.style.overflow = previousOverflow;
     };
   }, [view, !!lightbox]);
-  useEffect(() => {
-    if (walkRequested) skipWalk.current?.focus({ preventScroll: true });
-  }, [walkRequested]);
   useEffect(() => {
     if (view !== "studio") main.current?.focus({ preventScroll: true });
   }, [view]);
@@ -108,10 +99,8 @@ export default function Portfolio({
     setRegion(country);
     setView(next);
     setActiveId(id || null);
-    setEntering(false);
-    setWalkRequested(false);
+    setMonitorAwake(false);
     setStudyStage("overview");
-    if (next !== "studio") setSceneState("loading");
     history.pushState({}, "", assetBase + (params.size ? `?${params}` : ""));
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -137,10 +126,8 @@ export default function Portfolio({
         : null,
     );
   const contact = settings.email ? `mailto:${settings.email}` : null;
-  let entranceLabel = "Click anywhere to begin.";
-  if (entering) entranceLabel = "Entering the collection…";
-  else if (walkRequested) entranceLabel = "Preparing your walk…";
-  else if (sceneState === "fallback") entranceLabel = "Click anywhere to enter.";
+  const showGallery = view !== "studio" || monitorAwake;
+  const reveal = showGallery ? observeScrollReveal : undefined;
   const collectionNotice = collectionStatus && (
           <div className="collection-status" role="status">
             <p>{collectionStatus === "loading"
@@ -150,14 +137,14 @@ export default function Portfolio({
           </div>
   );
   const galleryFooter = (<footer className="site-footer">
-        <button className="brand" onClick={() => navigate("studio")}>
+        <button ref={reveal} className="brand" onClick={() => navigate("studio")}>
           {settings.name}
         </button>
-        {managementUrl && <a href={managementUrl}>Studio management ↗</a>}
+        {managementUrl && <a ref={reveal} href={managementUrl}>Studio management ↗</a>}
       </footer>);
   const galleryHeader = (
           <header className="site-header">
-            <button
+            <button ref={reveal}
               className="brand"
               onClick={() => navigate("studio")}
               aria-label={`${settings.name}, home`}
@@ -166,7 +153,7 @@ export default function Portfolio({
               <span>{settings.name}</span>
             </button>
             <nav aria-label="Main navigation">
-              <button
+              <button ref={reveal}
                 className={
                   ["studio","collection","all","scenes","portraits","street","album"].includes(view) ? "active" : ""
                 }
@@ -174,13 +161,13 @@ export default function Portfolio({
               >
                 The collection
               </button>
-              <button
+              <button ref={reveal}
                 className={view === "about" ? "active" : ""}
                 onClick={() => navigate("about")}
               >
                 About
               </button>
-              <button className="studio-nav" onClick={() => navigate("studio")}>
+              <button ref={reveal} className="studio-nav" onClick={() => navigate("studio")}>
                 <span className="status-dot" />
                 The studio
               </button>
@@ -194,17 +181,18 @@ export default function Portfolio({
       <main id="main" ref={main} tabIndex={-1}>
         {(view === "studio" || view === "collection") && <div
           ref={gallerySurface}
-          className={`gallery-surface view-collection ${view === "studio" ? "gallery-in-monitor" : "gallery-live"}`}
+          className={`gallery-surface view-collection ${showGallery ? "monitor-awake" : "monitor-idle"} ${view === "studio" ? "gallery-in-monitor" : "gallery-live"}`}
           inert={view === "studio"}
           aria-hidden={view === "studio" ? true : undefined}
         >
+          {view === "studio" && <div className="monitor-standby" aria-hidden="true"><span>▣</span></div>}
           {galleryHeader}
-          <ChapterIndex live={view === "collection"} albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
+          <ChapterIndex live={showGallery} albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
           {galleryFooter}
         </div>}
         {view === "studio" && (
           <section
-            className={`entrance programmer-entrance ${entering ? "is-entering" : ""}`}
+            className={`entrance programmer-entrance ${studyStage !== "overview" ? "is-entering" : ""}`}
             aria-label="Enter the photography studio"
           >
             <div className="entrance-brand brand">
@@ -226,7 +214,6 @@ export default function Portfolio({
             </div>
             <div className="scene-wrap">
               <Room
-                interact={roomInteraction}
                 gallerySurface={gallerySurface}
                 featured={albums
                   .map((a) => ({
@@ -234,51 +221,15 @@ export default function Portfolio({
                     title: a.title,
                   }))
                   .filter((p) => p.url)}
-                entering={walkRequested}
                 onEnter={() => navigate("collection")}
                 onStage={setStudyStage}
-                onBegin={() => {
-                  window.scrollTo({ top: 0, behavior: "instant" });
-                  setEntering(true);
-                  setWalkRequested(true);
-                }}
-                onReady={() => setSceneState("ready")}
-                onUnavailable={() => setSceneState("fallback")}
+                onWake={() => setMonitorAwake(true)}
               />
             </div>
-            {!walkRequested && (
-              <button
-                className="entrance-start"
-                aria-label={sceneState === "fallback" ? "Enter the collection" : "Start the walk to the gallery"}
-                aria-describedby="entrance-instruction"
-                onClick={e => {
-                  if (e.detail && roomInteraction.current?.(e.clientX,e.clientY)) return;
-                  setWalkRequested(true);
-                }}
-              />
-            )}
-            <div className="enter-laptop" aria-hidden="true">
-              <span className="enter-ring">↗</span>
-              <span>
-                {entranceLabel}
-                {sceneState === "fallback" && <small>DIRECT GALLERY ENTRANCE</small>}
-              </span>
-            </div>
-            <div className="entrance-bottom">
-              <span id="entrance-instruction">CLICK OR TAP ANYWHERE TO BEGIN</span>
-            </div>
-            {(walkRequested || sceneState === "fallback") && (
-              <div className={`walk-controls ${studyStage === "entering" ? "walk-controls-finishing" : ""}`}>
-                <p role="status">{sceneState === "fallback" ? "The photographs are still available." : studyStage === "entering" ? "Opening the gallery…" : entering ? "Walking to the desk…" : "Preparing your walk…"}</p>
-                <button ref={skipWalk} className="skip-walk" onClick={() => navigate("collection")}>
-                  Skip animation <span aria-hidden="true">↗</span>
-                </button>
-              </div>
-            )}
           </section>
         )}
         {view === "scenes" && <>
-          <button className="atlas-back" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
+          <button ref={observeScrollReveal} className="atlas-back" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
           <Suspense fallback={<section className="atlas-loading" role="status">Opening the atlas…</section>}>
             <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />
           </Suspense>
@@ -286,8 +237,8 @@ export default function Portfolio({
         {["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
-            <button className="text-link back-link" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
-            <div className="collection-heading">
+            <button ref={observeScrollReveal} className="text-link back-link" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
+            <div ref={observeScrollReveal} className="collection-heading">
               <h1>
                 {chapter ? chapter.title : "Collected"}
                 {!chapter && <><br /><em>moments.</em></>}
@@ -335,12 +286,12 @@ export default function Portfolio({
           (active ? (
             <section className="album-page">
               <button
-                className="text-link back-link"
+                ref={observeScrollReveal} className="text-link back-link"
                 onClick={() => navigate(albumContext.view, undefined, albumContext.region)}
               >
                 ← Back to {albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? "all collections" : albumContext.view}
               </button>
-              <div className="album-heading">
+              <div ref={observeScrollReveal} className="album-heading">
                 <div>
                   <p className="eyebrow">
                     {active.sample && "SAMPLE COLLECTION / "}
@@ -388,7 +339,7 @@ export default function Portfolio({
                   This collection is waiting for its first photograph.
                 </p>
               )}
-              <div className="album-end">
+              <div ref={observeScrollReveal} className="album-end">
                 <button onClick={() => navigate("collection")}>
                   Keep looking ↗
                 </button>
@@ -408,14 +359,14 @@ export default function Portfolio({
           ))}
         {view === "about" && (
           <section className="about-page">
-            <h1>
+            <h1 ref={observeScrollReveal}>
               To notice.
               <br />
               To remember.
               <br />
               <em>To look again.</em>
             </h1>
-            <div className="about-body">
+            <div ref={observeScrollReveal} className="about-body">
               <span className="brand-symbol large-symbol">▣</span>
               <div>
                 <h2>{settings.name}</h2>

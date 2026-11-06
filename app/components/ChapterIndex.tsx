@@ -5,8 +5,8 @@ import type { Album, Photo } from '@/lib/types';
 export default function ChapterIndex({live,albums,photos,assetBase,onChapter,onAll}:{live:boolean;albums:Album[];photos:Photo[];assetBase:string;onChapter:(chapter:ChapterId)=>void;onAll:()=>void}) {
   return <section className="chapter-index">
     <div className="chapter-index-heading">
-      <h1>Three ways<br/>of <em>seeing.</em></h1>
-      <div><button onClick={onAll}>All collections <span>↗</span></button></div>
+      <h1 ref={live ? observeScrollReveal : undefined}>Three ways<br/>of <em>seeing.</em></h1>
+      <div><button ref={live ? observeScrollReveal : undefined} onClick={onAll}>All collections <span>↗</span></button></div>
     </div>
     <div className="chapter-portals">{chapters.map((chapter,i)=>{
       const assigned=albums.filter(a=>inChapter(a,chapter.id));
@@ -27,7 +27,7 @@ export default function ChapterIndex({live,albums,photos,assetBase,onChapter,onA
           {chapter.id==='scenes'?<div className="chapter-earth" style={{backgroundImage:`url(${assetBase}atlas/earth-card.webp)`}}/>:cover?<img src={cover.thumb} alt=""/>:<div className={`chapter-study study-${chapter.id}`}><i/><i/><i/></div>}
         </div>
         <div className="chapter-portal-top"><span>0{i+1}</span><span>{chapter.id==='scenes'?'EXPLORE THE ATLAS':`${assigned.length.toString().padStart(2,'0')} COLLECTIONS`}</span></div>
-        <div className="chapter-portal-copy" ref={live ? observeScrollReveal : undefined}>
+        <div className="chapter-portal-copy">
           <h2>{chapter.title}</h2>
           <span className="chapter-arrow" aria-hidden="true">↗</span>
         </div>

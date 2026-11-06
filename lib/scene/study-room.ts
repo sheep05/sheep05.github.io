@@ -144,6 +144,14 @@ export function buildStudy(scene: THREE.Scene) {
   const fill=new THREE.PointLight('#edc99c',1.1,6,2);fill.position.set(-1.5,2,1.4);scene.add(fill);
   // Photography equipment and printed work.
   const camera=createXT5(THREE);camera.name='Fujifilm X-T5 study model';camera.position.set(.97,.915,-1.96);camera.rotation.y=-.35;scene.add(camera);
+  // Keep a forgiving hit area after the detailed camera is batched into the desk scene.
+  const cameraBounds = new THREE.Box3().setFromObject(camera);
+  const hitSize = cameraBounds.getSize(new THREE.Vector3()).addScalar(.09);
+  const cameraTarget = new THREE.Mesh(new THREE.BoxGeometry(hitSize.x, hitSize.y, hitSize.z));
+  cameraBounds.getCenter(cameraTarget.position);
+  cameraTarget.name = 'Inspect Fujifilm X-T5';
+  cameraTarget.visible = false;
+  scene.add(cameraTarget);
   const lens=cyl('Spare lens',.075,.14,[1.23,.99,-2.25],black);for(let i=0;i<9;i++)cyl('Lens focus ring',.078,.004,[1.23,.94+i*.009,-2.25],charcoal);
   line([[.83,.922,-1.78],[1.1,.922,-1.55],[1.35,.922,-1.65],[1.17,.922,-1.92]],.013,mat('#7a5540'));
   label('X-T5 / FIELD NOTES',.29,.045,[.99,.921,-1.55],'#b4aa93','#343b39').rotation.x=-Math.PI/2;
@@ -174,5 +182,5 @@ export function buildStudy(scene: THREE.Scene) {
   for(const x of [-2.3,-1.2])box('Linen cushion',[.45,.22,.43],[x,.55,1.94],paper,.07);
   box('Closed door',[.92,2.3,.055],[.5,1.15,2.79],walnut,.014);
   cyl('Door handle',.025,.13,[.84,1.05,2.72],brass).rotation.z=Math.PI/2;
-  return {screen,keys,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
+  return {screen,keys,cameraTarget,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
 }

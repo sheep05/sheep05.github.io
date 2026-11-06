@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { studyWalkPosition, easeStudy, WALK_SECONDS, ENTER_SECONDS, overviewPosition, overviewTarget, deskPosition, deskTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
+import { easeStudy, ENTER_SECONDS, overviewPosition, overviewTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
 
 type Props = {
-  gallerySurface: RefObject<HTMLDivElement | null>; interact: RefObject<((x:number,y:number)=>boolean)|null>; entering: boolean; onEnter: () => void; onReady: () => void;
-  onUnavailable: () => void; onBegin: () => void; onStage?: (stage: StudyStage) => void;
+  gallerySurface: RefObject<HTMLDivElement | null>;
+  onEnter: () => void;
+  onWake: () => void;
+  onStage: (stage: StudyStage) => void;
   featured: { url: string; title: string }[];
 };
 export default function Room(props: Props) {
@@ -13,14 +15,14 @@ export default function Room(props: Props) {
   const [ready,setReady]=useState(false),[failed,setFailed]=useState(false);
   const [stage,setStage]=useState<StudyStage>('overview');
   const state=useRef({stage:'overview' as StudyStage,day:false,lamp:true});
-  const commands=useRef({begin:()=>{},redraw:()=>{}});
+  const commands=useRef({begin:()=>{},inspect:()=>{},redraw:()=>{}});
   const changeStage=(next:StudyStage)=>{state.current.stage=next;setStage(next);live.current.onStage?.(next);};
   const toggleLamp=()=>{state.current.lamp=!state.current.lamp;};
   const toggleDay=()=>{state.current.day=!state.current.day;};
   useEffect(()=>{commands.current.redraw();},[JSON.stringify(props.featured)]);
   useEffect(()=>{
     let disposed=false, cleanup=()=>{};
-    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;cleanup();setFailed(true);live.current.onUnavailable();},20000);
+    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;cleanup();setFailed(true);},20000);
     async function init(){
       try{
         const [THREE,{buildStudy},{batchStatic},{RoomEnvironment},{galleryProjection}]=await Promise.all([import('three'),import('@/lib/scene/study-room'),import('@/lib/scene/batch-static'),import('three/addons/environments/RoomEnvironment.js'),import('@/lib/scene/gallery-projection')]);
@@ -49,7 +51,7 @@ export default function Room(props: Props) {
         try{environment=pmrem.fromScene(environmentScene,.05);scene.environment=environment.texture;scene.environmentIntensity=.22;}finally{environmentScene.dispose();pmrem.dispose();}
         study=buildStudy(scene);
         const room=study;
-        batchStatic(scene,[room.screen,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
+        batchStatic(scene,[room.screen,room.cameraTarget,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
         let artworkVersion=0;
         const updateArtwork=()=>{
           const version=++artworkVersion;
@@ -66,51 +68,94 @@ export default function Room(props: Props) {
           });
         };
         commands.current.redraw=updateArtwork;updateArtwork();
-        const end=new THREE.Vector3(...deskPosition);
-        const focusStart=new THREE.Vector3(...overviewTarget),focusEnd=new THREE.Vector3(...deskTarget),screenAt=new THREE.Vector3(...screenPosition);
-        let elapsed=0, previous=performance.now(),visible=true, daylight=0,lamplight=1;
-        let galleryStart=end.clone(),galleryGaze=focusEnd.clone();
-        const begin=()=>{
-          if(state.current.stage!=='overview')return;
-          live.current.onBegin();elapsed=0;
-          if(reduced){live.current.onEnter();return;}
-          changeStage('walking');
+        const home = new THREE.Vector3(...overviewPosition);
+        const homeGaze = new THREE.Vector3(...overviewTarget);
+        const screenAt = new THREE.Vector3(...screenPosition);
+        const modelAt = room.cameraTarget.position.clone();
+        const modelAngle = new THREE.Vector3(-.32, .32, 1).normalize();
+        const gaze = homeGaze.clone(), startPosition = home.clone(), startGaze = homeGaze.clone();
+        const destination = new THREE.Vector3(), endGaze = new THREE.Vector3();
+        let elapsed = 0, startFov = camera.fov, woke = false;
+        let previous=performance.now(),visible=true,daylight=0,lamplight=1;
+        const startMove = (next: StudyStage) => {
+          startPosition.copy(camera.position);
+          startGaze.copy(gaze);
+          startFov = camera.fov;
+          elapsed = 0;
+          changeStage(next);
         };
-        const enter=()=>{
-          elapsed=0;galleryStart=camera.position.clone();galleryGaze=focusEnd.clone();changeStage('entering');
+        const begin = () => {
+          if (state.current.stage !== 'overview') return;
+          if (reduced) { live.current.onEnter(); return; }
+          startMove('entering');
         };
-        commands.current.begin=begin;
-        const resize=()=>{const w=container.clientWidth,h=container.clientHeight;if(!w||!h)return;renderer.setSize(w,h);camera.aspect=w/h;camera.fov=state.current.stage==='overview'?(w<h?84:70):(w/h<.8?70:55);camera.updateProjectionMatrix();};
+        const inspect = () => {
+          if (state.current.stage === 'overview') startMove('inspecting');
+          else if (state.current.stage === 'inspecting') startMove('returning');
+        };
+        commands.current.begin = begin;
+        commands.current.inspect = inspect;
+        const resize = () => {
+          const w=container.clientWidth,h=container.clientHeight;
+          if (!w || !h) return;
+          renderer.setSize(w,h); camera.aspect=w/h;
+          if (state.current.stage==='overview') camera.fov=w<h?84:70;
+          camera.updateProjectionMatrix();
+        };
         const ro=new ResizeObserver(resize);ro.observe(container);resize();
         const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;});observer.observe(container);
         const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
         const hit=(x:number,y:number)=>{
           const rect=renderer.domElement.getBoundingClientRect();pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);
-          return raycaster.intersectObjects([room.lampTarget,room.windowTarget],true)[0]?.object;
+          return raycaster.intersectObjects([room.screen,room.cameraTarget,room.lampTarget,room.windowTarget],true)[0]?.object;
         };
-        const interact=(x:number,y:number)=>{if(state.current.stage==='entering')return false;const object=hit(x,y);if(!object)return false;if(object===room.windowTarget)toggleDay();else toggleLamp();return true;};
-        live.current.interact.current=interact;
-        const click=(e:PointerEvent)=>{interact(e.clientX,e.clientY);};
-        const hover=(e:PointerEvent)=>{renderer.domElement.style.cursor=hit(e.clientX,e.clientY)?'pointer':'default';};
-        const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);live.current.onUnavailable();cleanup();};
-        renderer.domElement.addEventListener('pointerup',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
-        cleanup=()=>{live.current.interact.current=null;ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('pointerup',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
+        const click = (e: MouseEvent) => {
+          if (state.current.stage === 'inspecting') { inspect(); return; }
+          if (state.current.stage !== 'overview') return;
+          const target = hit(e.clientX,e.clientY);
+          if (target === room.screen) begin();
+          else if (target === room.cameraTarget) inspect();
+          else if (target === room.windowTarget) toggleDay();
+          else if (target) toggleLamp();
+        };
+        const hover = (e: PointerEvent) => {
+          const interactive = state.current.stage === 'inspecting' || (state.current.stage === 'overview' && hit(e.clientX,e.clientY));
+          renderer.domElement.style.cursor = interactive ? 'pointer' : 'default';
+        };
+        const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);cleanup();};
+        renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
+        cleanup=()=>{ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('click',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
         const warm=room.lamp.color.clone(),daySky=new THREE.Color('#9bb5c3'),nightSky=new THREE.Color('#101c36');
         const frame=(now:number)=>{
           raf=requestAnimationFrame(frame);const dt=Math.min((now-previous)/1000,.05);previous=now;
           if(!visible||document.hidden)return;
           const current=state.current.stage;
-          if(current==='walking'){
-            elapsed+=dt;const t=Math.min(elapsed/WALK_SECONDS,1),e=easeStudy(t);camera.position.fromArray(studyWalkPosition(t));
-            const gait=Math.sin(Math.PI*t);
-            camera.lookAt(focusStart.clone().lerp(focusEnd,easeStudy(Math.min(t*1.8,1))));camera.rotateZ(Math.sin(t*Math.PI*12)*.002*gait);
-            camera.fov=(camera.aspect<1?84:70)*(1-e)+(camera.aspect<.8?70:55)*e;camera.updateProjectionMatrix();
-            if(t===1)enter();
-          }else if(current==='entering'){
-            elapsed+=dt;const t=Math.min(elapsed/ENTER_SECONDS,1),e=easeStudy(t);
-            const final=screenAt.clone().add(new THREE.Vector3(0,0,screenFillDistance(camera.aspect,camera.fov)));
-            camera.position.lerpVectors(galleryStart,final,e);camera.lookAt(galleryGaze.clone().lerp(screenAt,e));
-
+          if (current !== 'overview') {
+            const duration = current === 'entering' ? ENTER_SECONDS : 1.35;
+            elapsed = Math.min(duration, reduced ? duration : elapsed + dt);
+            const progress = easeStudy(elapsed / duration);
+            const homeFov = camera.aspect < 1 ? 84 : 70;
+            let endFov = homeFov;
+            if (current === 'entering') {
+              endFov = camera.aspect < .8 ? 70 : 55;
+              destination.copy(screenAt);
+              destination.z += screenFillDistance(camera.aspect, endFov);
+              endGaze.copy(screenAt);
+              if (progress > .84 && !woke) { woke = true; live.current.onWake(); }
+            } else if (current === 'inspecting') {
+              endFov = 36;
+              destination.copy(modelAt).addScaledVector(modelAngle, Math.max(.53, .7 / camera.aspect));
+              endGaze.copy(modelAt);
+            } else {
+              destination.copy(home);
+              endGaze.copy(homeGaze);
+            }
+            camera.position.lerpVectors(startPosition, destination, progress);
+            gaze.lerpVectors(startGaze, endGaze, progress);
+            camera.lookAt(gaze);
+            camera.fov = startFov + (endFov - startFov) * progress;
+            camera.updateProjectionMatrix();
+            if (current === 'returning' && elapsed === duration) changeStage('overview');
           }
           const speed=reduced?1:1-Math.exp(-dt*2.1);daylight+=(Number(state.current.day)-daylight)*speed;lamplight+=(Number(state.current.lamp)-lamplight)*speed;
           scene.environmentIntensity=.22+daylight*.18;room.hemi.intensity=.55+daylight*1.5;room.sun.intensity=.55+daylight*2.6;room.sun.color.setRGB(.58+daylight*.42,.68+daylight*.27,.9-daylight*.07);
@@ -129,20 +174,29 @@ export default function Room(props: Props) {
             const w=container.clientWidth,h=container.clientHeight;
             surface.style.width=`${w}px`;surface.style.height=`${h}px`;
             surface.style.transform=`matrix3d(${galleryProjection(camera,w,h).elements.join(',')})`;
-            surface.style.visibility='visible';
+            surface.style.visibility = current === 'inspecting' || current === 'returning' ? 'hidden' : 'visible';
           }
           // Keep this DOM gallery mounted: only its positioning and interactivity change.
           if(current==='entering'&&elapsed>=ENTER_SECONDS){cancelAnimationFrame(raf);live.current.onEnter();return;}
         };
-        raf=requestAnimationFrame(frame);clearTimeout(loadTimeout);setReady(true);live.current.onReady();
-      }catch(error){if(disposed)return;clearTimeout(loadTimeout);cleanup();console.error('Study unavailable',error);setFailed(true);live.current.onUnavailable();}
+        raf=requestAnimationFrame(frame);clearTimeout(loadTimeout);setReady(true);
+      }catch(error){if(disposed)return;clearTimeout(loadTimeout);cleanup();console.error('Study unavailable',error);setFailed(true);}
     }
-    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},redraw:()=>{}};cleanup();};
+    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},redraw:()=>{}};cleanup();};
   },[]);
-  useEffect(()=>{if(props.entering){if(ready)commands.current.begin();else if(failed)live.current.onEnter();}},[props.entering,ready,failed]);
   return <div className={`room study-room ${ready?'room-ready':''} study-${stage}`}>
     <div className="study-fallback" aria-hidden="true"><strong>Between code<br />and photographs.</strong></div>
     <div ref={mount} className="room-canvas" />
+    <div className="study-actions">
+      {failed ? <button onClick={props.onEnter}>Open gallery ↗</button> :
+        ready && stage === 'overview' ? <>
+          <button onClick={() => commands.current.begin()}>Open monitor ↗</button>
+          <button onClick={() => commands.current.inspect()}>Inspect camera</button>
+        </> : stage === 'inspecting' ? <>
+          <span>Fujifilm X-T5</span>
+          <button onClick={() => commands.current.inspect()}>Back to room ↩</button>
+        </> : stage === 'entering' ? <button onClick={props.onEnter}>Skip zoom ↗</button> : null}
+    </div>
     {!ready&&!failed&&<span className="room-loading">Opening the study…</span>}
     {failed&&<p className="study-unavailable">The 3D study is unavailable on this device. You can enter the gallery directly.</p>}
   </div>;
