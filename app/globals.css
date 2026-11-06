@@ -2295,7 +2295,7 @@ select {
 .chapter-index-heading button { margin-top: 24px; padding-bottom: 7px; border-bottom: 1px solid #67716f; font-size: 12px; }
 .chapter-index-heading button span { margin-left: 44px; }
 .chapter-portals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.chapter-portal { min-height: 450px; position: relative; overflow: hidden; text-align: left; border: 1px solid #bbc4c41c; background: #121b22; isolation: isolate; }
+.chapter-portal { min-height: 450px; position: relative; overflow: hidden; text-align: left; border: 0; color: inherit; text-decoration: none; background: #121b22; isolation: isolate; }
 .chapter-art { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
 .chapter-art:after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #09111722 15%, #0a101600 38%, #0a1016f2 100%); }
 .chapter-art > img { width: 100%; height: 100%; object-fit: cover; opacity: .68; transition: transform .8s; }
@@ -2465,3 +2465,20 @@ html { scrollbar-gutter: stable; }
 /* A rendered sphere from the 8K atlas map, rather than a cropped flat map. */
 .chapter-earth {width:min(90%,340px);top:10%;background-size:100% 100%;background-position:center;box-shadow:0 0 48px #46778a18;transform:translateX(-50%);}
 .chapter-portal:hover .chapter-earth {transform:translateX(-50%) scale(1.035);}
+
+.portal-scenes { background: transparent; }
+.portal-scenes .chapter-art::after { content: none; }
+.chapter-portal:focus-visible { outline: 2px solid #d8bd84; outline-offset: 4px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    transition: opacity 650ms ease-out, translate 650ms ease-out;
+  }
+  [data-reveal="below"]:not(:focus-within),
+  [data-reveal="above"]:not(:focus-within) {
+    opacity: 0;
+  }
+  [data-reveal="below"]:not(:focus-within) { translate: 0 10px; }
+  [data-reveal="above"]:not(:focus-within) { translate: 0 -10px; }
+  [data-reveal]:focus-within { transition: none; }
+}

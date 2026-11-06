@@ -1,4 +1,5 @@
 "use client";
+import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useEffect, useRef, useState } from "react";
 import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
 import { atlasPixelRatio, atlasTextureFile } from "@/lib/atlas-quality";
@@ -215,7 +216,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       </div>
       {shown.length ? <div className="atlas-album-grid">{shown.map(album=>{
         const photo=photos.find(p=>p.id===(album.coverId || album.photoIds[0]));
-        return <button className="atlas-album" key={album.id} onClick={()=>onAlbum(album.id)}>
+        return <button ref={observeScrollReveal} className="atlas-album" key={album.id} onClick={()=>onAlbum(album.id)}>
           <div>{photo?<img src={photo.thumb} alt={photo.alt||photo.title} loading="lazy"/>:<span>Photographs to come</span>}</div>
           <small>{album.photoIds.length} PHOTOGRAPHS <span>↗</span></small><h3>{album.title}</h3><p>{album.description}</p>
         </button>;

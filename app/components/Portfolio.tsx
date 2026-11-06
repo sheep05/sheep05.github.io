@@ -1,4 +1,5 @@
 "use client";
+import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
@@ -198,7 +199,7 @@ export default function Portfolio({
           aria-hidden={view === "studio" ? true : undefined}
         >
           {galleryHeader}
-          <ChapterIndex albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
+          <ChapterIndex live={view === "collection"} albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
           {galleryFooter}
         </div>}
         {view === "studio" && (
@@ -296,6 +297,7 @@ export default function Portfolio({
             <div className="collection-list">
               {listedAlbums.map((a, i) => (
                 <button
+                  ref={observeScrollReveal}
                   className="collection-row"
                   key={a.id}
                   onClick={() => navigate("album", a.id)}
@@ -357,6 +359,7 @@ export default function Portfolio({
               <div className="photo-sequence">
                 {albumPhotos(active).map((p, i) => (
                   <figure
+                    ref={observeScrollReveal}
                     className={`photo-frame frame-${i % 4} ${p.height > p.width ? "portrait" : ""}`}
                     key={p.id}
                   >
