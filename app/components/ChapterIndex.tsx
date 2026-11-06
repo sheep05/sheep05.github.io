@@ -3,7 +3,7 @@ import { chapters, inChapter, type ChapterId } from '@/lib/catalog';
 import type { Album, Photo } from '@/lib/types';
 export default function ChapterIndex({albums,photos,assetBase,onChapter,onAll}:{albums:Album[];photos:Photo[];assetBase:string;onChapter:(chapter:ChapterId)=>void;onAll:()=>void}) {
   return <section className="chapter-index">
-    <div className="chapter-index-heading"><p className="eyebrow">THE PHOTOGRAPHIC ARCHIVE</p><h1>Three ways<br/>of <em>seeing.</em></h1><div><p>Places. People. Passing moments.<br/>Choose where to begin.</p><button onClick={onAll}>All collections <span>↗</span></button></div></div>
+    <div className="chapter-index-heading"></p><button onClick={onAll}>All collections <span>↗</span></button></div>
     <div className="chapter-portals">{chapters.map((chapter,i)=>{
       const assigned=albums.filter(a=>inChapter(a,chapter.id));
       const first=assigned.find(a=>a.photoIds.length);
