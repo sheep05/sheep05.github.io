@@ -1,4 +1,5 @@
 "use client";
+import {animateCurtains} from '@/lib/scene/animate-curtains';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { easeStudy, ENTER_SECONDS, overviewPosition, overviewTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
 
@@ -48,9 +49,12 @@ export default function Room(props: Props) {
         };
         cleanup=resources;
         const environmentScene=new RoomEnvironment(),pmrem=new THREE.PMREMGenerator(renderer);
-        try{environment=pmrem.fromScene(environmentScene,.05);scene.environment=environment.texture;scene.environmentIntensity=.22;}finally{environmentScene.dispose();pmrem.dispose();}
+        try{environment=pmrem.fromScene(environmentScene,.04);scene.environment=environment.texture;scene.environmentIntensity=.22;}finally{environmentScene.dispose();pmrem.dispose();}
         study=buildStudy(scene);
         const room=study;
+        const {applyStudyMaterials}=await import('@/lib/scene/study-materials');
+        await applyStudyMaterials(scene,renderer,ownedTextures);
+        if(disposed){resources();return;}
         batchStatic(scene,[room.screen,room.cameraTarget,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
         let artworkVersion=0;
         const updateArtwork=()=>{
@@ -158,16 +162,12 @@ export default function Room(props: Props) {
             if (current === 'returning' && elapsed === duration) changeStage('overview');
           }
           const speed=reduced?1:1-Math.exp(-dt*2.1);daylight+=(Number(state.current.day)-daylight)*speed;lamplight+=(Number(state.current.lamp)-lamplight)*speed;
-          scene.environmentIntensity=.22+daylight*.18;room.hemi.intensity=.55+daylight*1.5;room.sun.intensity=.55+daylight*2.6;room.sun.color.setRGB(.58+daylight*.42,.68+daylight*.27,.9-daylight*.07);
-          room.lamp.intensity=9*lamplight;room.bulbMaterial.emissiveIntensity=2*lamplight;room.lamp.color.copy(warm);room.fill.intensity=.8+daylight*1.5;
+          scene.environmentIntensity=.35+daylight*.30;room.hemi.intensity=.24+daylight*.70;room.sun.intensity=.55+daylight*2.6;room.sun.color.setRGB(.58+daylight*.42,.68+daylight*.27,.9-daylight*.07);
+          room.lamp.intensity=9*lamplight;room.bulbMaterial.emissiveIntensity=2*lamplight;room.lamp.color.copy(warm);room.fill.intensity=.45+daylight*.65;
           room.skyMaterial.color.copy(nightSky).lerp(daySky,daylight);
           room.cityLights[0].color.setRGB(.65*(1-daylight)+.23,.46*(1-daylight)+.24,.25*(1-daylight)+.23);
           room.cityLights[1].color.setRGB(.035+daylight*.2,.055+daylight*.2,.08+daylight*.2);
-          if(!reduced)room.curtains.forEach(({mesh,base},index)=>{
-            const p=mesh.geometry.attributes.position;
-            for(let i=0;i<p.count;i++){const y=base[i*3+1],free=Math.pow((.93-y)/1.86,1.5);p.setZ(i,base[i*3+2]+Math.sin(now*.0007+y*2+index)*.07*free);}
-            p.needsUpdate=true;mesh.geometry.computeVertexNormals();
-          });
+          if(!reduced)animateCurtains(room.curtains,now);
           renderer.render(scene,camera);
           const surface=live.current.gallerySurface.current;
           if(surface){

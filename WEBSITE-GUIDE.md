@@ -118,8 +118,10 @@ The live editing database and originals' web copies remain in Cloudflare D1/KV. 
 | --- | --- | --- |
 | Gallery layout | `app/components/Portfolio.tsx` | Commit to `main` for GitHub; deploy Cloudflare separately for its preview |
 | Fonts, colors, spacing | `app/globals.css` | Same as above |
-| Walk/camera/curtain motion | `app/components/Room.tsx` | Same as above |
-| Furniture or scene geometry | `config/backend.json` | The publishing API origin and owner Studio URL; change these only after a replacement backend is ready. |
+| Monitor zoom and camera inspection | `app/components/Room.tsx` | Same as above |
+| Curtain motion | `lib/scene/animate-curtains.ts` | Same as above |
+| Room materials and environment lighting | `lib/scene/study-materials.ts`, `public/materials/poly-haven/` | Same as above; see [room material guide](ROOM-MATERIALS.md) |
+| Furniture or scene geometry | `lib/scene/study-room.ts` | Same as above |
 | `lib/catalog.ts` | Gallery chapters, country marker coordinates, and portable assignment validation. |
 | `public/atlas/` | Locally hosted Earth texture and its source/license credit. |
 | `scene-source/`, exported to `public/scene/` | Commit assets to `main`; see scene guide |

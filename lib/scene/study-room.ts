@@ -84,7 +84,7 @@ export function buildStudy(scene: THREE.Scene) {
     for(let i=0;i<a.count;i++)a.setZ(i,Math.sin(a.getX(i)*46)*.045);
     g.computeVertexNormals();
     const mesh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:'#c2b5a0',roughness:1,side:THREE.DoubleSide}));
-    mesh.rotation.y=-Math.PI/2;mesh.position.set(2.82,1.86,z);scene.add(mesh);curtains.push({mesh,base:new Float32Array(a.array)});
+    mesh.name='Curtain';mesh.rotation.y=-Math.PI/2;mesh.position.set(2.82,1.86,z);scene.add(mesh);curtains.push({mesh,base:new Float32Array(a.array)});
   }
   line([[2.8,2.84,-2.35],[2.8,2.84,1.35]],.02,brass);
   // Desk, monitor, workstation, and separate mechanical keys.
