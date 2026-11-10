@@ -2533,3 +2533,6 @@ html { scrollbar-gutter: stable; }
   height: clamp(180px, min(54svh, 50vw), 680px); width: auto; max-width: none;
   background: #e6e2d8; pointer-events: none;
 }
+
+/* The baked room preview also works when WebGL is unavailable. */
+.lounge-room .study-fallback { background-position:center; background-size:cover; }

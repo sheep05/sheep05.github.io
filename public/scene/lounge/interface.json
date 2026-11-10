@@ -1,0 +1,48 @@
+{
+  "screenWidth": 0.736,
+  "screenHeight": 0.45999999999999996,
+  "overviewPosition": [
+    0,
+    1.64,
+    4.65
+  ],
+  "overviewTarget": [
+    -0.05,
+    1.31,
+    -0.95
+  ],
+  "cameraPropPosition": [
+    -2.02,
+    0.44,
+    1.26
+  ],
+  "lampPosition": [
+    -2.98,
+    1.1,
+    -1.58
+  ],
+  "screenCenter": [
+    0.019999999552965164,
+    0.9919649362564087,
+    -0.8225986957550049
+  ],
+  "screenNormal": [
+    0.0,
+    0.2079116851091385,
+    0.9781476259231567
+  ],
+  "screenUp": [
+    0.0,
+    0.9781476259231567,
+    -0.2079116851091385
+  ],
+  "source": "Original geometry and CC0 texture maps. No paid source scene.",
+  "lighting": {
+    "on": "lightmap-on.png",
+    "off": "lightmap-off.png",
+    "uv": 1,
+    "scale": 2.0,
+    "encoded": "Linear RGB PNG; emission texture transports UV1, use as lightMap",
+    "bakedMesh": "Baked lounge interior"
+  }
+}

@@ -22,7 +22,7 @@ You are currently viewing the source-code repository. Use the links above to ent
 | [`db/`](db/) | The database schema and its migration history in `db/migrations/`. This defines album/photo metadata and sign-in records; it does not contain your uploaded image files. |
 | [`public/`](public/) | Source assets copied into website builds: the exported 3D model, fallback room image, sample photographs, and favicon. Edit or replace an asset here before rebuilding. |
 | [`docs/`](docs/) | An automatically maintained copy of the published website. GitHub Actions builds and deploys the site; do not edit generated bundles by hand. |
-| [`scene-source/`](scene-source/) | The editable Blender room, its textures, generation scripts, and visual verification files. Use this for changes to the bed, furniture, lighting, or Japanese exterior. |
+| [`scene-source/`](scene-source/) | The editable Blender room, its textures, generation scripts, and visual verification files. The active sofa lounge is in `scene-source/lounge/`; older bedroom assets remain archived. |
 | [`tests/`](tests/) | Authentication checks and local upload/album integration tests, plus a local-only sign-in fixture helper. These help verify that editing works and drafts remain private. |
 | [`scripts/`](scripts/) | Exports the public library and verifies that builds contain complete local photos. |
 | [`.github/workflows/`](.github/workflows/) | Publishes daily at 04:13 China time, on manual runs, and on main-branch source updates. |

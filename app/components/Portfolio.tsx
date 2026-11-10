@@ -215,6 +215,7 @@ export default function Portfolio({
             </div>
             <div className="scene-wrap">
               <Room
+                assetBase={assetBase}
                 gallerySurface={gallerySurface}
                 featured={albums
                   .map((a) => ({

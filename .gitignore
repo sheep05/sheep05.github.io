@@ -44,3 +44,7 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Blender autosave copies; the editable .blend itself is versioned.
+*.blend1
+*.blend2

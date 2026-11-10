@@ -1,0 +1,120 @@
+{
+  "license": "CC0-1.0",
+  "license_url": "https://polyhaven.com/license",
+  "assets": [
+    {
+      "id": "oak_veneer_02",
+      "url": "https://polyhaven.com/a/oak_veneer_02",
+      "authors": {
+        "Jenelle van Heerden": "All"
+      },
+      "tile_dimensions_mm": [
+        1000,
+        1000
+      ],
+      "maps": {
+        "color": {
+          "path": "oak_veneer_02/color.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_02/oak_veneer_02_diff_1k.jpg",
+          "md5": "895eda215c5d808bbc42041b498a856c"
+        },
+        "normal": {
+          "path": "oak_veneer_02/normal.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_02/oak_veneer_02_nor_gl_1k.jpg",
+          "md5": "18eb5cfc641f6ae9b169f53e89e1230c"
+        },
+        "roughness": {
+          "path": "oak_veneer_02/roughness.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_02/oak_veneer_02_rough_1k.jpg",
+          "md5": "bec1b2deb8bbef15a03b4a50b7453867"
+        }
+      }
+    },
+    {
+      "id": "rough_linen",
+      "url": "https://polyhaven.com/a/rough_linen",
+      "authors": {
+        "colormass": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "tile_dimensions_mm": [
+        270.7081392676629,
+        271.29998803138733
+      ],
+      "maps": {
+        "color": {
+          "path": "rough_linen/color.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rough_linen/rough_linen_diff_1k.jpg",
+          "md5": "663db789fb075462b685c1f740e58930"
+        },
+        "normal": {
+          "path": "rough_linen/normal.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rough_linen/rough_linen_nor_gl_1k.jpg",
+          "md5": "3350269a2e9c472aa406bd3cc1eaf2c8"
+        },
+        "roughness": {
+          "path": "rough_linen/roughness.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rough_linen/rough_linen_rough_1k.jpg",
+          "md5": "a380b24cc43cff88c39510305ebf0020"
+        }
+      }
+    },
+    {
+      "id": "white_plaster_02",
+      "url": "https://polyhaven.com/a/white_plaster_02",
+      "authors": {
+        "Rob Tuytel": "All"
+      },
+      "tile_dimensions_mm": [
+        1000,
+        1000
+      ],
+      "maps": {
+        "color": {
+          "path": "white_plaster_02/color.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_02/white_plaster_02_diff_1k.jpg",
+          "md5": "7b10c2686bcfd76d1f309a20fd06b57e"
+        },
+        "normal": {
+          "path": "white_plaster_02/normal.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_02/white_plaster_02_nor_gl_1k.jpg",
+          "md5": "55fc03203ebf1dc703a380fde93ff502"
+        },
+        "roughness": {
+          "path": "white_plaster_02/roughness.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_02/white_plaster_02_rough_1k.jpg",
+          "md5": "8b28f263360b8c4ddbdc4f7c650c4eeb"
+        }
+      }
+    },
+    {
+      "id": "hessian_230",
+      "url": "https://polyhaven.com/a/hessian_230",
+      "authors": {
+        "colormass": "Photography",
+        "Rico Cilliers": "Processing"
+      },
+      "tile_dimensions_mm": [
+        268.7538661074732,
+        267.1999931335449
+      ],
+      "maps": {
+        "color": {
+          "path": "hessian_230/color.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/hessian_230/hessian_230_diff_1k.jpg",
+          "md5": "6d2cee5fb9e5584b7a202ab27e1a6dcc"
+        },
+        "normal": {
+          "path": "hessian_230/normal.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/hessian_230/hessian_230_nor_gl_1k.jpg",
+          "md5": "468a884ffa63d912053840b110674c0a"
+        },
+        "roughness": {
+          "path": "hessian_230/roughness.jpg",
+          "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/hessian_230/hessian_230_rough_1k.jpg",
+          "md5": "8d3a20d7cc91d00de7d5980d471b3c59"
+        }
+      }
+    }
+  ]
+}

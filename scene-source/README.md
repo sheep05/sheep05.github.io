@@ -1,5 +1,7 @@
 # Blender source for the 3D room
 
+The active sofa-lounge development source is in [`lounge/`](lounge/README.md). The files described below preserve the older bedroom entrance for reference and recovery.
+
 Editable Blender source, room-generation scripts, textures, and visual checks for the 3D entrance, created with Blender 4.5.15 LTS. The exported browser assets live in `../public/scene/`; visitors do not need Blender installed.
 
 ## Files

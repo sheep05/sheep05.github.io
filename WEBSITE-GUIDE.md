@@ -106,7 +106,7 @@ Turning an album back into a draft removes it from the next successful GitHub pu
 | `config/backend.json` | The publishing API origin and owner Studio URL; change these only after a replacement backend is ready. |
 | `lib/catalog.ts` | Gallery chapters, country marker coordinates, and portable assignment validation. |
 | `public/atlas/` | Locally hosted Earth texture and its source/license credit. |
-| `scene-source/` | Archived Blender model and tools for the previous bedroom entrance; not the active study source. |
+| `scene-source/lounge/` | Editable Blender sofa lounge, generator, and lighting bake scripts. The older bedroom files remain archived beside this folder. |
 | `tests/` | Checks for authentication, publication privacy, complete downloads, and failure recovery. |
 | `worker/` | Cloudflare application entry. Cloudflare settings are in `wrangler.jsonc`. |
 
@@ -119,10 +119,12 @@ The live editing database and originals' web copies remain in Cloudflare D1/KV. 
 | Gallery layout | `app/components/Portfolio.tsx` | Commit to `main` for GitHub; deploy Cloudflare separately for its preview |
 | Fonts, colors, spacing | `app/globals.css` | Same as above |
 | Walk/camera/curtain motion | `app/components/Room.tsx` | Same as above |
-| Furniture or scene geometry | `config/backend.json` | The publishing API origin and owner Studio URL; change these only after a replacement backend is ready. |
-| `lib/catalog.ts` | Gallery chapters, country marker coordinates, and portable assignment validation. |
-| `public/atlas/` | Locally hosted Earth texture and its source/license credit. |
-| `scene-source/`, exported to `public/scene/` | Commit assets to `main`; see scene guide |
+| Sofa room furniture, materials, and baked lighting | `scene-source/lounge/` → `public/scene/lounge/` | Regenerate the GLB and lightmaps, then commit them with the source; see the lounge guide |
+| Room loading, lamp/daylight, and camera inspection | `lib/scene/lounge.ts`, `app/components/Room.tsx` | Commit to `main` for GitHub; deploy Cloudflare separately for its preview |
+| Tilted laptop-to-gallery alignment | `lib/scene/screen-surface.ts` | Same as above; run `node --test tests/lounge.test.mjs` |
+| Gallery chapters and country markers | `lib/catalog.ts` | Commit to `main` |
+| Earth textures | `public/atlas/` | Commit replacement assets and retain source/license credits |
+| Backend address | `config/backend.json` | Change only after a replacement backend is ready |
 | Studio upload/editing behavior | `app/studio/Studio.tsx`, `app/api/studio/route.ts` | Build and deploy Cloudflare |
 | Export policy or daily schedule | `scripts/`, `.github/workflows/publish-gallery.yml` | Commit to `main` |
 | This guide | `WEBSITE-GUIDE.md` | Commit the Markdown change |
@@ -170,3 +172,13 @@ Deploy matching server and static assets together. Do not deploy a newly rebuilt
 GitHub Pages' published-site limit is 1 GB. The exporter stops before photo copies alone reach 900 MB to leave space for the room and code. Source photos are also preserved in repository history. Store only optimized public copies here, not RAW originals. The existing Cloudflare free storage allowance is 1 GB.
 
 Official references: [Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [scheduled workflow behavior](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule), [Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).
+
+## Sofa-room development preview and recovery
+
+The sofa lounge is developed on `codex/sofa-room`. The previous working entrance is preserved on `backup/pre-sofa-room-2026-11-10`; this branch is a recovery point, not another public website. Until the lounge branch is merged into `main`, the public website keeps its existing entrance.
+
+The laptop on the sofa opens the gallery. Click the X-T5 on the coffee table to inspect it, then click again or use **Back to room**. Click the dome lamp to switch the interior lighting and the window to change day/night. **Open gallery** remains available while the room loads or if 3D is unavailable.
+
+The editable source is `scene-source/lounge/sofa-lounge.blend`. See `scene-source/lounge/README.md` for the generator, texture sources, lighting bake, and exports. Visitors download the exported GLB and lightmap; they do not need Blender, a Cloudflare connection, or a paid service. A first visit still needs internet, and 3D rendering needs WebGL; this revision does not promise first-visit offline access.
+
+To undo this revision after publication, revert its merge commit in GitHub and commit the revert to `main`. The ordinary publishing workflow rebuilds the previous website while preserving subsequent photo publications. Do not reset `main` to the backup branch: that could also discard newer public content.
