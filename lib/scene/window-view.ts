@@ -48,9 +48,16 @@ export function createWindowView(scene: THREE.Scene) {
     const front=x-1.68;
     box('Dark timber frontage',[.07,h*.7,3.54],[front,h*.35-1.2,z],timber);
     for(const offset of [-.91,.91]) {
-      box('Recessed shoji',[.025,.83,1.25],[front-.045,h-.9,z+offset],(i+offset>4?darkGlass:glass));
-      for(let bar=0;bar<8;bar++)box('Shoji lattice',[.045,.86,.022],[front-.07,h-.9,z+offset-.57+bar*.16],timber);
-      box('Shoji cross rail',[.05,.025,1.25],[front-.075,h-.91,z+offset],timber);
+      box('Recessed shoji',[.025,.83,1.25],[front-.045,h-1.9,z+offset],(i+offset>4?darkGlass:glass));
+      for(let bar=0;bar<8;bar++)box('Shoji lattice',[.045,.86,.022],[front-.07,h-1.9,z+offset-.57+bar*.16],timber);
+      box('Shoji cross rail',[.05,.025,1.25],[front-.075,h-1.91,z+offset],timber);
+    }
+    // The room sees the side elevations too: wrap the joinery around the corner.
+    box('Dark timber frontage',[3.32,h*.65,.06],[x,h*.325-1.2,z+1.77],timber);
+    for(const offset of [-.83,.83]) {
+      box('Recessed shoji',[1.15,.72,.025],[x+offset,h-1.9,z+1.81],i%2?darkGlass:glass);
+      for(let bar=0;bar<8;bar++)box('Shoji lattice',[.022,.75,.045],[x+offset-.53+bar*.15,h-1.9,z+1.83],timber);
+      box('Shoji cross rail',[1.16,.025,.05],[x+offset,h-1.91,z+1.835],timber);
     }
     // Ridge follows the lane; gently overhanging eaves frame each house.
     for(const side of [-1,1]) {
