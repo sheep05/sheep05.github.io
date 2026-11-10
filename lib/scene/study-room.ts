@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { createWindowView } from './window-view';
 import { createXT5 } from './fujifilm-xt5';
 import { screenPosition, screenSize } from './study-state';
 
@@ -58,23 +59,7 @@ export function buildStudy(scene: THREE.Scene) {
   for(const y of [.96,2.69])box('Window frame',[.18,.065,3.3],[3,y,-.5],walnut);
   for(const z of [-2.16,-.5,1.16])box('Window mullion',[.16,1.8,.055],[3,1.83,z],walnut);
   box('Window sill',[.35,.07,3.5],[2.93,.95,-.5],walnut,.02);
-  const sky=new THREE.Color('#101c36');
-  const outside=box('Sky beyond the window',[.1,20,40],[18,5,0],new THREE.MeshBasicMaterial({color:sky}));
-  outside.castShadow=false;
-  const cityLights=[new THREE.MeshBasicMaterial({color:'#d6a66a'}),new THREE.MeshBasicMaterial({color:'#354250'})];
-  const buildingMaterials=['#30343b','#46474a','#242e38'].map(color=>mat(color));
-  const city=new THREE.Group();scene.add(city);
-  for(let i=0;i<18;i++) {
-    const x=5+(i%3)*3.4,z=-8+Math.floor(i/3)*3.1,h=1.4+random()*3.4;
-    box('Neighbourhood building',[1.8,h,2.35],[x,h/2-.4,z],buildingMaterials[i%3],0,city);
-    for(let row=0;row<Math.floor(h/.6);row++)for(let col=0;col<3;col++) {
-      const glow=cityLights[random()>.35?0:1];
-      box('Apartment window',[.012,.26,.3],[x-.906,.2+row*.6,z-.7+col*.68],glow,0,city);
-    }
-    const roof=box('Overhanging roof',[2.05,.12,2.6],[x,h-.34,z],charcoal,0,city);roof.rotation.z=.04;
-  }
-  for(const z of [-3,2.6]) {cyl('Utility pole',.055,5,[4.3,2,z],walnut);box('Utility crossarm',[.2,.08,1.2],[4.3,4.2,z],charcoal);}
-  for(const offset of [-.3,0,.3])line([[4.3,4.2,-3+offset],[4.3,3.75,-.2+offset],[4.3,4.2,2.6+offset]],.008,charcoal);
+  const windowView=createWindowView(scene);
   const windowTarget=new THREE.Mesh(new THREE.PlaneGeometry(3.3,1.75),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
   windowTarget.name='Window day and night control';windowTarget.position.set(2.99,1.825,-.5);windowTarget.rotation.y=-Math.PI/2;windowTarget.visible=false;scene.add(windowTarget);
   // Pleated curtains remain inside the enclosure and move only at their free ends.
@@ -137,11 +122,12 @@ export function buildStudy(scene: THREE.Scene) {
   cyl('Lamp diffuser',.294,.008,[lampX,shadeY,lampZ],bulbMaterial,lampTarget);
   cyl('Lamp switch',.016,.009,[lampX+.105,.96,lampZ+.075],lampBronze,lampTarget);
   line([[lampX,.92,lampZ-.12],[lampX-.08,.92,-2.45],[lampX-.08,.85,-2.6],[lampX-.08,.15,-2.65]],.004,black,lampTarget);
-  const lamp=new THREE.PointLight('#ffcd94',9,4,2);lamp.position.set(lampX,shadeY-.025,lampZ);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.025;lamp.shadow.bias=-.001;scene.add(lamp);
+  const lamp=new THREE.PointLight('#ffcd94',9,4,2);lamp.position.set(lampX,shadeY-.025,lampZ);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.normalBias=.015;lamp.shadow.bias=-.0005;lamp.shadow.radius=3;scene.add(lamp);
   const hemi=new THREE.HemisphereLight('#819cbe','#55412e',.6);scene.add(hemi);
-  const sun=new THREE.DirectionalLight('#b4c6df',.65);sun.position.set(2.8,2.6,.4);sun.target.position.set(-1,.5,-1.7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:.1,far:12});sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;scene.add(sun,sun.target);
+  const sun=new THREE.DirectionalLight('#b4c6df',.65);sun.position.set(5,3.9,.4);sun.target.position.set(-1,.5,-1.7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:.1,far:18});sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;scene.add(sun,sun.target);
   const monitorLight=new THREE.PointLight('#b1cacc',.5,2.5,2);monitorLight.position.set(0,1.4,-1.95);scene.add(monitorLight);
   const fill=new THREE.PointLight('#edc99c',1.1,6,2);fill.position.set(-1.5,2,1.4);scene.add(fill);
+  const windowFill=new THREE.PointLight('#beced7',.07,7,2);windowFill.position.set(2.65,2,-.5);scene.add(windowFill);
   // Photography equipment and printed work.
   const camera=createXT5(THREE);camera.name='Fujifilm X-T5 study model';camera.position.set(.97,.915,-1.96);camera.rotation.y=-.35;scene.add(camera);
   // Keep a forgiving hit area after the detailed camera is batched into the desk scene.
@@ -182,5 +168,5 @@ export function buildStudy(scene: THREE.Scene) {
   for(const x of [-2.3,-1.2])box('Linen cushion',[.45,.22,.43],[x,.55,1.94],paper,.07);
   box('Closed door',[.92,2.3,.055],[.5,1.15,2.79],walnut,.014);
   cyl('Door handle',.025,.13,[.84,1.05,2.72],brass).rotation.z=Math.PI/2;
-  return {screen,keys,cameraTarget,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,skyMaterial:outside.material as THREE.MeshBasicMaterial,cityLights,curtains,prints,textures};
+  return {screen,keys,cameraTarget,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,windowFill,windowView,curtains,prints,textures};
 }

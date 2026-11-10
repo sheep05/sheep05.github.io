@@ -1,4 +1,5 @@
 "use client";
+import {updateStudyLighting} from '@/lib/scene/study-lighting';
 import {animateCurtains} from '@/lib/scene/animate-curtains';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { easeStudy, ENTER_SECONDS, overviewPosition, overviewTarget, screenPosition, screenFillDistance, type StudyStage } from '@/lib/scene/study-state';
@@ -31,7 +32,7 @@ export default function Room(props: Props) {
         const container=mount.current, reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
         const scene=new THREE.Scene();scene.background=new THREE.Color('#111820');
         const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'low-power'});
-        renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
+        renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
         renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
         renderer.domElement.setAttribute('aria-hidden','true');container.appendChild(renderer.domElement);
         const camera=new THREE.PerspectiveCamera(70,1,.035,65);
@@ -129,7 +130,6 @@ export default function Room(props: Props) {
         const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);cleanup();};
         renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
         cleanup=()=>{ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('click',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
-        const warm=room.lamp.color.clone(),daySky=new THREE.Color('#9bb5c3'),nightSky=new THREE.Color('#101c36');
         const frame=(now:number)=>{
           raf=requestAnimationFrame(frame);const dt=Math.min((now-previous)/1000,.05);previous=now;
           if(!visible||document.hidden)return;
@@ -162,11 +162,7 @@ export default function Room(props: Props) {
             if (current === 'returning' && elapsed === duration) changeStage('overview');
           }
           const speed=reduced?1:1-Math.exp(-dt*2.1);daylight+=(Number(state.current.day)-daylight)*speed;lamplight+=(Number(state.current.lamp)-lamplight)*speed;
-          scene.environmentIntensity=.35+daylight*.30;room.hemi.intensity=.24+daylight*.70;room.sun.intensity=.55+daylight*2.6;room.sun.color.setRGB(.58+daylight*.42,.68+daylight*.27,.9-daylight*.07);
-          room.lamp.intensity=9*lamplight;room.bulbMaterial.emissiveIntensity=2*lamplight;room.lamp.color.copy(warm);room.fill.intensity=.45+daylight*.65;
-          room.skyMaterial.color.copy(nightSky).lerp(daySky,daylight);
-          room.cityLights[0].color.setRGB(.65*(1-daylight)+.23,.46*(1-daylight)+.24,.25*(1-daylight)+.23);
-          room.cityLights[1].color.setRGB(.035+daylight*.2,.055+daylight*.2,.08+daylight*.2);
+          updateStudyLighting(scene,room,daylight,lamplight);
           if(!reduced)animateCurtains(room.curtains,now);
           renderer.render(scene,camera);
           const surface=live.current.gallerySurface.current;
@@ -190,8 +186,8 @@ export default function Room(props: Props) {
     <div className="study-actions">
       {failed ? <button onClick={props.onEnter}>Open gallery ↗</button> :
         ready && stage === 'overview' ? <>
-          <button onClick={() => commands.current.begin()}>Open monitor ↗</button>
-          <button onClick={() => commands.current.inspect()}>Inspect camera</button>
+          <button className="study-keyboard-action" onClick={() => commands.current.begin()}>Open monitor ↗</button>
+          <button className="study-keyboard-action" onClick={() => commands.current.inspect()}>Inspect camera</button>
         </> : stage === 'inspecting' ? <>
           <span>Fujifilm X-T5</span>
           <button onClick={() => commands.current.inspect()}>Back to room ↩</button>

@@ -17,3 +17,18 @@ test('curtains retain finite positions, normals, and bounds across their sway cy
   }
  }
 });
+
+test('breeze keeps the rod pinned and the hem within a gentle movement envelope',()=>{
+ const {curtains}=buildStudy(new THREE.Scene());let displacement=0;
+ for(let time=0;time<24000;time+=400){
+  animateCurtains(curtains,time);
+  for(const {mesh,base} of curtains){const p=mesh.geometry.attributes.position;
+   for(let i=0;i<p.count;i++){
+    const moved=Math.hypot(p.getX(i)-base[i*3],p.getZ(i)-base[i*3+2]);
+    if(base[i*3+1]>.92)assert.ok(moved<1e-7,'top stays attached to the curtain rod');
+    assert.ok(moved<.125,'no gust can intersect the desk or window wall');displacement=Math.max(displacement,moved);
+   }
+  }
+ }
+ assert.ok(displacement>.06,'the free hem visibly moves');
+});

@@ -33,9 +33,27 @@ export async function applyStudyMaterials(scene: THREE.Scene, renderer: THREE.We
   // The scan's dark stains are unsuitable for this maintained room. Keep its surface relief and roughness.
   plaster.map=null;plaster.color.set('#b9b2a6');
   const cream=fabric.clone();cream.map=null;cream.color.set('#d4caba');cream.normalScale.setScalar(.2);cream.side=THREE.DoubleSide;
+  const [stoneColor,stoneNormal]=await Promise.all([load('cobblestone_floor_08/color.jpg',true),load('cobblestone_floor_08/normal.jpg')]);
   scene.traverse(o=>{
     if(!(o instanceof THREE.Mesh))return;const n=o.name;
-    if(/Floor$|walnut desktop|Chair back|Archive shelf|Closed door|Photograph frame|Window.*(frame|sill)|Skirting/i.test(n)){o.material=wood;physicalUV(o,1.25,.75);}
+    // Carry the same scanned surface detail into the nearby street; its materials
+    // retain their own day/night colors rather than sharing the indoor wood tint.
+    if(n==='Stone lane'){
+      const material=o.material as THREE.MeshStandardMaterial;
+      material.map=stoneColor;material.normalMap=stoneNormal;material.normalScale.setScalar(.45);
+      physicalUV(o,3,3);
+    }
+    else if(/Dark timber frontage|Shoji lattice|Shoji cross rail|Garden trunk/.test(n)){
+      const material=o.material as THREE.MeshStandardMaterial;
+      material.map=wood.map;material.normalMap=wood.normalMap;material.normalScale.setScalar(.15);
+      physicalUV(o,1.25,.75);
+    }
+    else if(/Machiya plaster|Sloping ceramic roof|Pagoda eave/.test(n)){
+      const material=o.material as THREE.MeshStandardMaterial;
+      material.normalMap=plaster.normalMap;material.normalScale.setScalar(.18);
+      physicalUV(o,1.5,1.5);
+    }
+    else if(/Floor$|walnut desktop|Chair back|Archive shelf|Closed door|Photograph frame|Window.*(frame|sill)|Skirting/i.test(n)){o.material=wood;physicalUV(o,1.25,.75);}
     else if(/wall|Ceiling/.test(n)){o.material=plaster;physicalUV(o,1.5,1.5);}
     else if(/rug/i.test(n)){o.material=rug;physicalUV(o,.45,.45);}
     else if(/cushion|Curtain/i.test(n)){o.material=cream;physicalUV(o,.4,.4);}
