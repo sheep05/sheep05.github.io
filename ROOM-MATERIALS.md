@@ -24,3 +24,11 @@ Validate with `node --test tests/study.test.mjs tests/curtains.test.mjs`, `npx t
 `lib/scene/window-view.ts` builds an original Kyoto-inspired exterior with tiled roofs, lattice windows, lanterns, distant hills, and a pagoda. It uses local geometry and Poly Haven textures, including CC0 `cobblestone_floor_08` for the lane (source and checksums in `material-sources/window-stone-provenance.json`); visitors do not contact an external scenery service. Visual reference: [JNTO’s Gion and Higashiyama guide](https://www.japan.travel/en/destinations/kansai/kyoto/gion-and-higashiyama/). No reference photographs are copied into the website.
 
 The two persistent entrance buttons are hidden. Click the monitor or camera directly; equivalent controls remain available when navigating with the Tab key. Camera return, skip-zoom, and the gallery fallback remain available.
+
+## Progressive loading and connection failures
+
+The room opens with matching plain materials and local lighting first. Poly Haven textures are optional upgrades: two download at a time, each independently, after the first room frame. Failed maps leave their plain material in place. Requests time out after 20 seconds; the enhancement pass stops after 90 seconds, on context loss, or when entering/leaving the room. A gallery link is available during initial 3D startup and on devices where 3D is unavailable.
+
+`prepareStudyMaterials` sets UVs and shared material identities before batching. `applyStudyMaterials` updates those same materials asynchronously. Do not await it before rendering or reassign materials after batching. The unused plaster color scan is no longer downloaded.
+
+Run `node --test tests/study-materials.test.mjs` for failed/partial downloads, pending loads, batching identity, and disposal after cancellation. For actual browser checks, build Pages, then run `python3 tests/room-network-preview.py outputs/github-pages`: port 4205 delays textures 25 seconds, 4206 rejects all textures, 4207 rejects normal maps and HDR, and 4208 caps aggregate responses at 128 KiB/s. These test servers disable caching and are never deployed.

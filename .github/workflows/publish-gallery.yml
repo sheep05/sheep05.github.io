@@ -44,7 +44,7 @@ jobs:
         run: npm ci --include=dev --include=optional
       - name: Test gallery mapping and study interactions
         if: steps.changes.outputs.publish == 'true'
-        run: node --test tests/catalog.test.mjs tests/study.test.mjs tests/curtains.test.mjs tests/study-lighting.test.mjs
+        run: node --test tests/catalog.test.mjs tests/study.test.mjs tests/curtains.test.mjs tests/study-lighting.test.mjs tests/study-materials.test.mjs
       - name: Build and verify the independent public website
         if: steps.changes.outputs.publish == 'true'
         run: |

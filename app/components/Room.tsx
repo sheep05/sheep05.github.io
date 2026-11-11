@@ -24,10 +24,11 @@ export default function Room(props: Props) {
   useEffect(()=>{commands.current.redraw();},[JSON.stringify(props.featured)]);
   useEffect(()=>{
     let disposed=false, cleanup=()=>{};
-    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;cleanup();setFailed(true);},20000);
+    const release=()=>{const clean=cleanup;cleanup=()=>{};clean();};
+    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;release();setFailed(true);},20000);
     async function init(){
       try{
-        const [THREE,{buildStudy},{batchStatic},{RoomEnvironment},{galleryProjection}]=await Promise.all([import('three'),import('@/lib/scene/study-room'),import('@/lib/scene/batch-static'),import('three/addons/environments/RoomEnvironment.js'),import('@/lib/scene/gallery-projection')]);
+        const [THREE,{buildStudy},{batchStatic},{RoomEnvironment},{galleryProjection},{prepareStudyMaterials,applyStudyMaterials}]=await Promise.all([import('three'),import('@/lib/scene/study-room'),import('@/lib/scene/batch-static'),import('three/addons/environments/RoomEnvironment.js'),import('@/lib/scene/gallery-projection'),import('@/lib/scene/study-materials')]);
         if(disposed||!mount.current)return;
         const container=mount.current, reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
         const scene=new THREE.Scene();scene.background=new THREE.Color('#111820');
@@ -38,9 +39,12 @@ export default function Room(props: Props) {
         const camera=new THREE.PerspectiveCamera(70,1,.035,65);
         camera.position.fromArray(overviewPosition);camera.lookAt(new THREE.Vector3(...overviewTarget));
         let environment:import('three').WebGLRenderTarget|undefined;
+        const materialAbort=new AbortController();
+        let enhanceTimer:ReturnType<typeof setTimeout>|undefined,materialDeadline:ReturnType<typeof setTimeout>|undefined;
         let raf=0;let study:ReturnType<typeof buildStudy>|undefined;
         const ownedTextures=new Set<import('three').Texture>();
         const resources=()=>{
+          materialAbort.abort();clearTimeout(enhanceTimer);clearTimeout(materialDeadline);
           cancelAnimationFrame(raf);
           const geometries=new Set<import('three').BufferGeometry>(),materials=new Set<import('three').Material>();
           scene.traverse(o=>{const m=o as import('three').Mesh;if(m.geometry)geometries.add(m.geometry);if(m.material)(Array.isArray(m.material)?m.material:[m.material]).forEach(a=>materials.add(a));});
@@ -53,9 +57,7 @@ export default function Room(props: Props) {
         try{environment=pmrem.fromScene(environmentScene,.04);scene.environment=environment.texture;scene.environmentIntensity=.22;}finally{environmentScene.dispose();pmrem.dispose();}
         study=buildStudy(scene);
         const room=study;
-        const {applyStudyMaterials}=await import('@/lib/scene/study-materials');
-        await applyStudyMaterials(scene,renderer,ownedTextures);
-        if(disposed){resources();return;}
+        const materialPlan=prepareStudyMaterials(scene);
         batchStatic(scene,[room.screen,room.cameraTarget,...room.keys,room.lampTarget,room.windowTarget,...room.prints,...room.curtains.map(c=>c.mesh)]);
         let artworkVersion=0;
         const updateArtwork=()=>{
@@ -91,6 +93,7 @@ export default function Room(props: Props) {
         };
         const begin = () => {
           if (state.current.stage !== 'overview') return;
+          materialAbort.abort();clearTimeout(enhanceTimer);
           if (reduced) { live.current.onEnter(); return; }
           startMove('entering');
         };
@@ -127,9 +130,10 @@ export default function Room(props: Props) {
           const interactive = state.current.stage === 'inspecting' || (state.current.stage === 'overview' && hit(e.clientX,e.clientY));
           renderer.domElement.style.cursor = interactive ? 'pointer' : 'default';
         };
-        const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;setFailed(true);setReady(false);cleanup();};
+        const contextLost=(e:Event)=>{e.preventDefault();if(disposed)return;disposed=true;setFailed(true);setReady(false);release();};
         renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('pointermove',hover);renderer.domElement.addEventListener('webglcontextlost',contextLost);
         cleanup=()=>{ro.disconnect();observer.disconnect();renderer.domElement.removeEventListener('click',click);renderer.domElement.removeEventListener('pointermove',hover);renderer.domElement.removeEventListener('webglcontextlost',contextLost);resources();};
+        let enhancementsStarted=false;
         const frame=(now:number)=>{
           raf=requestAnimationFrame(frame);const dt=Math.min((now-previous)/1000,.05);previous=now;
           if(!visible||document.hidden)return;
@@ -165,6 +169,28 @@ export default function Room(props: Props) {
           updateStudyLighting(scene,room,daylight,lamplight);
           if(!reduced)animateCurtains(room.curtains,now);
           renderer.render(scene,camera);
+          if(!enhancementsStarted){
+            enhancementsStarted=true;
+            container.dataset.roomReadyMs=String(Math.round(performance.now()));
+            // The base room has rendered and controls are live. Optional assets
+            // start on a later task, never inside the startup timeout.
+            enhanceTimer=setTimeout(()=>{
+              if(disposed||materialAbort.signal.aborted)return;
+              container.dataset.materials='loading';
+              materialDeadline=setTimeout(()=>materialAbort.abort(),90000);
+              void applyStudyMaterials(scene,renderer,ownedTextures,{
+                plan:materialPlan,signal:materialAbort.signal,
+                onProgress:report=>{
+                  container.dataset.materialsLoaded=String(report.loaded);
+                  if(environment&&scene.environment!==environment.texture){environment.dispose();environment=undefined;}
+                }
+              }).then(report=>{
+                if(disposed)return;
+                container.dataset.materials=report.loaded===report.total?'ready':report.loaded?'partial':'fallback';
+              }).catch(()=>{if(!disposed)container.dataset.materials='fallback';})
+                .finally(()=>clearTimeout(materialDeadline));
+            },150);
+          }
           const surface=live.current.gallerySurface.current;
           if(surface){
             const w=container.clientWidth,h=container.clientHeight;
@@ -176,16 +202,16 @@ export default function Room(props: Props) {
           if(current==='entering'&&elapsed>=ENTER_SECONDS){cancelAnimationFrame(raf);live.current.onEnter();return;}
         };
         raf=requestAnimationFrame(frame);clearTimeout(loadTimeout);setReady(true);
-      }catch(error){if(disposed)return;clearTimeout(loadTimeout);cleanup();console.error('Study unavailable',error);setFailed(true);}
+      }catch(error){if(disposed)return;clearTimeout(loadTimeout);disposed=true;release();console.error('Study unavailable',error);setFailed(true);}
     }
-    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},redraw:()=>{}};cleanup();};
+    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},redraw:()=>{}};release();};
   },[]);
   return <div className={`room study-room ${ready?'room-ready':''} study-${stage}`}>
     <div className="study-fallback" aria-hidden="true"><strong>Between code<br />and photographs.</strong></div>
     <div ref={mount} className="room-canvas" />
     <div className="study-actions">
-      {failed ? <button onClick={props.onEnter}>Open gallery ↗</button> :
-        ready && stage === 'overview' ? <>
+      {failed||!ready ? <button onClick={props.onEnter}>Open gallery ↗</button> :
+        stage === 'overview' ? <>
           <button className="study-keyboard-action" onClick={() => commands.current.begin()}>Open monitor ↗</button>
           <button className="study-keyboard-action" onClick={() => commands.current.inspect()}>Inspect camera</button>
         </> : stage === 'inspecting' ? <>
