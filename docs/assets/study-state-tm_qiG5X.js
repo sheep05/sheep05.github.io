@@ -1,0 +1,1 @@
+var e=2.3;function t(e){let t=Math.min(1,Math.max(0,e));return t*t*(3-2*t)}var n=[0,1.85,2.55],r=[0,1.3,-1.85],i=[0,1.47,-2.11],a=[1.28,.8];function o(e,t){return Math.min(a[1],a[0]/e)/(2*Math.tan(t*Math.PI/360))}export{o as a,r as i,t as n,i as o,n as r,a as s,e as t};
