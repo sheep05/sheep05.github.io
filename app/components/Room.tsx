@@ -6,7 +6,6 @@ import { easeStudy, ENTER_SECONDS, overviewPosition, overviewTarget, screenPosit
 
 type Props = {
   gallerySurface: RefObject<HTMLDivElement | null>;
-  onEnter: () => void;
   onWake: () => void;
   onStage: (stage: StudyStage) => void;
   featured: { url: string; title: string }[];
@@ -17,7 +16,7 @@ export default function Room(props: Props) {
   const [ready,setReady]=useState(false),[failed,setFailed]=useState(false);
   const [stage,setStage]=useState<StudyStage>('overview');
   const state=useRef({stage:'overview' as StudyStage,day:false,lamp:true});
-  const commands=useRef({begin:()=>{},inspect:()=>{},redraw:()=>{}});
+  const commands=useRef({begin:()=>{},inspect:()=>{},back:()=>{},redraw:()=>{}});
   const changeStage=(next:StudyStage)=>{state.current.stage=next;setStage(next);live.current.onStage?.(next);};
   const toggleLamp=()=>{state.current.lamp=!state.current.lamp;};
   const toggleDay=()=>{state.current.day=!state.current.day;};
@@ -94,7 +93,7 @@ export default function Room(props: Props) {
         const begin = () => {
           if (state.current.stage !== 'overview') return;
           materialAbort.abort();clearTimeout(enhanceTimer);
-          if (reduced) { live.current.onEnter(); return; }
+          woke = false;
           startMove('entering');
         };
         const inspect = () => {
@@ -103,6 +102,9 @@ export default function Room(props: Props) {
         };
         commands.current.begin = begin;
         commands.current.inspect = inspect;
+        commands.current.back = () => {
+          if (state.current.stage !== 'overview') startMove('returning');
+        };
         const resize = () => {
           const w=container.clientWidth,h=container.clientHeight;
           if (!w || !h) return;
@@ -199,27 +201,26 @@ export default function Room(props: Props) {
             surface.style.visibility = current === 'inspecting' || current === 'returning' ? 'hidden' : 'visible';
           }
           // Keep this DOM gallery mounted: only its positioning and interactivity change.
-          if(current==='entering'&&elapsed>=ENTER_SECONDS){cancelAnimationFrame(raf);live.current.onEnter();return;}
+          // Stay at the monitor after the zoom; the projected gallery remains inert.
         };
         raf=requestAnimationFrame(frame);clearTimeout(loadTimeout);setReady(true);
       }catch(error){if(disposed)return;clearTimeout(loadTimeout);disposed=true;release();console.error('Study unavailable',error);setFailed(true);}
     }
-    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},redraw:()=>{}};release();};
+    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},back:()=>{},redraw:()=>{}};release();};
   },[]);
   return <div className={`room study-room ${ready?'room-ready':''} study-${stage}`}>
     <div className="study-fallback" aria-hidden="true"><strong>Between code<br />and photographs.</strong></div>
     <div ref={mount} className="room-canvas" />
     <div className="study-actions">
-      {failed||!ready ? <button onClick={props.onEnter}>Open gallery ↗</button> :
-        stage === 'overview' ? <>
+      {!failed && ready && stage === 'overview' ? <>
           <button className="study-keyboard-action" onClick={() => commands.current.begin()}>Open monitor ↗</button>
           <button className="study-keyboard-action" onClick={() => commands.current.inspect()}>Inspect camera</button>
         </> : stage === 'inspecting' ? <>
           <span>Fujifilm X-T5</span>
           <button onClick={() => commands.current.inspect()}>Back to room ↩</button>
-        </> : stage === 'entering' ? <button onClick={props.onEnter}>Skip zoom ↗</button> : null}
+        </> : stage === 'entering' ? <button onClick={() => commands.current.back()}>Back to room ↩</button> : null}
     </div>
     {!ready&&!failed&&<span className="room-loading">Opening the study…</span>}
-    {failed&&<p className="study-unavailable">The 3D study is unavailable on this device. You can enter the gallery directly.</p>}
+    {failed&&<p className="study-unavailable">The 3D study is unavailable on this device. You can return to the About page.</p>}
   </div>;
 }

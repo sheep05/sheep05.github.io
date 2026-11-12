@@ -19,14 +19,19 @@ export default function Portfolio({
   managementUrl = "/studio",
   collectionStatus = null,
   onRetry,
+  roomExitUrl,
+  coverUrl,
 }: {
   initial: Collection;
   assetBase?: string;
   managementUrl?: string | null;
   collectionStatus?: "loading" | "error" | null;
   onRetry?: () => void;
+  roomExitUrl?: string;
+  coverUrl?: string;
 }) {
   const { settings } = initial;
+  const collectionHubUrl = coverUrl ? `${coverUrl}#collections` : null;
   const samples = settings.showSamples
     ? sampleCollection
     : { albums: [], photos: [] };
@@ -62,6 +67,10 @@ export default function Portfolio({
   useEffect(() => {
     const read = () => {
       const p = new URLSearchParams(location.search);
+      if (!p.has("album") && coverUrl && ["collection", "about"].includes(p.get("view") || "")) {
+        location.replace(p.get("view") === "collection" ? `${coverUrl}#collections` : coverUrl);
+        return;
+      }
       setView(p.has("album") ? "album" : p.get("view") || "studio");
       setActiveId(p.get("album"));
       setRegion(p.get("region"));
@@ -73,7 +82,7 @@ export default function Portfolio({
     read();
     window.addEventListener("popstate", read);
     return () => window.removeEventListener("popstate", read);
-  }, []);
+  }, [coverUrl]);
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     if (lightbox) dialog.current?.showModal();
@@ -87,6 +96,10 @@ export default function Portfolio({
     if (view !== "studio") main.current?.focus({ preventScroll: true });
   }, [view]);
   function navigate(next: string, id?: string, country: string | null = null) {
+    if (!id && coverUrl && (next === "collection" || next === "about")) {
+      location.assign(next === "collection" ? `${coverUrl}#collections` : coverUrl);
+      return;
+    }
     const params = new URLSearchParams();
     if (id) {
       params.set("album", id);
@@ -94,7 +107,7 @@ export default function Portfolio({
       setAlbumContext({ view, region });
       if (region) params.set("region", region);
     } else {
-      if (next !== "studio") params.set("view", next);
+      if (next !== "studio" || coverUrl) params.set("view", next);
       if (country) params.set("region", country);
     }
     setRegion(country);
@@ -137,13 +150,17 @@ export default function Portfolio({
             {collectionStatus === "error" && <button className="text-link" onClick={onRetry}>Retry photographs ↗</button>}
           </div>
   );
-  const galleryFooter = (<footer className="site-footer">
+  const galleryFooter = coverUrl ? null : (<footer className="site-footer">
         <button ref={reveal} className="brand" onClick={() => navigate("studio")}>
           {settings.name}
         </button>
         {managementUrl && <a ref={reveal} href={managementUrl}>Studio management ↗</a>}
       </footer>);
-  const galleryHeader = (
+  const galleryHeader = collectionHubUrl ? (
+    <header className="collection-hub-header">
+      <a href={collectionHubUrl}>Collections <span aria-hidden="true" /></a>
+    </header>
+  ) : (
           <header className="site-header">
             <button ref={reveal}
               className="brand"
@@ -196,6 +213,7 @@ export default function Portfolio({
             className={`entrance programmer-entrance ${studyStage !== "overview" ? "is-entering" : ""}`}
             aria-label="Enter the photography studio"
           >
+            <a className="room-return" href={roomExitUrl || `${assetBase}?view=about`}>Back to About</a>
             <div className="entrance-brand brand">
               <span className="brand-symbol" aria-hidden="true">▣</span>
               <span>{settings.name}</span>
@@ -222,15 +240,16 @@ export default function Portfolio({
                     title: a.title,
                   }))
                   .filter((p) => p.url)}
-                onEnter={() => navigate("collection")}
-                onStage={setStudyStage}
+                onStage={(stage) => {
+                  setStudyStage(stage);
+                  if (stage === "overview") setMonitorAwake(false);
+                }}
                 onWake={() => setMonitorAwake(true)}
               />
             </div>
           </section>
         )}
         {view === "scenes" && <>
-          <button ref={observeScrollReveal} className="atlas-back" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
           <Suspense fallback={<section className="atlas-loading" role="status">Opening the atlas…</section>}>
             <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />
           </Suspense>
@@ -238,7 +257,6 @@ export default function Portfolio({
         {["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
-            <button ref={observeScrollReveal} className="text-link back-link" onClick={()=>navigate("collection")}>← Three ways of seeing</button>
             <div ref={observeScrollReveal} className="collection-heading">
               <h1>
                 {chapter ? chapter.title : "Collected"}

@@ -9,6 +9,17 @@ export default defineConfig({
   publicDir: fileURLToPath(new URL("./public", import.meta.url)),
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
   plugins: [react()],
-  build: { outDir: "../outputs/github-pages", emptyOutDir: true },
+  build: {
+    outDir: "../outputs/github-pages", emptyOutDir: true,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          // Keep React and its CommonJS helpers together to avoid a cycle
+          // between the lazy gallery entry and shared JSX runtime.
+          groups: [{ name: "react-vendor", test: /node_modules\/(react|react-dom|scheduler)\/|\0rolldown\/runtime/ }],
+        },
+      },
+    },
+  },
   server: { host: "127.0.0.1", port: 5173, watch: { usePolling: true } },
 });
