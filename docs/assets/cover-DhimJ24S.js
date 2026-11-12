@@ -5,7 +5,7 @@ var e=`
     <button class="menu-toggle" aria-controls="menu-panel" aria-expanded="false"><span>Menu</span><i aria-hidden="true"></i></button>
     <div class="sheet">
       <a class="skip-link" href="#cover">Skip to introduction</a>
-      <header class="masthead"><div class="cover-identity"><svg class="identity-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><path d="M13 3H3v26h26V19M21 3h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/><circle cx="21" cy="11" r="3" fill="currentColor"/><path d="M3 23c5-10 10-10 14-3s8 5 12 1" stroke="currentColor" stroke-width="1.8"/></svg><div class="wordmark">Sheep’s<br>photography</div></div></header>
+      <header class="masthead"><div class="cover-identity"><img class="identity-icon" src="/cover/sheep-icon.png" width="1536" height="1024" alt=""><div class="wordmark">Sheep’s<br>photography</div></div></header>
       <main id="cover" tabindex="-1"></main>
 
     </div>
