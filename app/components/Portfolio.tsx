@@ -3,7 +3,6 @@ import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
-import SpaceBackdrop from "./SpaceBackdrop";
 import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
 import StreetStrip from "./StreetStrip";
@@ -193,8 +192,7 @@ export default function Portfolio({
           </header>
   );
   return (
-    <div className={`portfolio view-${view}`}>
-      {view === "scenes" && <SpaceBackdrop/>}
+    <div className={`portfolio view-${view}${["scenes", "portraits", "street", "all", "album"].includes(view) ? " photography-pages" : ""}`}>
       {view !== "studio" && view !== "collection" && <><a className="skip-link" href="#main">Skip to content</a>{galleryHeader}</>}
       <main id="main" ref={main} tabIndex={-1}>
         {(view === "studio" || view === "collection") && <div
