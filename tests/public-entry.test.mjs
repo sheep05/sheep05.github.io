@@ -45,7 +45,7 @@ test('workshop, globe, categories, and existing album deep links remain reachabl
 
 test('collection HTML renders its requested content immediately without a workshop or loading interstitial',async()=>{
   const {registerHooks}=await import('node:module');
-  const {transpileModule,JsxEmit,ModuleKind}=await import('typescript');
+  const {transpileModule,JsxEmit,ModuleKind,ScriptTarget}=await import('typescript');
   const hooks=registerHooks({
     resolve(specifier,context,next) {
       if(specifier.startsWith('@/'))specifier=new URL('../'+specifier.slice(2),import.meta.url).href;
@@ -61,7 +61,7 @@ test('collection HTML renders its requested content immediately without a worksh
     },
     load(url,context,next) {
       if(url.startsWith('file:')&&url.endsWith('.json'))return {format:'module',shortCircuit:true,source:'export default '+readFileSync(new URL(url),'utf8')};
-      if(url.endsWith('.tsx'))return {format:'module',shortCircuit:true,source:transpileModule(readFileSync(new URL(url),'utf8'),{compilerOptions:{jsx:JsxEmit.ReactJSX,module:ModuleKind.ESNext}}).outputText};
+      if(url.endsWith('.tsx'))return {format:'module',shortCircuit:true,source:transpileModule(readFileSync(new URL(url),'utf8'),{compilerOptions:{jsx:JsxEmit.ReactJSX,module:ModuleKind.ESNext,target:ScriptTarget.ES2022}}).outputText};
       return next(url,context);
     },
   });
@@ -71,7 +71,7 @@ test('collection HTML renders its requested content immediately without a worksh
     const {default:Portfolio}=await import('../app/components/Portfolio.tsx');
     const {galleryRoute}=await import('../lib/public-entry.ts');
     const {collection}=JSON.parse(readFileSync(new URL('../public/published/collection.json',import.meta.url),'utf8'));
-    for(const [view,title] of [['scenes','A personal'],['portraits','Portraits'],['street','Street']]) {
+    for(const [view,title] of [['scenes','ATLAS'],['portraits','Portraits'],['street','Street']]) {
       const html=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute(`?view=${view}`),coverUrl:'/'}));
       assert.ok(html.includes(title));
       assert.ok(!html.includes('Opening the atlas'));
@@ -82,9 +82,24 @@ test('collection HTML renders its requested content immediately without a worksh
     const atlas=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=scenes&region=JP'),coverUrl:'/'}));
     assert.match(atlas, /<button class="atlas-selection"[^>]*aria-label="Explore 1 collection in Japan"/);
     assert.ok(!atlas.includes('atlas-collections'));
+    assert.ok(!atlas.includes('DRAG TO EXPLORE'));
+    assert.ok(!atlas.includes('Earth imagery:'));
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
-    assert.ok(country.includes('Back to the atlas'));
+    assert.ok(country.replace(/<!--.*?-->/g,'').includes('Back to the atlas'));
     assert.ok(country.includes('Love scences in Japan'));
     assert.ok(!country.includes('Modern, clear and pleasant'));
+    const {regions,atRegion}=await import('../lib/catalog.ts');
+    for(const region of regions){
+      const html=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute(`?view=all&region=${region.id}`),coverUrl:'/'}));
+      const ids=[...new Set(collection.albums.filter(a=>atRegion(a,region.id)).flatMap(a=>a.photoIds))];
+      assert.ok(!html.includes('collection-row'),region.id);
+      assert.equal((html.match(/aria-label="View [^"]* full screen"/g)||[]).length,ids.length,region.id);
+      assert.ok(html.replace(/<!--.*?-->/g,'').includes('Back to the atlas'),region.id);
+    }
+    // Multiple albums in a country are combined without repeating shared photographs.
+    const japan=collection.albums.find(a=>atRegion(a,'JP'));
+    const multi={...collection,albums:[...collection.albums,{...japan,id:'extra-japan'}]};
+    const combined=renderToString(createElement(Portfolio,{initial:multi,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
+    assert.equal((combined.match(/aria-label="View [^"]* full screen"/g)||[]).length,japan.photoIds.length);
   } finally {hooks.deregister();}
 });

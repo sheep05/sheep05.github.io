@@ -1,0 +1,5 @@
+/* Keep the native pointer; this separate dot trails it and inverts over the work. */
+.site-cursor { position:fixed; top:0; left:0; width:0; height:0; z-index:2147483647; pointer-events:none; mix-blend-mode:difference; opacity:0; will-change:transform; }
+.site-cursor.is-visible { opacity:1; }
+.site-cursor i { display:block; width:15px; height:15px; border-radius:50%; background:#fff; transform:translate(-50%,-50%) scale(var(--cursor-scale,1)); transition:transform .18s ease; }
+@media (hover:none), (pointer:coarse), (prefers-reduced-motion:reduce) { .site-cursor { display:none; } }

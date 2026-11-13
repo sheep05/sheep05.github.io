@@ -189,7 +189,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
 
   return <section className="atlas-page">
     <div className="atlas-intro">
-      <h1 ref={observeScrollReveal}>A personal<br/><em>atlas.</em></h1>
+      <h1 ref={observeScrollReveal}>ATLAS</h1>
       <div className="atlas-region-list" aria-label="Choose a country">
         {regions.map((region,i) => <button ref={observeScrollReveal} key={region.id} aria-pressed={selected === region.id} onClick={()=>onSelect(region.id)}>
           <span className="region-number">0{i+1}</span><span>{region.name}</span>
@@ -217,7 +217,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         <span className="atlas-selection-copy"><span>{activeRegion?.name || selected}</span><small>No collections here yet.</small></span>
       </div>)}
       <div className="atlas-world-footer">
-        <span role="status">{state==='ready'?'DRAG TO EXPLORE · SELECT A PLACE':state==='loading'?'PREPARING THE EARTH…':'CHOOSE A PLACE FROM THE LIST'}</span>
+        {state!=='ready' && <span role="status">{state==='loading'?'PREPARING THE EARTH…':'CHOOSE A PLACE FROM THE LIST'}</span>}
         {state==='ready' && <div className="atlas-tools">
           <button aria-label="Zoom in on Earth" onClick={()=>zoom.current(-.4)}>+</button>
           <button aria-label="Zoom out from Earth" onClick={()=>zoom.current(.4)}>−</button>
@@ -226,6 +226,5 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       </div>
       {activeRegion && <span className="atlas-coordinate" aria-hidden="true">{activeRegion.lat.toFixed(2)}° N / {activeRegion.lon.toFixed(2)}° E</span>}
     </div>
-    <p ref={observeScrollReveal} className="atlas-image-credit">Earth imagery: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Solar System Scope</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
   </section>;
 }

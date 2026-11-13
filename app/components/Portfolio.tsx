@@ -66,7 +66,12 @@ export default function Portfolio({
       gallerySurface.current.style.transform = "";
     }
   }, [view]);
-  const active = albums.find((a) => a.id === activeId);
+  const active: Album | undefined = country ? {
+    id: `region-${region}`, title: country,
+    description: listedAlbums.length===1 ? listedAlbums[0].description : "",
+    photoIds: [...new Set(listedAlbums.flatMap(a=>a.photoIds))],
+    position: 0, published: true, coverId: null,
+  } : albums.find((a) => a.id === activeId);
   useEffect(() => {
     const read = () => {
       const p = new URLSearchParams(location.search);
@@ -161,7 +166,7 @@ export default function Portfolio({
       </footer>);
   const galleryHeader = collectionHubUrl ? (
     <header className="collection-hub-header">
-      <a href={collectionHubUrl}>Collections <span aria-hidden="true" /></a>
+      <a href={collectionHubUrl}>Collections <span aria-hidden="true" data-collection-magnet /></a>
     </header>
   ) : (
           <header className="site-header">
@@ -252,14 +257,13 @@ export default function Portfolio({
           </section>
         )}
         {view === "scenes" && <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onExplore={id=>navigate("all",undefined,id)} />}
-        {["all", "portraits", "street"].includes(view) && (
+        {!country && ["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
-            {country && <button className="text-link back-link" onClick={()=>navigate("scenes",undefined,region)}>← Back to the atlas</button>}
             <div ref={observeScrollReveal} className="collection-heading">
               <h1>
-                {country || (chapter ? chapter.title : "Collected")}
-                {!chapter && !country && <><br /><em>moments.</em></>}
+                {chapter ? chapter.title : "Collected"}
+                {!chapter && <><br /><em>moments.</em></>}
                 <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
             </div>
@@ -302,14 +306,14 @@ export default function Portfolio({
             {listedAlbums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
           </section>
         )}
-        {view === "album" &&
+        {(view === "album" || country) &&
           (active ? (
             <section className="album-page">
               <button
                 ref={observeScrollReveal} className="text-link back-link"
-                onClick={() => navigate(albumContext.view, undefined, albumContext.region)}
+                onClick={() => navigate(country ? "scenes" : albumContext.view, undefined, country ? region : albumContext.region)}
               >
-                ← Back to {albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? (regions.find(r=>r.id===albumContext.region)?.name || "all collections") : albumContext.view}
+                ← Back to {country || albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? (regions.find(r=>r.id===albumContext.region)?.name || "all collections") : albumContext.view}
               </button>
               <div ref={observeScrollReveal} className="album-heading">
                 <div>

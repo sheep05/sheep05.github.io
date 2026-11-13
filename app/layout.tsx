@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SiteCursor from "./components/SiteCursor";
 export const metadata: Metadata = {
   title: "Quiet Studio — Photography",
   description:
@@ -13,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><SiteCursor/>{children}</body>
     </html>
   );
 }
