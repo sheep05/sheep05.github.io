@@ -2425,8 +2425,8 @@ select {
 .atlas-pin line { stroke: #d9c08d88; stroke-width: 1; }
 .atlas-selection { position: absolute; left: 7%; bottom: 70px; display: flex; gap: 14px; align-items: center; padding: 12px 18px 12px 12px; background: #0c171fe8; border: 1px solid #80909b33; backdrop-filter: blur(12px); max-width: 90%; }
 .atlas-selection > img { width: 84px; height: 62px; object-fit: cover; }
-.atlas-selection > div > span { display: block; font: 24px var(--serif); }
-.atlas-selection button, .atlas-selection small { display: block; margin-top: 8px; font-size: 10px; color: #cab98f; }
+.atlas-selection-copy > span:first-child { display: block; font: 24px var(--serif); }
+.atlas-selection-action, .atlas-selection small { display: block; margin-top: 8px; font-size: 10px; color: #cab98f; }
 .atlas-selection small { color: #96a7ad; }
 @media (max-width: 760px) { .atlas-selection { left: 4%; bottom: 52px; } .atlas-selection > img { width: 60px; height: 48px; } }
 
@@ -2641,8 +2641,8 @@ body:has(.photography-pages) { background: #fff; }
 .photography-pages .atlas-pin line { stroke: #626262; }
 .photography-pages .atlas-pin i { background: #fff; box-shadow: 0 0 0 2px #000; }
 .photography-pages .atlas-pin.selected i { background: #000; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; }
-.photography-pages .atlas-selection button { color: #000; }
-.photography-pages .atlas-selection button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.atlas-selection { text-align: left; }
+button.atlas-selection:hover .atlas-selection-action { text-decoration: underline; text-underline-offset: 3px; }
 .photography-pages .street-strip { scrollbar-color: #999 transparent; }
 .photography-pages .atlas-pins { overflow: clip; }
 /* Navigation focus supports screen readers without framing the entire page. */
@@ -2651,4 +2651,40 @@ body:has(.photography-pages) { background: #fff; }
   .photography-pages :is(.collection-heading h1, .atlas-intro h1) {
     font-size: clamp(48px, 15.5vw, 68px);
   }
+}
+
+/* Atlas uses a black stage; the cover and photographic collections stay white. */
+body:has(.view-scenes) { background: #000; }
+.photography-pages.view-scenes {
+  --paper: #000;
+  --ink: #fff;
+  --muted: #aaa;
+  --line: #555;
+  --accent: #fff;
+  color-scheme: dark;
+}
+.view-scenes ::selection { background: #fff; color: #000; }
+.view-scenes button:focus-visible { outline-color: #fff; }
+.view-scenes .atlas-region-list > button:hover { background: #191919; }
+.view-scenes :is(.atlas-pin > span, .atlas-tools button, .atlas-selection) {
+  background: #000;
+  color: #fff;
+}
+.view-scenes :is(.atlas-pin:hover > span, .atlas-pin.selected > span) {
+  color: #fff;
+  border-color: #fff;
+}
+.view-scenes .atlas-pin > span { font-size: 14px; min-height: 34px; padding: 6px 10px; letter-spacing: .01em; }
+.view-scenes .atlas-pin i { width: 11px; height: 11px; left: 8.5px; top: 8.5px; box-shadow: 0 0 0 2px #000, 0 0 0 3px #fff; }
+.view-scenes .atlas-pin.selected i { background: #000; box-shadow: 0 0 0 3px #fff; }
+.view-scenes .atlas-pin line { stroke: #bbb; stroke-width: 1.25; }
+.view-scenes .atlas-selection-action { color: #fff; font-size: 13px; }
+.view-scenes button.atlas-selection:hover { border-color: #fff; }
+@media (min-width: 761px) {
+  .view-scenes .atlas-pin > span { font-size: 16px; }
+}
+
+@media (max-width: 760px) {
+  .view-scenes .atlas-selection { top: 0; bottom: auto; }
+  .view-scenes .atlas-world:has(.atlas-selection) .atlas-coordinate { display: none; }
 }

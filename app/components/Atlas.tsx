@@ -5,9 +5,9 @@ import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
 import { atlasPixelRatio, atlasTextureFile, globeDiameter } from "@/lib/atlas-quality";
 import type { Album, Photo } from "@/lib/types";
 
-export default function Atlas({ albums, photos, assetBase, selected, onSelect, onAlbum, onAll }: {
+export default function Atlas({ albums, photos, assetBase, selected, onSelect, onExplore }: {
   albums: Album[]; photos: Photo[]; assetBase: string; selected: string | null;
-  onSelect: (id: string | null) => void; onAlbum: (id: string) => void; onAll: () => void;
+  onSelect: (id: string | null) => void; onExplore: (id: string) => void;
 }) {
   const mount = useRef<HTMLDivElement>(null);
   const dragSurface = useRef<HTMLDivElement>(null);
@@ -163,6 +163,17 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
             point.project(camera);
             pin.hidden=!facing || Math.abs(point.x)>1 || Math.abs(point.y)>1;
             pin.style.left=`${(point.x*.5+.5)*100}%`; pin.style.top=`${(-point.y*.5+.5)*100}%`;
+            const label = pin.querySelector('span');
+            const leader = pin.querySelector('line');
+            if (label && leader && !pin.hidden) {
+              const x = (point.x*.5+.5)*host.clientWidth - 14;
+              const y = (-point.y*.5+.5)*host.clientHeight - 14;
+              const left = Math.max(6-x, Math.min(region.labelX, host.clientWidth-x-label.offsetWidth-6));
+              const top = Math.max(6-y, Math.min(region.labelY, host.clientHeight-y-label.offsetHeight-6));
+              label.style.left = `${left}px`; label.style.top = `${top}px`;
+              leader.setAttribute('x2', String(left < 14 ? left + label.offsetWidth : left));
+              leader.setAttribute('y2', String(top + label.offsetHeight/2));
+            }
           }
           renderer.render(scene,camera);
           needsRender = regions.some(region => !pins.current[region.id]);
@@ -186,7 +197,6 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         </button>)}
         {extraRegions.map(id => <button ref={observeScrollReveal} key={id} aria-pressed={selected===id} onClick={()=>onSelect(id)}><span>{id}</span><span>↗</span></button>)}
       </div>
-      <button ref={observeScrollReveal} className="atlas-all-link" onClick={()=>onSelect(null)}>All Scenes collections ↗</button>
     </div>
     <div ref={observeScrollReveal} className={`atlas-world atlas-${state}`}>
       {state !== 'ready' && <div className="atlas-flat-earth" aria-hidden="true" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>}
@@ -198,15 +208,14 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           <i/><span style={{left:region.labelX,top:region.labelY}}>{region.name}</span>
         </button>)}
       </div>}
-      {selected && <div className="atlas-selection">
+      {selected && (shown.length ? <button className="atlas-selection" onClick={()=>onExplore(selected)} aria-label={`Explore ${shown.length} collection${shown.length===1?'':'s'} in ${activeRegion?.name || selected}`}>
         {preview && <img src={preview.thumb} alt=""/>}
-        <div><span>{activeRegion?.name || selected}</span>
-          {shown.length ? <button onClick={()=>{
-            document.getElementById('atlas-collections')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
-            document.getElementById('atlas-collection-title')?.focus({preventScroll:true});
-          }}>Explore {shown.length} collection{shown.length===1?'':'s'} ↗</button> : <small>No collections here yet.</small>}
-        </div>
-      </div>}
+        <span className="atlas-selection-copy"><span>{activeRegion?.name || selected}</span>
+          <span className="atlas-selection-action">Explore {shown.length} collection{shown.length===1?'':'s'} ↗</span>
+        </span>
+      </button> : <div className="atlas-selection" role="status">
+        <span className="atlas-selection-copy"><span>{activeRegion?.name || selected}</span><small>No collections here yet.</small></span>
+      </div>)}
       <div className="atlas-world-footer">
         <span role="status">{state==='ready'?'DRAG TO EXPLORE · SELECT A PLACE':state==='loading'?'PREPARING THE EARTH…':'CHOOSE A PLACE FROM THE LIST'}</span>
         {state==='ready' && <div className="atlas-tools">
@@ -218,17 +227,5 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       {activeRegion && <span className="atlas-coordinate" aria-hidden="true">{activeRegion.lat.toFixed(2)}° N / {activeRegion.lon.toFixed(2)}° E</span>}
     </div>
     <p ref={observeScrollReveal} className="atlas-image-credit">Earth imagery: <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noreferrer">Solar System Scope</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a></p>
-    <div id="atlas-collections" className="atlas-collections" aria-live="polite">
-      <div ref={observeScrollReveal} className="atlas-collections-heading"><div><h2 id="atlas-collection-title" tabIndex={-1}>{activeRegion?.name || selected || 'Across the atlas'}<sup>{shown.length.toString().padStart(2,'0')}</sup></h2></div>
-        <button onClick={onAll}>All collections ↗</button>
-      </div>
-      {shown.length ? <div className="atlas-album-grid">{shown.map(album=>{
-        const photo=photos.find(p=>p.id===(album.coverId || album.photoIds[0]));
-        return <button ref={observeScrollReveal} className="atlas-album" key={album.id} onClick={()=>onAlbum(album.id)}>
-          <div>{photo?<img src={photo.thumb} alt={photo.alt||photo.title} loading="lazy"/>:<span>Photographs to come</span>}</div>
-          <small>{album.photoIds.length} PHOTOGRAPHS <span>↗</span></small><h3>{album.title}</h3><p>{album.description}</p>
-        </button>;
-      })}</div> : <div ref={observeScrollReveal} className="atlas-empty"><p>No collections here yet.</p><button onClick={onAll}>Explore all collections ↗</button></div>}
-    </div>
   </section>;
 }

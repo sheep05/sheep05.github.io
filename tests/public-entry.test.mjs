@@ -9,7 +9,9 @@ test('cover images and font stay within their delivery budgets',()=>{
   assert.ok(statSync(new URL('cover/sheep-icon-small.webp',root)).size<8000);
   assert.ok(statSync(new URL('cover/WorkSans-Variable.woff2',root)).size<150000);
   for(const source of coverPhoto('').srcset.split(', ')) {
-    assert.ok(statSync(new URL(source.split(' ')[0],root)).size<300000);
+    const [path,width]=source.split(' ');
+    const budget={1200:300000,2000:600000,3200:1100000,4800:1800000}[parseInt(width)];
+    assert.ok(statSync(new URL(path,root)).size<budget, path);
   }
 });
 
@@ -75,6 +77,14 @@ test('collection HTML renders its requested content immediately without a worksh
       assert.ok(!html.includes('Opening the atlas'));
       assert.ok(!html.includes('programmer-entrance'));
       assert.ok(!html.includes('Opening the study'));
+      if(view==='scenes') assert.ok(!html.includes('Across the atlas'));
     }
+    const atlas=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=scenes&region=JP'),coverUrl:'/'}));
+    assert.match(atlas, /<button class="atlas-selection"[^>]*aria-label="Explore 1 collection in Japan"/);
+    assert.ok(!atlas.includes('atlas-collections'));
+    const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
+    assert.ok(country.includes('Back to the atlas'));
+    assert.ok(country.includes('Love scences in Japan'));
+    assert.ok(!country.includes('Modern, clear and pleasant'));
   } finally {hooks.deregister();}
 });

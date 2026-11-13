@@ -6,7 +6,7 @@ import Room from "./Room";
 import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
 import StreetStrip from "./StreetStrip";
-import { chapters, inChapter } from "@/lib/catalog";
+import { atRegion, chapters, inChapter, regions } from "@/lib/catalog";
 import Atlas from "./Atlas";
 import { galleryRoute } from "@/lib/public-entry";
 import { sampleCollection } from "@/lib/samples";
@@ -53,7 +53,8 @@ export default function Portfolio({
   const [studyStage, setStudyStage] = useState<StudyStage>("overview");
   const [region, setRegion] = useState<string | null>(initialRoute?.region || null);
   const [albumContext, setAlbumContext] = useState<{ view: string; region: string | null }>({ view: initialRoute?.from || "collection", region: initialRoute?.region || null });
-  const listedAlbums = view === "portraits" || view === "street" ? albums.filter(a => inChapter(a, view)) : albums;
+  const country = view === "all" && region ? regions.find(r => r.id === region)?.name || region : null;
+  const listedAlbums = country ? albums.filter(a => inChapter(a, "scenes") && atRegion(a, region!)) : view === "portraits" || view === "street" ? albums.filter(a => inChapter(a, view)) : albums;
   const chapter = chapters.find(c => c.id === view);
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -250,14 +251,15 @@ export default function Portfolio({
             </div>
           </section>
         )}
-        {view === "scenes" && <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />}
+        {view === "scenes" && <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onExplore={id=>navigate("all",undefined,id)} />}
         {["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
+            {country && <button className="text-link back-link" onClick={()=>navigate("scenes",undefined,region)}>← Back to the atlas</button>}
             <div ref={observeScrollReveal} className="collection-heading">
               <h1>
-                {chapter ? chapter.title : "Collected"}
-                {!chapter && <><br /><em>moments.</em></>}
+                {country || (chapter ? chapter.title : "Collected")}
+                {!chapter && !country && <><br /><em>moments.</em></>}
                 <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
             </div>
@@ -307,7 +309,7 @@ export default function Portfolio({
                 ref={observeScrollReveal} className="text-link back-link"
                 onClick={() => navigate(albumContext.view, undefined, albumContext.region)}
               >
-                ← Back to {albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? "all collections" : albumContext.view}
+                ← Back to {albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? (regions.find(r=>r.id===albumContext.region)?.name || "all collections") : albumContext.view}
               </button>
               <div ref={observeScrollReveal} className="album-heading">
                 <div>
