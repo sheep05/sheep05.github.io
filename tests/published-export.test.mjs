@@ -30,6 +30,7 @@ test('exports complete public text and both local JPEG sizes with no private rel
   assert.equal(s.collection.settings.email,'');
   assert.equal(JSON.stringify(s).includes('private-contact@example.test'),false);
   assert.deepEqual(s.collection.photos[0].albumIds,['album']);
+  assert.equal(s.collection.photos[0].fullUrl,ORIGIN+'/api/media/photo');
   for(const key of ['url','thumb']) {
     const path=s.collection.photos[0][key];
     assert.match(path,/^\/published\/media\/[a-f0-9]{64}\.jpg$/);
@@ -89,6 +90,7 @@ test('chapter assignments survive publication through a different backend origin
   assert.deepEqual(exported.albums[0].chapters,['scenes','street']);
   assert.deepEqual(exported.albums[0].regions,['JP','SG']);
   assert.equal(JSON.stringify(exported).includes(ORIGIN),false);
+  assert.equal(exported.photos[0].fullUrl,origin+'/api/media/photo');
 });
 test('legacy feeds stay unassigned; malformed classifications never replace the public copy',async t=>{
   assert.deepEqual(publicCollection(fixture()).albums[0].chapters,[]);

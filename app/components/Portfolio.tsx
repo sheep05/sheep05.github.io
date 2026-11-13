@@ -8,6 +8,7 @@ import ChapterIndex from "./ChapterIndex";
 import StreetStrip from "./StreetStrip";
 import { atRegion, chapters, inChapter, regions } from "@/lib/catalog";
 import Atlas from "./Atlas";
+import FullscreenPhoto from "./FullscreenPhoto";
 import { galleryRoute } from "@/lib/public-entry";
 import { sampleCollection } from "@/lib/samples";
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
@@ -279,7 +280,7 @@ export default function Portfolio({
               </h1>
             </div>
             {view === "street" ? listedAlbums.map(album => (
-              <StreetStrip key={album.id} album={album} photos={albumPhotos(album)} onOpen={() => navigate("album", album.id)} />
+              <StreetStrip key={album.id} album={album} photos={albumPhotos(album)} onOpen={() => navigate("album", album.id)} onPhoto={open} />
             )) : <div className="collection-list">
               {listedAlbums.map((a, i) => (
                 <button
@@ -303,7 +304,7 @@ export default function Portfolio({
                   <div className="row-image">
                     {cover(a) ? (
                       <img
-                        src={cover(a)!.url}
+                        src={cover(a)!.thumb}
                         alt={cover(a)!.alt || cover(a)!.title}
                         loading="lazy"
                       />
@@ -354,7 +355,10 @@ export default function Portfolio({
                       aria-label={`View ${p.title} full screen`}
                     >
                       <img
-                        src={p.url}
+                        src={p.thumb}
+                        width={p.width}
+                        height={p.height}
+                        decoding="async"
                         alt={p.alt || p.title}
                         loading={i === 0 ? "eager" : "lazy"}
                       />
@@ -458,13 +462,7 @@ export default function Portfolio({
               >
                 ←
               </button>
-              <img
-                src={lightbox.photos[lightbox.index].url}
-                alt={
-                  lightbox.photos[lightbox.index].alt ||
-                  lightbox.photos[lightbox.index].title
-                }
-              />
+              <FullscreenPhoto key={lightbox.photos[lightbox.index].id} photo={lightbox.photos[lightbox.index]} />
               <button
                 className="lightbox-next"
                 onClick={() => shift(1)}

@@ -41,7 +41,24 @@ test('coordinates match the Earth texture and each country rotates to the visibl
   }
 });
 
-const {atlasTextureFile,atlasPixelRatio}=await import('../lib/atlas-quality.ts');
+const {atlasPixelRatio}=await import('../lib/atlas-quality.ts');
+test('Atlas shares one compact texture request across repeat visits and retries failures',async()=>{
+ const {loadAtlasTexture}=await import('../lib/atlas-assets.ts');
+ const original=globalThis.fetch,calls=[];
+ try {
+  globalThis.fetch=async url=>{calls.push(url);return new Response('texture');};
+  const first=loadAtlasTexture('/cache-test/');
+  assert.equal(loadAtlasTexture('/cache-test/'),first);
+  await first;
+  await loadAtlasTexture('/cache-test/');
+  assert.deepEqual(calls,['/cache-test/atlas/earth-day-4k.jpg']);
+  assert.ok(readFileSync(new URL('../public/atlas/earth-day-4k.jpg',import.meta.url)).length<600000);
+  globalThis.fetch=async()=>new Response('',{status:503});
+  await assert.rejects(loadAtlasTexture('/retry-test/'));
+  globalThis.fetch=async()=>new Response('recovered');
+  assert.equal(await (await loadAtlasTexture('/retry-test/')).text(),'recovered');
+ } finally {globalThis.fetch=original;}
+});
 test('the globe drag circle matches its visible silhouette at every zoom and viewport',async()=>{
  const {globeDiameter}=await import('../lib/atlas-quality.ts');
  const {PerspectiveCamera,Raycaster,Vector2,Sphere}=await import('three');
@@ -59,12 +76,7 @@ test('the globe drag circle matches its visible silhouette at every zoom and vie
   }
  }
 });
-test('Earth quality follows GPU capacity and preserves sharp high-density rendering',()=>{
- assert.equal(atlasTextureFile(16384,1440,8),'earth-day-8k.jpg');
- assert.equal(atlasTextureFile(8192,390,8),'earth-day-4k.jpg');
- assert.equal(atlasTextureFile(8192,1440,4),'earth-day-4k.jpg');
- assert.equal(atlasTextureFile(4096,1440,8),'earth-day-4k.jpg');
- assert.equal(atlasTextureFile(2048,1440,8),'earth-day.jpg');
+test('Earth rendering preserves sharp high-density rendering within a pixel budget',()=>{
  assert.equal(atlasPixelRatio(800,600,2),2);
  assert.ok(atlasPixelRatio(2000,1500,3)**2*2000*1500<=6000001);
 });

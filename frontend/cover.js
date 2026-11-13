@@ -2,6 +2,7 @@ import markup from './cover.html?raw';
 import './cover.css';
 import { coverPhoto } from '../lib/cover-assets';
 import { installSiteCursor } from '../lib/site-cursor';
+import { warmAtlas } from '../lib/atlas-assets';
 
 const base = import.meta.env.BASE_URL;
 const photo = coverPhoto(base);
@@ -11,7 +12,7 @@ document.querySelector('#root').innerHTML = markup;
 const cursor = installSiteCursor();
 const hidePointer = cursor.hide;
 const cover = document.querySelector('#cover');
-cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${base}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure><details class="cover-credits"><summary>Image credits</summary><p>Earth texture: <a href="https://www.solarsystemscope.com/textures/">Solar System Scope / INOVE</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; resized and recompressed for this website. <a href="${base}atlas/README.md">Full credits and licenses</a>.</p></details>`;
+cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${base}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
 const toggle=document.querySelector('.menu-toggle'),panel=document.querySelector('.menu-panel'),sheet=document.querySelector('.sheet'),dismiss=document.querySelector('.menu-dismiss');
 let menuCloseTimer;
 function setMenu(open,focusFirst=false){
@@ -51,7 +52,10 @@ if (design === 'c') {
     <div class="menu-secondary">
       <a href="#cover" data-return-about>About</a>
       <a href="${base}?view=all"><span data-roll>All albums</span></a>
-    </div>`;
+    </div>
+    <a class="menu-credits" href="${base}atlas/README.md">Image credits</a>`;
+  const atlasLink = panel.querySelector('a[href$="?view=scenes"]');
+  for (const event of ['pointerenter', 'focus', 'touchstart']) atlasLink.addEventListener(event, () => warmAtlas(base), {once:true, passive:true});
   panel.hidden = false;
   panel.setAttribute('aria-hidden','true');
   panel.querySelector('[data-return-about]').addEventListener('click',event=>{

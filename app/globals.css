@@ -782,6 +782,10 @@ select {
   font-size: 25px;
   padding: 12px 0;
 }
+.fullscreen-photo { position:relative; display:grid; min-width:0; min-height:80px; }
+.fullscreen-photo img { display:block; }
+.fullscreen-photo-status { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:12px; font-size:14px; }
+.lightbox-stage .fullscreen-photo-status button { font-size:14px; text-decoration:underline; }
 .lightbox-bottom {
   padding-top: 12px;
 }
@@ -2352,6 +2356,7 @@ select {
 .orbit-two { width: 67%; height: 83%; top: 8%; left: 16%; transform: rotate(-25deg); border-style: dashed; border-color: #64849214; }
 .atlas-flat-earth { position: absolute; width: 65%; max-width: 450px; aspect-ratio: 1; left: 50%; top: 50%; transform: translate(-50%,-50%); border-radius: 50%; background-size: auto 100%; background-position: 78% 50%; box-shadow: inset -45px -12px 60px #000e, 0 0 40px #7ab7d229; }
 .atlas-fallback .atlas-canvas { display: none; }
+.atlas-loading .atlas-canvas { visibility: hidden; }
 .atlas-pins { position: absolute; inset: 0; pointer-events: none; }
 .atlas-pin { pointer-events: auto; position: absolute; width: 28px; height: 28px; transform: translate(-50%,-50%); border-radius: 50%; color: #f3ddae; }
 .atlas-pin[hidden] { display: none; }

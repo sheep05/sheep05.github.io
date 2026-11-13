@@ -8,6 +8,7 @@ export type Photo = {
   height: number;
   url: string;
   thumb: string;
+  fullUrl?: string;
   albumIds: string[];
   credit?: string;
   source?: string;

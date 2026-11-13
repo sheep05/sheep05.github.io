@@ -2,7 +2,8 @@
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useEffect, useRef, useState } from "react";
 import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
-import { atlasPixelRatio, atlasTextureFile, globeDiameter } from "@/lib/atlas-quality";
+import { atlasPixelRatio, globeDiameter } from "@/lib/atlas-quality";
+import { loadAtlasTexture } from "@/lib/atlas-assets";
 import { atlasPreviewPosition } from "@/lib/atlas-preview";
 import type { Album, Photo } from "@/lib/types";
 
@@ -28,10 +29,9 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
   useEffect(() => {
     let disposed = false;
     let cleanup = () => {};
-    const abort = new AbortController();
     async function init() {
       try {
-        const T = await import('three');
+        const [T, textureBlob] = await Promise.all([import('three'), loadAtlasTexture(assetBase)]);
         if (disposed || !mount.current || !dragSurface.current) return;
         const host = mount.current;
         const interaction = dragSurface.current;
@@ -124,29 +124,20 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
         };
         let activeBitmap:ImageBitmap|null=null;
         const release=cleanup;cleanup=()=>{release();activeBitmap?.close();activeBitmap=null;};
-        const memory=(navigator as Navigator & {deviceMemory?:number}).deviceMemory;
-        const preferred=atlasTextureFile(renderer.capabilities.maxTextureSize,innerWidth,memory);
-        // If a large texture cannot load, retain an accessible Earth using a smaller local asset.
-        for(const filename of [...new Set([preferred,'earth-day-4k.jpg','earth-day.jpg'])]){
-          const request=new AbortController(),cancel=()=>request.abort();
-          abort.signal.addEventListener('abort',cancel,{once:true});
-          const timeout=setTimeout(cancel,20000);
-          try{
-            const response=await fetch(`${assetBase}atlas/${filename}`,{signal:request.signal});
-            if(!response.ok)throw new Error('Earth texture unavailable');
-            const bitmap=await createImageBitmap(await response.blob(),{imageOrientation:'flipY'});
-            if(disposed){bitmap.close();return;}
-            activeBitmap=bitmap;break;
-          }catch(error){if(disposed)return;if(filename==='earth-day.jpg')throw error;}
-          finally{clearTimeout(timeout);abort.signal.removeEventListener('abort',cancel);}
-        }
-        if(!activeBitmap)throw new Error('Earth texture unavailable');
+        const limit = renderer.capabilities.maxTextureSize;
+        const bitmap = await createImageBitmap(textureBlob, {
+          imageOrientation: 'flipY',
+          ...(limit < 4096 ? {resizeWidth:limit, resizeHeight:limit / 2} : {}),
+        });
+        if(disposed){bitmap.close();return;}
+        activeBitmap = bitmap;
         const texture=new T.CanvasTexture(activeBitmap);
         texture.colorSpace=T.SRGBColorSpace;
         texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
         texture.minFilter=T.LinearMipmapLinearFilter;texture.magFilter=T.LinearFilter;
         material.map=texture;material.needsUpdate=true;
         const point = new T.Vector3();
+        let firstFrame = true;
         renderer.setAnimationLoop((now: number) => {
           const dt = Math.min((now-last)/1000,.05); last=now;
           if (!visible || document.hidden || (!needsRender && !turning)) return;
@@ -205,15 +196,15 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
             }
           }
           renderer.render(scene,camera);
+          if(firstFrame){firstFrame=false;setState('ready');}
           needsRender = regions.some(region => !pins.current[region.id]);
         });
-        setState('ready');
       } catch (error) {
         if (!disposed) { cleanup(); setState('fallback'); console.warn('Atlas uses the accessible region list',error); }
       }
     }
     init();
-    return () => { disposed=true; abort.abort(); cleanup(); focusRegion.current=()=>{}; zoom.current=()=>{}; };
+    return () => { disposed=true; cleanup(); focusRegion.current=()=>{}; zoom.current=()=>{}; };
   }, [assetBase]);
 
   return <section className="atlas-page">
@@ -227,7 +218,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
       </div>
     </div>
     <div ref={observeScrollReveal} className={`atlas-world atlas-${state}`}>
-      {state !== 'ready' && <div className="atlas-flat-earth" aria-hidden="true" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>}
+      {state === 'fallback' && <div className="atlas-flat-earth" aria-hidden="true" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>}
       <div ref={mount} className="atlas-canvas" aria-hidden="true"/>
       <div ref={dragSurface} className="atlas-drag-surface" role="group" aria-label="Interactive Earth. Drag to rotate, or use the arrow keys. Country buttons are also available in the list." tabIndex={state==='ready'?0:-1} style={{pointerEvents:state==='ready'?'auto':'none'}}/>
       {state==='ready' && <div className="atlas-pins">
