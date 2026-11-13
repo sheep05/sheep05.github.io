@@ -40,7 +40,7 @@ document.addEventListener('keydown',e=>{
  }
 });
 if (design === 'c') {
-  document.title = 'About Sheep — Photography';
+  document.title = 'Sheep’s Photography';
   toggle.setAttribute('aria-label','Open collections');
   toggle.querySelector('span').textContent = 'Collections';
   panel.innerHTML = `
