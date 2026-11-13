@@ -1,4 +1,4 @@
-import{n as e}from"./index-CPyX91e2.js";var t=`
+import{n as e}from"./index-BJHwiRKe.js";var t=`
   <div class="stage">
     <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
     </nav>
