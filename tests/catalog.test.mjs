@@ -42,6 +42,23 @@ test('coordinates match the Earth texture and each country rotates to the visibl
 });
 
 const {atlasTextureFile,atlasPixelRatio}=await import('../lib/atlas-quality.ts');
+test('the globe drag circle matches its visible silhouette at every zoom and viewport',async()=>{
+ const {globeDiameter}=await import('../lib/atlas-quality.ts');
+ const {PerspectiveCamera,Raycaster,Vector2,Sphere}=await import('three');
+ for(const [width,height] of [[759,590],[350,430],[1100,590]]) {
+  for(const distance of [3.5,4.6,6.5]) {
+   const fov=width/height<.85?48:40;
+   const camera=new PerspectiveCamera(fov,width/height,.1,50);
+   camera.position.z=distance;camera.updateMatrixWorld();
+   const diameter=globeDiameter(height,fov,distance,1.25);
+   const ray=new Raycaster(),sphere=new Sphere(new Vector3(),1.25);
+   for(const factor of [.99,1.01]) {
+    ray.setFromCamera(new Vector2(diameter/width*factor,0),camera);
+    assert.equal(ray.ray.intersectsSphere(sphere),factor<1);
+   }
+  }
+ }
+});
 test('Earth quality follows GPU capacity and preserves sharp high-density rendering',()=>{
  assert.equal(atlasTextureFile(16384,1440,8),'earth-day-8k.jpg');
  assert.equal(atlasTextureFile(8192,390,8),'earth-day-4k.jpg');

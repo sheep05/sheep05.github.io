@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @font-face {
   font-family: Work;
-  src: url('/cover/WorkSans-Variable.ttf') format('truetype');
+  src: url('/cover/WorkSans-Variable.woff2') format('woff2');
   font-weight: 100 900;
   font-display: swap;
 }
@@ -2337,8 +2337,15 @@ select {
 .atlas-region-list button > span:last-child { font: 16px var(--sans); }
 .atlas-all-link { font-size: 11px; color: #aab5b5; margin-top: 24px; border-bottom: 1px solid #77878066; padding-bottom: 7px; }
 .atlas-world { position: relative; min-width: 0; min-height: 590px; align-self: stretch; background: radial-gradient(ellipse at center, #28425120, transparent 65%); }
-.atlas-canvas { position: absolute; inset: 0; touch-action: none; cursor: grab; }
-.atlas-canvas.is-dragging { cursor: grabbing; }
+.atlas-canvas { position: absolute; inset: 0; pointer-events: none; }
+.atlas-world { overflow: clip; }
+.atlas-drag-surface {
+  position: absolute; left: 50%; top: 50%; width: 0; height: 0;
+  transform: translate(-50%, -50%); border-radius: 50%; clip-path: circle(50%);
+  touch-action: none; cursor: grab;
+}
+.atlas-drag-surface.is-dragging { cursor: grabbing; }
+.atlas-drag-surface:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
 .atlas-canvas canvas { display: block; width: 100%; height: 100%; }
 .atlas-orbit { position: absolute; width: 88%; height: 54%; left: 6%; top: 23%; border: 1px solid #6484921c; border-radius: 50%; transform: rotate(-25deg); pointer-events: none; }
 .orbit-two { width: 67%; height: 83%; top: 8%; left: 16%; transform: rotate(-25deg); border-style: dashed; border-color: #64849214; }
@@ -2638,6 +2645,8 @@ body:has(.photography-pages) { background: #fff; }
 .photography-pages .atlas-selection button:hover { text-decoration: underline; text-underline-offset: 3px; }
 .photography-pages .street-strip { scrollbar-color: #999 transparent; }
 .photography-pages .atlas-pins { overflow: clip; }
+/* Navigation focus supports screen readers without framing the entire page. */
+.portfolio main:focus, .portfolio h2[tabindex="-1"]:focus { outline: none; }
 @media (max-width: 760px) {
   .photography-pages :is(.collection-heading h1, .atlas-intro h1) {
     font-size: clamp(48px, 15.5vw, 68px);

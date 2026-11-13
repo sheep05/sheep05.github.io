@@ -1,15 +1,17 @@
 import markup from './cover.html?raw';
 import './cover.css';
+import { coverPhoto } from '../lib/cover-assets';
 
 const base = import.meta.env.BASE_URL;
+const photo = coverPhoto(base);
 const design = 'c';
 document.body.classList.add('design-c');
 document.querySelector('#root').innerHTML = markup;
 const cover = document.querySelector('#cover');
-cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${base}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${base}cover/sheep-about-2000.jpg" srcset="${base}cover/sheep-about-1000.jpg 1000w, ${base}cover/sheep-about-2000.jpg 2000w" sizes="(max-width:700px) 700px, 100vw" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high"></figure>`;
+cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${base}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
 const toggle=document.querySelector('.menu-toggle'),panel=document.querySelector('.menu-panel'),sheet=document.querySelector('.sheet'),dismiss=document.querySelector('.menu-dismiss');
 let menuCloseTimer;
-function setMenu(open){
+function setMenu(open,focusFirst=false){
  clearTimeout(menuCloseTimer);
  if(design==='c'){
   const url=new URL(location.href);
@@ -19,10 +21,10 @@ function setMenu(open){
  document.body.classList.toggle('menu-closing',!open);
  document.body.classList.toggle('menu-open',open);toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('span').textContent=open?'Close':design==='c'?'Collections':'Menu';toggle.setAttribute('aria-label',open?'Close menu':design==='c'?'Open collections':'Open menu');panel.hidden=!open&&design!=='c';panel.inert=!open;panel.setAttribute('aria-hidden',String(!open));sheet.inert=open;dismiss.hidden=!open;
  menuCloseTimer=setTimeout(()=>document.body.classList.remove('menu-closing'),850);
- if(open)panel.querySelector('a').focus({preventScroll:true});else toggle.focus({preventScroll:true});
+ if(open){if(focusFirst)panel.querySelector('a').focus({preventScroll:true});}else toggle.focus({preventScroll:true});
  hidePointer();
 }
-toggle.setAttribute('aria-label','Open menu');toggle.addEventListener('click',()=>setMenu(toggle.getAttribute('aria-expanded')!=='true'));dismiss.addEventListener('click',()=>setMenu(false));
+toggle.setAttribute('aria-label','Open menu');toggle.addEventListener('click',event=>setMenu(toggle.getAttribute('aria-expanded')!=='true',event.detail===0));dismiss.addEventListener('click',()=>setMenu(false));
 document.addEventListener('keydown',e=>{
  if(e.key==='Tab')hidePointer();
  if(toggle.getAttribute('aria-expanded')!=='true')return;

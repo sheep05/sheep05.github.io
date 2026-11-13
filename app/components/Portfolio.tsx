@@ -1,13 +1,14 @@
 "use client";
 import { observeScrollReveal } from "@/lib/scroll-reveal";
-import { useState, useEffect, useLayoutEffect, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
 import type { StudyStage } from "@/lib/scene/study-state";
 import ChapterIndex from "./ChapterIndex";
 import StreetStrip from "./StreetStrip";
 import { chapters, inChapter } from "@/lib/catalog";
-const Atlas = lazy(() => import("./Atlas"));
+import Atlas from "./Atlas";
+import { galleryRoute } from "@/lib/public-entry";
 import { sampleCollection } from "@/lib/samples";
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return <span aria-hidden="true">{diagonal ? "↗" : "↗"}</span>;
@@ -20,6 +21,7 @@ export default function Portfolio({
   onRetry,
   roomExitUrl,
   coverUrl,
+  initialRoute,
 }: {
   initial: Collection;
   assetBase?: string;
@@ -28,6 +30,7 @@ export default function Portfolio({
   onRetry?: () => void;
   roomExitUrl?: string;
   coverUrl?: string;
+  initialRoute?: ReturnType<typeof galleryRoute>;
 }) {
   const { settings } = initial;
   const collectionHubUrl = coverUrl ? `${coverUrl}#collections` : null;
@@ -40,16 +43,16 @@ export default function Portfolio({
       url: photo.url.startsWith("/") ? assetBase + photo.url.slice(1) : photo.url,
       thumb: photo.thumb.startsWith("/") ? assetBase + photo.thumb.slice(1) : photo.thumb,
     }));
-  const [view, setView] = useState("studio"),
-    [activeId, setActiveId] = useState<string | null>(null),
+  const [view, setView] = useState(initialRoute?.view || "studio"),
+    [activeId, setActiveId] = useState<string | null>(initialRoute?.album || null),
     [monitorAwake, setMonitorAwake] = useState(false),
     [lightbox, setLightbox] = useState<{
       photos: Photo[];
       index: number;
     } | null>(null);
   const [studyStage, setStudyStage] = useState<StudyStage>("overview");
-  const [region, setRegion] = useState<string | null>(null);
-  const [albumContext, setAlbumContext] = useState({ view: "collection", region: null as string | null });
+  const [region, setRegion] = useState<string | null>(initialRoute?.region || null);
+  const [albumContext, setAlbumContext] = useState<{ view: string; region: string | null }>({ view: initialRoute?.from || "collection", region: initialRoute?.region || null });
   const listedAlbums = view === "portraits" || view === "street" ? albums.filter(a => inChapter(a, view)) : albums;
   const chapter = chapters.find(c => c.id === view);
   const [info, setInfo] = useState(false);
@@ -70,11 +73,11 @@ export default function Portfolio({
         location.replace(p.get("view") === "collection" ? `${coverUrl}#collections` : coverUrl);
         return;
       }
-      setView(p.has("album") ? "album" : p.get("view") || "studio");
-      setActiveId(p.get("album"));
-      setRegion(p.get("region"));
-      const from = p.get("from") || "collection";
-      setAlbumContext({ view: ["scenes","portraits","street","all"].includes(from) ? from : "collection", region: p.get("region") });
+      const route = galleryRoute(location.search);
+      setView(route.view);
+      setActiveId(route.album);
+      setRegion(route.region);
+      setAlbumContext({ view: route.from, region: route.region });
       setMonitorAwake(false);
       setStudyStage("overview");
     };
@@ -247,11 +250,7 @@ export default function Portfolio({
             </div>
           </section>
         )}
-        {view === "scenes" && <>
-          <Suspense fallback={<section className="atlas-loading" role="status">Opening the atlas…</section>}>
-            <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />
-          </Suspense>
-        </>}
+        {view === "scenes" && <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onAlbum={id=>navigate("album",id)} onAll={()=>navigate("all")} />}
         {["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}

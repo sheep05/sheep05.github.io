@@ -2,7 +2,7 @@
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useEffect, useRef, useState } from "react";
 import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
-import { atlasPixelRatio, atlasTextureFile } from "@/lib/atlas-quality";
+import { atlasPixelRatio, atlasTextureFile, globeDiameter } from "@/lib/atlas-quality";
 import type { Album, Photo } from "@/lib/types";
 
 export default function Atlas({ albums, photos, assetBase, selected, onSelect, onAlbum, onAll }: {
@@ -10,11 +10,11 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
   onSelect: (id: string | null) => void; onAlbum: (id: string) => void; onAll: () => void;
 }) {
   const mount = useRef<HTMLDivElement>(null);
+  const dragSurface = useRef<HTMLDivElement>(null);
   const pins = useRef<Record<string, HTMLButtonElement | null>>({});
   const focusRegion = useRef<(id: string | null) => void>(() => {});
   const zoom = useRef<(amount: number) => void>(() => {});
   const selection = useRef(selected);
-  selection.current = selected;
   const [state, setState] = useState<'loading' | 'ready' | 'fallback'>('loading');
   const sceneAlbums = albums.filter(a => inChapter(a, 'scenes'));
   const activeRegion = regions.find(r => r.id === selected);
@@ -22,7 +22,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
   const firstAlbum = shown.find(a => a.photoIds.length);
   const preview = firstAlbum && photos.find(p => p.id === (firstAlbum.coverId || firstAlbum.photoIds[0]));
   const extraRegions = [...new Set(sceneAlbums.flatMap(a => a.regions || []))].filter(id => !regions.some(r => r.id === id));
-  useEffect(() => { focusRegion.current(selected); }, [selected]);
+  useEffect(() => { selection.current = selected; focusRegion.current(selected); }, [selected]);
   useEffect(() => {
     let disposed = false;
     let cleanup = () => {};
@@ -30,8 +30,9 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
     async function init() {
       try {
         const T = await import('three');
-        if (disposed || !mount.current) return;
+        if (disposed || !mount.current || !dragSurface.current) return;
         const host = mount.current;
+        const interaction = dragSurface.current;
         const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
         renderer.setPixelRatio(atlasPixelRatio(host.clientWidth,host.clientHeight,devicePixelRatio));
         renderer.outputColorSpace = T.SRGBColorSpace;
@@ -68,7 +69,11 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           if (reduced.matches) { earth.quaternion.copy(destination); turning = false; }
         };
         if (selection.current) focusRegion.current(selection.current);
-        zoom.current = amount => { camera.position.z = Math.max(3.5, Math.min(6.5, camera.position.z + amount)); needsRender = true; };
+        const updateDragArea = () => {
+          const diameter = globeDiameter(host.clientHeight, camera.fov, camera.position.z, 1.25);
+          interaction.style.width = interaction.style.height = `${diameter}px`;
+        };
+        zoom.current = amount => { camera.position.z = Math.max(3.5, Math.min(6.5, camera.position.z + amount)); updateDragArea(); needsRender = true; };
         const resize = () => {
           const w = host.clientWidth, h = host.clientHeight;
           if (!w || !h) return;
@@ -76,14 +81,14 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           renderer.setSize(w, h);
           camera.aspect = w / h;
           camera.fov = camera.aspect < .85 ? 48 : 40;
-          camera.updateProjectionMatrix(); needsRender = true;
+          camera.updateProjectionMatrix(); updateDragArea(); needsRender = true;
         };
         const ro = new ResizeObserver(resize); ro.observe(host); resize();
         const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; needsRender = true; }); io.observe(host);
         const down = (e: PointerEvent) => {
           if (dragging || e.button !== 0) return;
           dragging = true; turning = false; pointerId = e.pointerId; px = e.clientX; py = e.clientY;
-          host.setPointerCapture(pointerId); host.classList.add('is-dragging');
+          interaction.setPointerCapture(pointerId); interaction.classList.add('is-dragging');
         };
         const move = (e: PointerEvent) => {
           if (!dragging || e.pointerId !== pointerId) return;
@@ -91,7 +96,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           earth.quaternion.premultiply(new T.Quaternion().setFromEuler(new T.Euler(dy,dx,0,'XYZ')));
           px=e.clientX; py=e.clientY; needsRender = true;
         };
-        const up = () => { dragging = false; host.classList.remove('is-dragging'); };
+        const up = () => { dragging = false; interaction.classList.remove('is-dragging'); };
         const keyboard = (e: KeyboardEvent) => {
           const direction: Record<string, [number,number]> = { ArrowLeft:[0,-.14], ArrowRight:[0,.14], ArrowUp:[-.14,0], ArrowDown:[.14,0] };
           if (!direction[e.key]) return;
@@ -99,13 +104,13 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           earth.quaternion.premultiply(new T.Quaternion().setFromEuler(new T.Euler(...direction[e.key],0,'XYZ')));
         };
         const lost = (e: Event) => { e.preventDefault(); renderer.setAnimationLoop(null); setState('fallback'); };
-        host.addEventListener('pointerdown', down); host.addEventListener('pointermove', move);
-        host.addEventListener('pointerup', up); host.addEventListener('pointercancel', up); host.addEventListener('lostpointercapture', up); host.addEventListener('keydown', keyboard);
+        interaction.addEventListener('pointerdown', down); interaction.addEventListener('pointermove', move);
+        interaction.addEventListener('pointerup', up); interaction.addEventListener('pointercancel', up); interaction.addEventListener('lostpointercapture', up); interaction.addEventListener('keydown', keyboard);
         renderer.domElement.addEventListener('webglcontextlost', lost);
         cleanup = () => {
           renderer.setAnimationLoop(null); ro.disconnect(); io.disconnect();
-          host.removeEventListener('pointerdown',down); host.removeEventListener('pointermove',move);
-          host.removeEventListener('pointerup',up); host.removeEventListener('pointercancel',up); host.removeEventListener('lostpointercapture',up); host.removeEventListener('keydown',keyboard);
+          interaction.removeEventListener('pointerdown',down); interaction.removeEventListener('pointermove',move);
+          interaction.removeEventListener('pointerup',up); interaction.removeEventListener('pointercancel',up); interaction.removeEventListener('lostpointercapture',up); interaction.removeEventListener('keydown',keyboard);
           renderer.domElement.removeEventListener('webglcontextlost',lost);
           scene.traverse(o => {
             const mesh = o as import('three').Mesh;
@@ -148,6 +153,8 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
             if (earth.quaternion.angleTo(destination)<.002) turning=false;
           }
           earth.updateMatrixWorld();
+          // Project markers with the current camera even before the first render.
+          camera.updateMatrixWorld();
           for (const region of regions) {
             const pin=pins.current[region.id]; if (!pin) continue;
             point.fromArray(globePoint(region.lat, region.lon,1.265)).applyQuaternion(earth.quaternion);
@@ -183,7 +190,8 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
     </div>
     <div ref={observeScrollReveal} className={`atlas-world atlas-${state}`}>
       {state !== 'ready' && <div className="atlas-flat-earth" aria-hidden="true" style={{backgroundImage:`url(${assetBase}atlas/earth-day.jpg)`}}/>}
-      <div ref={mount} className="atlas-canvas" role="group" aria-label="Interactive Earth. Drag to rotate, or use the arrow keys. Country buttons are also available in the list." tabIndex={state==='ready'?0:-1}/>
+      <div ref={mount} className="atlas-canvas" aria-hidden="true"/>
+      <div ref={dragSurface} className="atlas-drag-surface" role="group" aria-label="Interactive Earth. Drag to rotate, or use the arrow keys. Country buttons are also available in the list." tabIndex={state==='ready'?0:-1} style={{pointerEvents:state==='ready'?'auto':'none'}}/>
       {state==='ready' && <div className="atlas-pins">
         {regions.map(region=><button hidden key={region.id} ref={el=>{pins.current[region.id]=el;}} className={`atlas-pin ${selected===region.id?'selected':''}`} onClick={()=>onSelect(region.id)} aria-label={`Explore ${region.name}`} aria-pressed={selected===region.id}>
           <svg width="28" height="28" aria-hidden="true"><line x1="14" y1="14" x2={region.labelX < 0 ? region.labelX + 70 : region.labelX} y2={region.labelY + 14}/></svg>
