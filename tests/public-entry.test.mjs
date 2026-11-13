@@ -87,7 +87,7 @@ test('collection HTML renders its requested content immediately without a worksh
     assert.ok(!atlas.includes('DRAG TO EXPLORE'));
     assert.ok(!atlas.includes('Earth imagery:'));
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
-    assert.ok(country.replace(/<!--.*?-->/g,'').includes('Back to the atlas'));
+    assert.ok(country.includes('aria-label="Back to Atlas region selection"'));
     assert.ok(country.includes('Love scences in Japan'));
     assert.ok(!country.includes('Modern, clear and pleasant'));
     const {regions,atRegion}=await import('../lib/catalog.ts');
@@ -96,7 +96,10 @@ test('collection HTML renders its requested content immediately without a worksh
       const ids=[...new Set(collection.albums.filter(a=>atRegion(a,region.id)).flatMap(a=>a.photoIds))];
       assert.ok(!html.includes('collection-row'),region.id);
       assert.equal((html.match(/aria-label="View [^"]* full screen"/g)||[]).length,ids.length,region.id);
-      assert.ok(html.replace(/<!--.*?-->/g,'').includes('Back to the atlas'),region.id);
+      assert.ok(html.includes(`href="/?view=scenes&amp;region=${region.id}"`),region.id);
+      assert.ok(html.includes('aria-label="Back to Atlas region selection"'),region.id);
+      assert.ok(!html.includes('back-link'),region.id);
+      assert.ok(!html.includes('FRAMES'),region.id);
     }
     // Multiple albums in a country are combined without repeating shared photographs.
     const japan=collection.albums.find(a=>atRegion(a,'JP'));
