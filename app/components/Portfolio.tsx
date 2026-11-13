@@ -72,6 +72,10 @@ export default function Portfolio({
     photoIds: [...new Set(listedAlbums.flatMap(a=>a.photoIds))],
     position: 0, published: true, coverId: null,
   } : albums.find((a) => a.id === activeId);
+  const photoRegion = country ? region : view === "album" && active
+    ? (albumContext.region && atRegion(active, albumContext.region)
+      ? albumContext.region : regions.find(r => atRegion(active, r.id))?.id) || null
+    : null;
   useEffect(() => {
     const read = () => {
       const p = new URLSearchParams(location.search);
@@ -164,9 +168,16 @@ export default function Portfolio({
         </button>
         {managementUrl && <a ref={reveal} href={managementUrl}>Studio management ↗</a>}
       </footer>);
-  const galleryHeader = collectionHubUrl ? (
+  const galleryHeader = collectionHubUrl || photoRegion ? (
     <header className="collection-hub-header">
-      <a href={collectionHubUrl}>Collections <span aria-hidden="true" data-collection-magnet /></a>
+      <a href={photoRegion ? `${assetBase}?view=scenes&region=${photoRegion}` : collectionHubUrl!}
+        aria-label={photoRegion ? "Back to Atlas region selection" : undefined}
+        onClick={photoRegion ? event => {
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          navigate("scenes", undefined, photoRegion);
+        } : undefined}
+      >{photoRegion ? "Atlas" : "Collections"} <span aria-hidden="true" data-collection-magnet /></a>
     </header>
   ) : (
           <header className="site-header">
@@ -309,18 +320,18 @@ export default function Portfolio({
         {(view === "album" || country) &&
           (active ? (
             <section className="album-page">
-              <button
+              {!photoRegion && <button
                 ref={observeScrollReveal} className="text-link back-link"
                 onClick={() => navigate(country ? "scenes" : albumContext.view, undefined, country ? region : albumContext.region)}
               >
                 ← Back to {country || albumContext.view === "scenes" ? "the atlas" : albumContext.view === "collection" ? "the gallery" : albumContext.view === "all" ? (regions.find(r=>r.id===albumContext.region)?.name || "all collections") : albumContext.view}
-              </button>
+              </button>}
               <div ref={observeScrollReveal} className="album-heading">
                 <div>
-                  <p className="eyebrow">
+                  {!photoRegion && <p className="eyebrow">
                     {active.sample && "SAMPLE COLLECTION / "}
                     {String(active.photoIds.length).padStart(2, "0")} FRAMES
-                  </p>
+                  </p>}
                   <h1>{active.title}</h1>
                 </div>
                 <p>{active.description}</p>
