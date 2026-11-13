@@ -68,3 +68,21 @@ test('Earth quality follows GPU capacity and preserves sharp high-density render
  assert.equal(atlasPixelRatio(800,600,2),2);
  assert.ok(atlasPixelRatio(2000,1500,3)**2*2000*1500<=6000001);
 });
+
+
+test('country previews follow their labels and stay inside desktop and mobile stages',async()=>{
+ const {atlasPreviewPosition}=await import('../lib/atlas-preview.ts');
+ for(const width of [350,760]) {
+  const card={width:230,height:90},bounds={width,height:500};
+  for(const label of [{x:10,y:20,width:70,height:36},{x:width-85,y:400,width:70,height:36},{x:width/2-35,y:230,width:70,height:36}]) {
+   const p=atlasPreviewPosition(label,card,bounds);
+   assert.ok(p.x>=8 && p.x+card.width<=width-8);
+   assert.ok(p.y>=8 && p.y+card.height<=492);
+   assert.ok(p.x>=label.x+label.width || p.x+card.width<=label.x || p.y>=label.y+label.height || p.y+card.height<=label.y);
+  }
+ }
+ const card={width:230,height:90},bounds={width:760,height:500};
+ const label={x:100,y:100,width:70,height:36};
+ const first=atlasPreviewPosition(label,card,bounds),next=atlasPreviewPosition({...label,x:140,y:140},card,bounds);
+ assert.deepEqual({x:next.x-first.x,y:next.y-first.y},{x:40,y:40});
+});

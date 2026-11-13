@@ -80,8 +80,10 @@ test('collection HTML renders its requested content immediately without a worksh
       if(view==='scenes') assert.ok(!html.includes('Across the atlas'));
     }
     const atlas=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=scenes&region=JP'),coverUrl:'/'}));
-    assert.match(atlas, /<button class="atlas-selection"[^>]*aria-label="Explore 1 collection in Japan"/);
+    assert.match(atlas, /<button[^>]*class="atlas-selection"[^>]*aria-label="View photos from Japan"/);
     assert.ok(!atlas.includes('atlas-collections'));
+    assert.ok(!atlas.includes('region-number'));
+    assert.ok(!atlas.includes('Explore 1 collection'));
     assert.ok(!atlas.includes('DRAG TO EXPLORE'));
     assert.ok(!atlas.includes('Earth imagery:'));
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));

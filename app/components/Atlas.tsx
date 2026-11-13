@@ -3,6 +3,7 @@ import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useEffect, useRef, useState } from "react";
 import { atRegion, globePoint, inChapter, regions } from "@/lib/catalog";
 import { atlasPixelRatio, atlasTextureFile, globeDiameter } from "@/lib/atlas-quality";
+import { atlasPreviewPosition } from "@/lib/atlas-preview";
 import type { Album, Photo } from "@/lib/types";
 
 export default function Atlas({ albums, photos, assetBase, selected, onSelect, onExplore }: {
@@ -11,6 +12,7 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
 }) {
   const mount = useRef<HTMLDivElement>(null);
   const dragSurface = useRef<HTMLDivElement>(null);
+  const previewCard = useRef<HTMLElement | null>(null);
   const pins = useRef<Record<string, HTMLButtonElement | null>>({});
   const focusRegion = useRef<(id: string | null) => void>(() => {});
   const zoom = useRef<(amount: number) => void>(() => {});
@@ -175,6 +177,19 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
               leader.setAttribute('y2', String(top + label.offsetHeight/2));
             }
           }
+          const card=previewCard.current;
+          if(card) {
+            const pin=selection.current ? pins.current[selection.current] : null;
+            const label=pin?.querySelector('span');
+            card.style.visibility=pin?.hidden?'hidden':'visible';
+            if(pin && label && !pin.hidden) {
+              const position=atlasPreviewPosition({
+                x:pin.offsetLeft-14+label.offsetLeft, y:pin.offsetTop-14+label.offsetTop,
+                width:label.offsetWidth,height:label.offsetHeight,
+              },{width:card.offsetWidth,height:card.offsetHeight},{width:host.clientWidth,height:host.clientHeight-54});
+              card.style.left=`${position.x}px`;card.style.top=`${position.y}px`;
+            }
+          }
           renderer.render(scene,camera);
           needsRender = regions.some(region => !pins.current[region.id]);
         });
@@ -191,11 +206,10 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
     <div className="atlas-intro">
       <h1 ref={observeScrollReveal}>ATLAS</h1>
       <div className="atlas-region-list" aria-label="Choose a country">
-        {regions.map((region,i) => <button ref={observeScrollReveal} key={region.id} aria-pressed={selected === region.id} onClick={()=>onSelect(region.id)}>
-          <span className="region-number">0{i+1}</span><span>{region.name}</span>
-          <small>{sceneAlbums.filter(a=>atRegion(a,region.id)).length.toString().padStart(2,'0')}</small><span aria-hidden="true">↗</span>
+        {regions.map(region => <button ref={observeScrollReveal} key={region.id} aria-pressed={selected === region.id} onClick={()=>onSelect(region.id)}>
+          <span>{region.name}</span><span aria-hidden="true">↗</span>
         </button>)}
-        {extraRegions.map(id => <button ref={observeScrollReveal} key={id} aria-pressed={selected===id} onClick={()=>onSelect(id)}><span>{id}</span><span>↗</span></button>)}
+        {extraRegions.map(id => <button ref={observeScrollReveal} key={id} aria-pressed={selected===id} onClick={()=>onSelect(id)}><span>{id}</span><span aria-hidden="true">↗</span></button>)}
       </div>
     </div>
     <div ref={observeScrollReveal} className={`atlas-world atlas-${state}`}>
@@ -208,12 +222,12 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
           <i/><span style={{left:region.labelX,top:region.labelY}}>{region.name}</span>
         </button>)}
       </div>}
-      {selected && (shown.length ? <button className="atlas-selection" onClick={()=>onExplore(selected)} aria-label={`Explore ${shown.length} collection${shown.length===1?'':'s'} in ${activeRegion?.name || selected}`}>
+      {selected && (shown.length ? <button ref={el=>{previewCard.current=el;}} style={{visibility:state==='ready'?'hidden':'visible'}} className="atlas-selection" onClick={()=>onExplore(selected)} aria-label={`View photos from ${activeRegion?.name || selected}`}>
         {preview && <img src={preview.thumb} alt=""/>}
         <span className="atlas-selection-copy"><span>{activeRegion?.name || selected}</span>
-          <span className="atlas-selection-action">Explore {shown.length} collection{shown.length===1?'':'s'} ↗</span>
+          <span className="atlas-selection-action">Explore</span>
         </span>
-      </button> : <div className="atlas-selection" role="status">
+      </button> : <div ref={el=>{previewCard.current=el;}} style={{visibility:state==='ready'?'hidden':'visible'}} className="atlas-selection" role="status">
         <span className="atlas-selection-copy"><span>{activeRegion?.name || selected}</span><small>No collections here yet.</small></span>
       </div>)}
       <div className="atlas-world-footer">

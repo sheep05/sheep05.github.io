@@ -2424,12 +2424,12 @@ select {
 }
 .atlas-pin svg { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
 .atlas-pin line { stroke: #d9c08d88; stroke-width: 1; }
-.atlas-selection { position: absolute; left: 7%; bottom: 70px; display: flex; gap: 14px; align-items: center; padding: 12px 18px 12px 12px; background: #0c171fe8; border: 1px solid #80909b33; backdrop-filter: blur(12px); max-width: 90%; }
+.atlas-selection { position: absolute; left: 8px; top: 8px; bottom: auto; display: flex; gap: 14px; align-items: center; padding: 12px 18px 12px 12px; background: #0c171fe8; border: 1px solid #80909b33; backdrop-filter: blur(12px); max-width: 90%; }
 .atlas-selection > img { width: 84px; height: 62px; object-fit: cover; }
 .atlas-selection-copy > span:first-child { display: block; font: 24px var(--serif); }
 .atlas-selection-action, .atlas-selection small { display: block; margin-top: 8px; font-size: 10px; color: #cab98f; }
 .atlas-selection small { color: #96a7ad; }
-@media (max-width: 760px) { .atlas-selection { left: 4%; bottom: 52px; } .atlas-selection > img { width: 60px; height: 48px; } }
+@media (max-width: 760px) { .atlas-selection { left: 8px; bottom: auto; } .atlas-selection > img { width: 60px; height: 48px; } }
 
 /* A closed programmer / photographer study, with a deliberate computer interaction. */
 .programmer-entrance .room:after { background: linear-gradient(90deg,#0a111342,transparent 55%),linear-gradient(0deg,#080d1460,transparent 23%); pointer-events:none; }
@@ -2617,7 +2617,7 @@ body:has(.photography-pages) { background: #fff; }
 .photography-pages :is(.collection-heading h1 em, .atlas-intro h1 em,
   .atlas-region-list > button, .atlas-all-link, .atlas-empty p) { color: var(--ink); }
 .photography-pages .atlas-region-list > button { text-shadow: none; border-color: var(--line); }
-.photography-pages .atlas-region-list > button[aria-pressed=true] > span:nth-child(2) {
+.photography-pages .atlas-region-list > button[aria-pressed=true] > span:first-child {
   text-decoration: underline;
   text-underline-offset: 5px;
 }
@@ -2686,9 +2686,19 @@ body:has(.view-scenes) { background: #000; }
 }
 
 @media (max-width: 760px) {
-  .view-scenes .atlas-selection { top: 0; bottom: auto; }
   .view-scenes .atlas-world:has(.atlas-selection) .atlas-coordinate { display: none; }
 }
 
 .photography-pages :is(.album-page, .photo-sequence, .photo-frame, .photo-frame > button, .lightbox, .lightbox-stage, .lightbox-top, .lightbox-bottom, .photo-details) { background:#fff; color:#000; }
 .atlas-world-footer { justify-content:flex-end; }
+
+/* Quiet country navigation, with the preview attached to the globe label. */
+.view-scenes .atlas-region-list { max-width:360px; }
+.view-scenes .atlas-region-list > button { min-height:72px; padding:14px 22px; gap:20px; font-size:clamp(26px,2.5vw,34px); }
+.view-scenes .atlas-region-list button > span:last-child { margin-left:auto; font-size:20px; }
+.view-scenes .atlas-selection { width:max-content; max-width:calc(100% - 16px); z-index:3; }
+@media (max-width:760px) {
+  .view-scenes .atlas-region-list { max-width:none; gap:0 12px; }
+  .view-scenes .atlas-region-list > button { min-height:66px; padding:14px 10px; gap:8px; font-size:clamp(22px,6vw,28px); }
+  .view-scenes .atlas-region-list button > span:last-child { font-size:17px; }
+}
