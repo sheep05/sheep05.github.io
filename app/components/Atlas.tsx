@@ -183,11 +183,25 @@ export default function Atlas({ albums, photos, assetBase, selected, onSelect, o
             const label=pin?.querySelector('span');
             card.style.visibility=pin?.hidden?'hidden':'visible';
             if(pin && label && !pin.hidden) {
+              const obstacles=[];
+              for(const marker of Object.values(pins.current)) {
+                if(!marker || marker.hidden)continue;
+                const name=marker.querySelector('span');
+                if(name)obstacles.push({x:marker.offsetLeft-14+name.offsetLeft,y:marker.offsetTop-14+name.offsetTop,width:name.offsetWidth,height:name.offsetHeight});
+                obstacles.push({x:marker.offsetLeft-10,y:marker.offsetTop-10,width:20,height:20});
+              }
+              const worldRect=host.getBoundingClientRect();
+              for(const control of host.parentElement!.querySelectorAll<HTMLElement>('.atlas-tools, .atlas-coordinate')) {
+                if(!control.offsetWidth || !control.offsetHeight)continue;
+                const rect=control.getBoundingClientRect();
+                obstacles.push({x:(rect.left-worldRect.left)*host.clientWidth/worldRect.width,y:(rect.top-worldRect.top)*host.clientHeight/worldRect.height,width:rect.width*host.clientWidth/worldRect.width,height:rect.height*host.clientHeight/worldRect.height});
+              }
               const position=atlasPreviewPosition({
                 x:pin.offsetLeft-14+label.offsetLeft, y:pin.offsetTop-14+label.offsetTop,
                 width:label.offsetWidth,height:label.offsetHeight,
-              },{width:card.offsetWidth,height:card.offsetHeight},{width:host.clientWidth,height:host.clientHeight-54});
-              card.style.left=`${position.x}px`;card.style.top=`${position.y}px`;
+              },{width:card.offsetWidth,height:card.offsetHeight},{width:host.clientWidth,height:host.clientHeight},obstacles);
+              card.style.visibility=position?'visible':'hidden';
+              if(position){card.style.left=`${position.x}px`;card.style.top=`${position.y}px`;}
             }
           }
           renderer.render(scene,camera);

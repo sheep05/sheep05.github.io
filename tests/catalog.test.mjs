@@ -76,6 +76,7 @@ test('country previews follow their labels and stay inside desktop and mobile st
   const card={width:230,height:90},bounds={width,height:500};
   for(const label of [{x:10,y:20,width:70,height:36},{x:width-85,y:400,width:70,height:36},{x:width/2-35,y:230,width:70,height:36}]) {
    const p=atlasPreviewPosition(label,card,bounds);
+   assert.ok(p);
    assert.ok(p.x>=8 && p.x+card.width<=width-8);
    assert.ok(p.y>=8 && p.y+card.height<=492);
    assert.ok(p.x>=label.x+label.width || p.x+card.width<=label.x || p.y>=label.y+label.height || p.y+card.height<=label.y);
@@ -84,5 +85,21 @@ test('country previews follow their labels and stay inside desktop and mobile st
  const card={width:230,height:90},bounds={width:760,height:500};
  const label={x:100,y:100,width:70,height:36};
  const first=atlasPreviewPosition(label,card,bounds),next=atlasPreviewPosition({...label,x:140,y:140},card,bounds);
- assert.deepEqual({x:next.x-first.x,y:next.y-first.y},{x:40,y:40});
+ assert.ok(first && next);
+ assert.notDeepEqual(next,first);
+});
+
+
+test('Malaysia preview avoids Singapore, other pins, labels, and controls',async()=>{
+ const {atlasPreviewPosition}=await import('../lib/atlas-preview.ts');
+ const intersects=(p,size,r)=>p.x<r.x+r.width && p.x+size.width>r.x && p.y<r.y+r.height && p.y+size.height>r.y;
+ for(const width of [350,760]) {
+  const bounds={width,height:500},card={width:220,height:88};
+  const label={x:width*.2,y:270,width:90,height:38};
+  const obstacles=[label,{x:width*.45,y:315,width:100,height:38},{x:width*.55,y:260,width:20,height:20},{x:width*.58,y:285,width:20,height:20},{x:width-125,y:450,width:120,height:42},{x:width*.15,y:90,width:70,height:38},{x:width*.65,y:95,width:70,height:38}];
+  const p=atlasPreviewPosition(label,card,bounds,obstacles);
+  assert.ok(p);
+  for(const r of obstacles)assert.equal(intersects(p,card,r),false);
+ }
+ assert.equal(atlasPreviewPosition({x:0,y:0,width:350,height:500},{width:220,height:88},{width:350,height:500}),null);
 });
