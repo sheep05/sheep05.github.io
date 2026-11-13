@@ -1,4 +1,4 @@
-import{n as e}from"./index-B8o9nGXR.js";import{n as t,r as n}from"./atlas-assets-tqWBlYV4.js";var r=`
+import{n as e}from"./index-bviHmJ-b.js";import{n as t,r as n}from"./atlas-assets-CXkWY2Rm.js";var r=`
   <div class="stage">
     <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
     </nav>
