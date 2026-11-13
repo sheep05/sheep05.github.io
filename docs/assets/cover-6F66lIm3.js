@@ -1,0 +1,24 @@
+import{n as e}from"./index-Bcf9ysZg.js";import{n as t,r as n}from"./atlas-assets-C_jxb_vw.js";var r=`
+  <div class="stage">
+    <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
+    </nav>
+    <button class="menu-toggle" aria-controls="menu-panel" aria-expanded="false"><span>Menu</span><i aria-hidden="true"></i></button>
+    <div class="sheet">
+      <a class="skip-link" href="#cover">Skip to introduction</a>
+      <header class="masthead"><div class="cover-identity"><img class="identity-icon" src="/cover/sheep-icon-small.webp" width="192" height="128" alt=""><div class="wordmark">Sheep’s<br>photography</div></div></header>
+      <main id="cover" tabindex="-1"></main>
+
+    </div>
+    <button class="menu-dismiss" aria-label="Close menu" tabindex="-1" hidden></button>
+  </div>
+`,i=`/`,a=e(i),o=`c`;document.body.classList.add(`design-c`),document.querySelector(`#root`).innerHTML=r;var s=n().hide,c=document.querySelector(`#cover`);c.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${i}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${a.src}" srcset="${a.srcset}" sizes="${a.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;var l=document.querySelector(`.menu-toggle`),u=document.querySelector(`.menu-panel`),d=document.querySelector(`.sheet`),f=document.querySelector(`.menu-dismiss`),p;function m(e,t=!1){if(clearTimeout(p),o===`c`){let t=new URL(location.href);t.hash=e?`collections`:``,history.replaceState(null,``,t)}document.body.classList.toggle(`menu-closing`,!e),document.body.classList.toggle(`menu-open`,e),l.setAttribute(`aria-expanded`,String(e)),l.querySelector(`span`).textContent=e?`Close`:o===`c`?`Collections`:`Menu`,l.setAttribute(`aria-label`,e?`Close menu`:o===`c`?`Open collections`:`Open menu`),u.hidden=!e&&o!==`c`,u.inert=!e,u.setAttribute(`aria-hidden`,String(!e)),d.inert=e,f.hidden=!e,p=setTimeout(()=>document.body.classList.remove(`menu-closing`),850),e?t&&u.querySelector(`a`).focus({preventScroll:!0}):l.focus({preventScroll:!0}),s()}if(l.setAttribute(`aria-label`,`Open menu`),l.addEventListener(`click`,e=>m(l.getAttribute(`aria-expanded`)!==`true`,e.detail===0)),f.addEventListener(`click`,()=>m(!1)),document.addEventListener(`keydown`,e=>{if(e.key===`Tab`&&s(),l.getAttribute(`aria-expanded`)===`true`&&(e.key===`Escape`&&(e.preventDefault(),m(!1)),e.key===`Tab`)){let t=[...u.querySelectorAll(`a`),l],n=t[0],r=t[t.length-1];e.shiftKey&&document.activeElement===n?(e.preventDefault(),r.focus()):!e.shiftKey&&document.activeElement===r&&(e.preventDefault(),n.focus())}}),o===`c`){document.title=`Sheep’s Photography`,l.setAttribute(`aria-label`,`Open collections`),l.querySelector(`span`).textContent=`Collections`,u.innerHTML=`
+    <div class="menu-primary">
+      <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${i}?view=scenes"><span data-roll>Atlas</span></a></div></div>
+      <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${i}?view=portraits"><span data-roll>Portraits</span></a></div></div>
+      <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${i}?view=street"><span data-roll>Street</span></a></div></div>
+    </div>
+    <div class="menu-secondary">
+      <a href="#cover" data-return-about>About</a>
+      <a href="${i}?view=all"><span data-roll>All albums</span></a>
+    </div>
+    <a class="menu-credits" href="${i}atlas/README.md">Image credits</a>`;let e=u.querySelector(`a[href$="?view=scenes"]`);for(let n of[`pointerenter`,`focus`,`touchstart`])e.addEventListener(n,()=>t(i),{once:!0,passive:!0});u.hidden=!1,u.setAttribute(`aria-hidden`,`true`),u.querySelector(`[data-return-about]`).addEventListener(`click`,e=>{e.preventDefault(),m(!1),d.scrollTop=0,c.focus({preventScroll:!0})});let n=u.querySelectorAll(`.menu-primary [data-roll]`);for(let e of n){let t=e.textContent;e.closest(`a`).setAttribute(`aria-label`,t),e.classList.add(`roll-word`),e.setAttribute(`aria-hidden`,`true`),e.replaceChildren(...Array.from(t,e=>{let t=document.createElement(`span`);return t.className=`roll-char`,t.textContent=e===` `?`\xA0`:e,t.dataset.letter=t.textContent,t}))}l.querySelector(`i`).setAttribute(`data-collection-magnet`,``),location.hash===`#collections`&&m(!0)}
