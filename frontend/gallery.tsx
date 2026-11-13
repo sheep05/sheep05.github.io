@@ -7,7 +7,7 @@ import snapshot from "../public/published/collection.json";
 import "../app/globals.css";
 import { galleryRoute } from "../lib/public-entry";
 
-// Browse local previews; Cloudflare full-size media is requested only in the viewer.
+// Bundle the public text and local photo paths. Visitors never query Cloudflare.
 createRoot(document.getElementById("root")!).render(
   <><SiteCursor/><Portfolio initial={snapshot.collection as Collection}
     initialRoute={galleryRoute(location.search)}

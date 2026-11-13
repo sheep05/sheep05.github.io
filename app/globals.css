@@ -782,10 +782,6 @@ select {
   font-size: 25px;
   padding: 12px 0;
 }
-.fullscreen-photo { position:relative; display:grid; min-width:0; min-height:80px; }
-.fullscreen-photo img { display:block; }
-.fullscreen-photo-status { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:12px; font-size:14px; }
-.lightbox-stage .fullscreen-photo-status button { font-size:14px; text-decoration:underline; }
 .lightbox-bottom {
   padding-top: 12px;
 }

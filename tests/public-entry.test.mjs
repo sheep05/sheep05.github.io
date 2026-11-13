@@ -100,10 +100,6 @@ test('collection HTML renders its requested content immediately without a worksh
       assert.ok(html.includes('aria-label="Back to Atlas region selection"'),region.id);
       assert.ok(!html.includes('back-link'),region.id);
       assert.ok(!html.includes('FRAMES'),region.id);
-      for (const photo of collection.photos.filter(p=>ids.includes(p.id))) {
-        assert.ok(html.includes(`src="${photo.thumb}"`),photo.id);
-        assert.ok(!html.includes(`src="${photo.url}"`),photo.id);
-      }
     }
     // Multiple albums in a country are combined without repeating shared photographs.
     const japan=collection.albums.find(a=>atRegion(a,'JP'));

@@ -3,11 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import type { Album, Photo } from "@/lib/types";
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 
-export default function StreetStrip({ album, photos, onOpen, onPhoto }: {
+export default function StreetStrip({ album, photos, onOpen }: {
   album: Album;
   photos: Photo[];
   onOpen: () => void;
-  onPhoto: (photos: Photo[], index: number) => void;
 }) {
   const rail = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; left: number } | null>(null);
@@ -83,16 +82,19 @@ export default function StreetStrip({ album, photos, onOpen, onPhoto }: {
       }}
     >
       {frames.map((photo, index) => <a key={photo.id} draggable={false}
-        href={photo.fullUrl || photo.url}
-        aria-label={`View ${photo.title} full screen`}
+        href={'?album=' + encodeURIComponent(album.id) + '&from=street'}
+        aria-label={photo.title + ' — open ' + album.title}
         onClick={event => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
           event.preventDefault();
-          onPhoto(frames, index);
+          onOpen();
         }}>
-          <img src={photo.thumb} decoding="async"
+        <picture>
+          <source media="(max-width: 600px) and (max-resolution: 2dppx)" srcSet={photo.thumb} />
+          <img src={photo.url}
             alt={photo.alt || photo.title} width={photo.width || 3} height={photo.height || 2}
             loading={index < 2 ? "eager" : "lazy"} draggable={false} />
+        </picture>
       </a>)}
     </div> : <p>No photographs yet.</p>}
   </section>;

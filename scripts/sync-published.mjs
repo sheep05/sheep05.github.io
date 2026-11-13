@@ -78,8 +78,6 @@ export async function syncPublished({directory = 'public/published', fetcher = f
   try {
     await mkdir(join(stage, 'media'));
     for (const photo of collection.photos) {
-      // Keep the validated public origin for click-only full-screen requests.
-      photo.fullUrl = photo.url;
       for (const key of ['url','thumb']) {
         // Uploaded image IDs are immutable; replacing an image creates a new ID.
         const filename = hash(photo[key]) + '.jpg';
