@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "contentHash": "a39f4fc3ee5f445d00bfd8b47a974ce65a2720d71120e5072fe053b5a9ba2670",
-  "publishedAt": "2026-11-03T09:10:22.897Z",
+  "contentHash": "4b458fd8c85706c64fd5d1bca8324f29b62fdf1a446cb5d482abbef7de2fbf36",
+  "publishedAt": "2026-11-13T07:03:32.571Z",
   "collection": {
     "settings": {
       "name": "Sheep's Photograghy",
@@ -117,7 +117,8 @@
         "thumb": "/published/media/401f2dff53daa8eb9ecb49e3bb94ae593c42153c74ebff45e4da3266a8b48a9d.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/93d9571a-3628-44d8-91e7-96ed7880187b"
       },
       {
         "id": "b2e74558-8ee5-4b20-855f-09df5a7ffa20",
@@ -130,7 +131,8 @@
         "thumb": "/published/media/2c045bf3463d918dedfd904af4f74ba6e8ca74d1936b771c0b5f2daccbeea5e4.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/b2e74558-8ee5-4b20-855f-09df5a7ffa20"
       },
       {
         "id": "812b22e4-8d35-4961-bf43-077e82fb63a9",
@@ -143,7 +145,8 @@
         "thumb": "/published/media/2df5a62e3652bc6bcefa8ff5aaf9e392a0ea39324c5b9ce717a0c1be6c4bab5d.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/812b22e4-8d35-4961-bf43-077e82fb63a9"
       },
       {
         "id": "ca11aa4a-736b-46d4-99e0-5103942b601f",
@@ -156,7 +159,8 @@
         "thumb": "/published/media/2e0282ddb0f423072dc569b856f43465657b8b5c78244bba80866f78968112ee.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/ca11aa4a-736b-46d4-99e0-5103942b601f"
       },
       {
         "id": "d17480dd-1c4e-4cad-9385-f818e536b019",
@@ -169,7 +173,8 @@
         "thumb": "/published/media/49e0c164c655bcb31cb96340b3bd5e6b2464e1ba032090ab11daf6da2d8fb2b5.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/d17480dd-1c4e-4cad-9385-f818e536b019"
       },
       {
         "id": "9712d2da-401a-465e-8039-a6352151c0e8",
@@ -182,7 +187,8 @@
         "thumb": "/published/media/840a79d8fa1b4ddf77ef7557516645d7a81e69eda16fb5a01478d12376eb059b.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/9712d2da-401a-465e-8039-a6352151c0e8"
       },
       {
         "id": "6b221665-2cdc-4c02-88f8-4281af7f7522",
@@ -195,7 +201,8 @@
         "thumb": "/published/media/32d52431e9e1ed4db81cbb7c8d6e371757f7dc79dd7d4f19c17067a876d9f08b.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/6b221665-2cdc-4c02-88f8-4281af7f7522"
       },
       {
         "id": "b5990ed7-245d-405b-870a-71056cbd84da",
@@ -208,7 +215,8 @@
         "thumb": "/published/media/35e17a9436fdd1405b55313832d7e6e31cb1a444ecaee833ad1e66d3cc60576a.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/b5990ed7-245d-405b-870a-71056cbd84da"
       },
       {
         "id": "e2cd14b6-5d20-41a2-a535-5d5963c299dc",
@@ -221,7 +229,8 @@
         "thumb": "/published/media/fb37441ea2aa61fe59a962e4904aa2d53ad88ac8e4939da67ba737272a31a6ca.jpg",
         "albumIds": [
           "0f0a6e25-182b-4b2f-b001-40d77f218909"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/e2cd14b6-5d20-41a2-a535-5d5963c299dc"
       },
       {
         "id": "108fb797-2938-4b90-8213-d98ca85d9911",
@@ -234,7 +243,8 @@
         "thumb": "/published/media/87e94e26b1b5f4d425ee3ab6f1a21318dd93021075d0768cc27c00c099578973.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/108fb797-2938-4b90-8213-d98ca85d9911"
       },
       {
         "id": "b3b83549-bf6b-4d4d-a05a-ea685792539e",
@@ -247,7 +257,8 @@
         "thumb": "/published/media/20b99d3931089d259d2f4ea7ca6893ad02ef835ceaff939cab1c64cd08b59c21.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/b3b83549-bf6b-4d4d-a05a-ea685792539e"
       },
       {
         "id": "1e176668-607c-4460-a999-c5cb3e918353",
@@ -260,7 +271,8 @@
         "thumb": "/published/media/e0eba626e79dbaade352e5ad44751b62f18fc0715d6de0d591e6f71c9257dfd2.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/1e176668-607c-4460-a999-c5cb3e918353"
       },
       {
         "id": "484e69e6-459e-4c50-b5bc-18a90bbd5bdc",
@@ -273,7 +285,8 @@
         "thumb": "/published/media/dca5414cd965e9d65fd61bad8e71462cfbca8b41bfaa1838c30d1b5a4b648444.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/484e69e6-459e-4c50-b5bc-18a90bbd5bdc"
       },
       {
         "id": "eb735600-d42a-44e4-b9e8-32ec8f0538d4",
@@ -286,7 +299,8 @@
         "thumb": "/published/media/f9ba29f8178159322de6942469e04f78065ce24939780df38e6c809ed72d7dfd.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/eb735600-d42a-44e4-b9e8-32ec8f0538d4"
       },
       {
         "id": "5a243474-0bb4-4441-b7eb-f00c17895a9d",
@@ -299,7 +313,8 @@
         "thumb": "/published/media/a1bfc06878e691cb191d71f3628bed5695860da953ab34bd5424f7b79594f6fe.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/5a243474-0bb4-4441-b7eb-f00c17895a9d"
       },
       {
         "id": "ef283b02-4544-4911-8a65-2945afe7339f",
@@ -312,7 +327,8 @@
         "thumb": "/published/media/eaf82edefcb54edc4c95f10e43f89309ab5cbaf5665893042f69a109e75343c1.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/ef283b02-4544-4911-8a65-2945afe7339f"
       },
       {
         "id": "7a687011-dca9-48bf-ab6b-e8748d081d86",
@@ -325,7 +341,8 @@
         "thumb": "/published/media/daa9e4c061a26ee707cf6f2b3e2060b36b25a0708f8f99d9c93cbd2be1c9281c.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/7a687011-dca9-48bf-ab6b-e8748d081d86"
       },
       {
         "id": "771878c7-b9b7-459b-b98e-b909e3603379",
@@ -338,7 +355,8 @@
         "thumb": "/published/media/fe5604c75a13a21c28178439e4a1473ff94d0aa09b5239df914f8b1e7a97484f.jpg",
         "albumIds": [
           "32964a14-e4f8-4a38-8dc7-e16dd5c4a61e"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/771878c7-b9b7-459b-b98e-b909e3603379"
       },
       {
         "id": "347834bb-5d6f-4c08-bbe6-0a272a1af305",
@@ -351,7 +369,8 @@
         "thumb": "/published/media/51f735832f811b528eda3bd44f2b73e36b6ceca95d9ffe43634a1c1324998ff0.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/347834bb-5d6f-4c08-bbe6-0a272a1af305"
       },
       {
         "id": "56cc2fe2-e5a9-45c1-9d53-f77b895aec39",
@@ -364,7 +383,8 @@
         "thumb": "/published/media/1e91bba1dca9a18329a36dd130a87e89396b3435a78f5ecb5b0e6db4e4629beb.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/56cc2fe2-e5a9-45c1-9d53-f77b895aec39"
       },
       {
         "id": "e2540214-ba54-452d-8c5f-31619de4ef05",
@@ -377,7 +397,8 @@
         "thumb": "/published/media/7cd252d16c9aa1f0d79cb66a45a9539ba98ecf80f4c1e242805204e1ba98a0ac.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/e2540214-ba54-452d-8c5f-31619de4ef05"
       },
       {
         "id": "ce9180d9-8320-4679-899b-50ce29f7a882",
@@ -390,7 +411,8 @@
         "thumb": "/published/media/7e6353b1a026c346d8764ddecd304d0402febb9647edb87af184ee5230349b0f.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/ce9180d9-8320-4679-899b-50ce29f7a882"
       },
       {
         "id": "c02bf84e-5dc9-41dd-845a-f5004f0462cf",
@@ -403,7 +425,8 @@
         "thumb": "/published/media/6fd3c0eb1ca106fbbad9b4bc9112dbf3ed4ff9cce0b7bbe527e51549275cae76.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/c02bf84e-5dc9-41dd-845a-f5004f0462cf"
       },
       {
         "id": "97643d2d-580e-472b-a548-51abe19c2a7c",
@@ -416,7 +439,8 @@
         "thumb": "/published/media/ea3b6de7e566c0f3b18c3b36994ff88e6149ddc2bd16464179ff1ff51c09a06e.jpg",
         "albumIds": [
           "109ed9f7-3b84-43d2-8ce5-8b51a95b753d"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/97643d2d-580e-472b-a548-51abe19c2a7c"
       },
       {
         "id": "74fa05d6-aecc-460c-8407-4ebea1233151",
@@ -429,7 +453,8 @@
         "thumb": "/published/media/d69ffb45b2ef98198c1f286fb9c59697b2aed49452def52a4f360aa6f8450a1c.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/74fa05d6-aecc-460c-8407-4ebea1233151"
       },
       {
         "id": "7566f219-91b0-48f6-8c06-1529b7d2aadc",
@@ -442,7 +467,8 @@
         "thumb": "/published/media/06b540f3b9a9afb28c9699670804269ab86f797cb08018f06deb108301dae4f9.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/7566f219-91b0-48f6-8c06-1529b7d2aadc"
       },
       {
         "id": "105b663f-a573-4326-b764-5663278ac2b1",
@@ -455,7 +481,8 @@
         "thumb": "/published/media/43d1a9325dd1f45d0a3cfb4204a1cac507da0247d3224811899ad59c6615d7b8.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/105b663f-a573-4326-b764-5663278ac2b1"
       },
       {
         "id": "02f7f2ab-68a0-4541-8762-e382b2224fb6",
@@ -468,7 +495,8 @@
         "thumb": "/published/media/559e37f7a2d1a7797b7b30d1c3650a3518d913c596fdf6ee26c0b819dadbf85d.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/02f7f2ab-68a0-4541-8762-e382b2224fb6"
       },
       {
         "id": "2a4507db-942b-4b98-b975-bdd26a9eb3af",
@@ -481,7 +509,8 @@
         "thumb": "/published/media/d92eaa7bdc3219a2c4f611aaf9c95769648a909bd6b360f09301cfa732aa00d8.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/2a4507db-942b-4b98-b975-bdd26a9eb3af"
       },
       {
         "id": "8898e146-4b5b-41cd-a0bb-e592a7986033",
@@ -494,7 +523,8 @@
         "thumb": "/published/media/9372bb662cbed7a8b4402800392edddb6541ac3b058aaee2c087fa8dc499cfda.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/8898e146-4b5b-41cd-a0bb-e592a7986033"
       },
       {
         "id": "42c356ad-7f62-4844-9e6f-a4e3163ade0c",
@@ -507,7 +537,8 @@
         "thumb": "/published/media/6a98ae6328fb3ac534ff30b00e92db6a39d59dc1461c460af52a21ca5575c372.jpg",
         "albumIds": [
           "0c0a2598-eff3-4a8e-be11-4baf17f8d2d0"
-        ]
+        ],
+        "fullUrl": "https://quiet-studio-backend.sheep05.workers.dev/api/media/42c356ad-7f62-4844-9e6f-a4e3163ade0c"
       }
     ],
     "isOwner": false,
