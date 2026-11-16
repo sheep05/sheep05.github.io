@@ -12,9 +12,17 @@ document.querySelector('#root').innerHTML = markup;
 const cursor = installSiteCursor();
 const hidePointer = cursor.hide;
 const cover = document.querySelector('#cover');
-cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
+cover.innerHTML=`<h1 id="about-title" class="sr-only">Sheep’s Photography</h1><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
 const toggle=document.querySelector('.menu-toggle'),panel=document.querySelector('.menu-panel'),sheet=document.querySelector('.sheet'),dismiss=document.querySelector('.menu-dismiss');
 let menuCloseTimer;
+function finishMenuClose(){
+ if(document.body.classList.contains('menu-open'))return;
+ clearTimeout(menuCloseTimer);
+ document.body.classList.remove('menu-closing');
+}
+sheet.addEventListener('transitionend',event=>{
+ if(event.target===sheet&&event.propertyName==='transform')finishMenuClose();
+});
 function setMenu(open,focusFirst=false){
  clearTimeout(menuCloseTimer);
  if(design==='c'){
@@ -24,7 +32,10 @@ function setMenu(open,focusFirst=false){
  }
  document.body.classList.toggle('menu-closing',!open);
  document.body.classList.toggle('menu-open',open);toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('span').textContent=open?'':design==='c'?'Collections':'Menu';toggle.setAttribute('aria-label',open?'Close menu':design==='c'?'Open collections':'Open menu');panel.hidden=!open&&design!=='c';panel.inert=!open;panel.setAttribute('aria-hidden',String(!open));sheet.inert=open;dismiss.hidden=!open;
- menuCloseTimer=setTimeout(()=>document.body.classList.remove('menu-closing'),850);
+ if(!open){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)finishMenuClose();
+  else menuCloseTimer=setTimeout(finishMenuClose,900);
+ }
  if(open){if(focusFirst)panel.querySelector('a').focus({preventScroll:true});}else toggle.focus({preventScroll:true});
  hidePointer();
 }
@@ -49,9 +60,9 @@ if (design === 'c') {
       <a href="${base}?view=studio">Visit my workshop</a>
     </div>
     <div class="menu-primary">
-      <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${base}?view=scenes"><span data-roll>Atlas</span></a></div></div>
-      <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${base}?view=portraits"><span data-roll>Portraits</span></a></div></div>
-      <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${base}?view=street"><span data-roll>Street</span></a></div></div>
+      <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${base}?view=scenes"><span data-roll>Atlas</span><small class="menu-translation" lang="zh-Hans">地图集</small></a></div></div>
+      <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${base}?view=portraits"><span data-roll>Portraits</span><small class="menu-translation" lang="zh-Hans">人像</small></a></div></div>
+      <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${base}?view=street"><span data-roll>Street</span><small class="menu-translation" lang="zh-Hans">街拍</small></a></div></div>
     </div>
     <a class="menu-credits" href="${base}atlas/README.md">Image credits</a>`;
   const atlasLink = panel.querySelector('a[href$="?view=scenes"]');
@@ -63,7 +74,8 @@ if (design === 'c') {
   const letters = panel.querySelectorAll('.menu-primary [data-roll]');
   for (const word of letters) {
     const text = word.textContent;
-    word.closest('a').setAttribute('aria-label', text);
+    const link = word.closest('a');
+    link.setAttribute('aria-label', `${text} ${link.querySelector('.menu-translation').textContent}`);
     word.classList.add('roll-word');
     word.setAttribute('aria-hidden','true');
     word.replaceChildren(...Array.from(text, letter=>{
