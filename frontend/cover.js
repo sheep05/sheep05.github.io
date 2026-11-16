@@ -12,7 +12,7 @@ document.querySelector('#root').innerHTML = markup;
 const cursor = installSiteCursor();
 const hidePointer = cursor.hide;
 const cover = document.querySelector('#cover');
-cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p><a class="about-action" href="mailto:speedsheep55@gmail.com">Contact me</a><a class="about-action" href="${base}?view=studio">Visit my workshop</a></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
+cover.innerHTML=`<section class="about-intro" aria-labelledby="about-title"><h1 id="about-title" class="sr-only">About Sheep</h1><p class="about-roles">Student / Photographer / Engineer</p></section><figure class="about-photo"><img src="${photo.src}" srcset="${photo.srcset}" sizes="${photo.sizes}" width="5709" height="3811" alt="Sheep holding a camera beneath a sunlit canopy of trees" fetchpriority="high" decoding="async"></figure>`;
 const toggle=document.querySelector('.menu-toggle'),panel=document.querySelector('.menu-panel'),sheet=document.querySelector('.sheet'),dismiss=document.querySelector('.menu-dismiss');
 let menuCloseTimer;
 function setMenu(open,focusFirst=false){
@@ -23,7 +23,7 @@ function setMenu(open,focusFirst=false){
   history.replaceState(null,'',url);
  }
  document.body.classList.toggle('menu-closing',!open);
- document.body.classList.toggle('menu-open',open);toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('span').textContent=open?'Close':design==='c'?'Collections':'Menu';toggle.setAttribute('aria-label',open?'Close menu':design==='c'?'Open collections':'Open menu');panel.hidden=!open&&design!=='c';panel.inert=!open;panel.setAttribute('aria-hidden',String(!open));sheet.inert=open;dismiss.hidden=!open;
+ document.body.classList.toggle('menu-open',open);toggle.setAttribute('aria-expanded',String(open));toggle.querySelector('span').textContent=open?'':design==='c'?'Collections':'Menu';toggle.setAttribute('aria-label',open?'Close menu':design==='c'?'Open collections':'Open menu');panel.hidden=!open&&design!=='c';panel.inert=!open;panel.setAttribute('aria-hidden',String(!open));sheet.inert=open;dismiss.hidden=!open;
  menuCloseTimer=setTimeout(()=>document.body.classList.remove('menu-closing'),850);
  if(open){if(focusFirst)panel.querySelector('a').focus({preventScroll:true});}else toggle.focus({preventScroll:true});
  hidePointer();
@@ -44,26 +44,20 @@ if (design === 'c') {
   toggle.setAttribute('aria-label','Open collections');
   toggle.querySelector('span').textContent = 'Collections';
   panel.innerHTML = `
+    <div class="menu-actions">
+      <a href="mailto:speedsheep55@gmail.com">Contact me</a>
+      <a href="${base}?view=studio">Visit my workshop</a>
+    </div>
     <div class="menu-primary">
       <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${base}?view=scenes"><span data-roll>Atlas</span></a></div></div>
       <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${base}?view=portraits"><span data-roll>Portraits</span></a></div></div>
       <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${base}?view=street"><span data-roll>Street</span></a></div></div>
-    </div>
-    <div class="menu-secondary">
-      <a href="#cover" data-return-about>About</a>
-      <a href="${base}?view=all"><span data-roll>All albums</span></a>
     </div>
     <a class="menu-credits" href="${base}atlas/README.md">Image credits</a>`;
   const atlasLink = panel.querySelector('a[href$="?view=scenes"]');
   for (const event of ['pointerenter', 'focus', 'touchstart']) atlasLink.addEventListener(event, () => warmAtlas(base), {once:true, passive:true});
   panel.hidden = false;
   panel.setAttribute('aria-hidden','true');
-  panel.querySelector('[data-return-about]').addEventListener('click',event=>{
-    event.preventDefault();
-    setMenu(false);
-    sheet.scrollTop = 0;
-    cover.focus({preventScroll:true});
-  });
   // Three copies of each character allow adjacent letters to roll in opposite directions.
   // Screen readers receive one normal link name, never the decorative copies.
   const letters = panel.querySelectorAll('.menu-primary [data-roll]');
