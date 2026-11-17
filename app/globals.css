@@ -2706,18 +2706,28 @@ button.atlas-selection:hover .atlas-selection-action { text-decoration: underlin
   .atlas-page--film .atlas-film video { width: 150%; max-width: none; flex-shrink: 0; }
 }
 
-/* Comparable image area keeps portraits and landscapes equally prominent. */
-.atlas-editorial { padding: clamp(64px, 9vw, 140px) 0 10vw; }
-.atlas-editorial-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(40px, 8vw, 128px); align-items: end; margin-bottom: clamp(72px, 12vw, 180px); }
+/* Uneven editorial pairs retain the large photographs, with roomier small slots. */
+.atlas-editorial { padding: clamp(80px, 12vw, 180px) 0 12vw; }
+.atlas-editorial-row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 2vw; align-items: end; margin-bottom: 16vw; }
 .atlas-editorial-row:last-child { margin-bottom: 0; }
-.atlas-editorial-row figure { margin: 0; min-width: 0; display: flex; justify-content: center; }
-.atlas-editorial-row button { display: block; width: min(100%, calc(var(--photo-scale) * clamp(220px, 30vw, 440px))); padding: 0; background: none; border: 0; }
+.atlas-editorial-row figure { margin: 0; min-width: 0; }
+.atlas-editorial-row button { display: block; width: 100%; padding: 0; background: none; border: 0; }
 .atlas-editorial-row img { display: block; width: 100%; height: auto; }
+.atlas-editorial-row.arrangement-0 figure:first-child { grid-column: 1 / 7; }
+.atlas-editorial-row.arrangement-0 figure:nth-child(2) { grid-column: 9 / 13; }
 .atlas-editorial-row.arrangement-1 { align-items: start; }
+.atlas-editorial-row.arrangement-1 figure:first-child { grid-column: 1 / 6; }
+.atlas-editorial-row.arrangement-1 figure:nth-child(2) { grid-column: 8 / 12; margin-top: 5vw; }
+.atlas-editorial-row.arrangement-2 figure:first-child { grid-column: 1 / 5; margin-bottom: 4vw; }
+.atlas-editorial-row.arrangement-2 figure:nth-child(2) { grid-column: 6 / 13; }
 @media (max-width: 600px) {
   .atlas-editorial { padding-top: 64px; padding-bottom: 80px; }
   .atlas-editorial-row { display: flex; flex-direction: column; align-items: stretch; gap: 64px; margin-bottom: 64px; }
-  .atlas-editorial-row button { width: min(100%, calc(var(--photo-scale) * 72vw)); }
+  .atlas-editorial-row figure { width: 100%; }
+  .atlas-editorial-row figure:nth-child(2) { width: 86%; align-self: flex-end; }
+  .atlas-editorial-row.arrangement-1 figure:nth-child(2) { margin-top: 0; }
+  .atlas-editorial-row.arrangement-2 figure:first-child { width: 86%; margin-bottom: 0; }
+  .atlas-editorial-row.arrangement-2 figure:nth-child(2) { width: 100%; }
 }
 /* Feather only the outer white margin, avoiding a hard video-layer edge on scroll. */
 .atlas-film { background: #fff; border: 0; outline: 0; box-shadow: none; }
