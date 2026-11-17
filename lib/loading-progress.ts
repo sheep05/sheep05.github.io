@@ -6,6 +6,7 @@ const tasks = new Map<symbol, Task>();
 const listeners = new Set<() => void>();
 let cleanupTimer: ReturnType<typeof setTimeout> | undefined;
 let highWater = 0;
+let batch = 0;
 function notify() { listeners.forEach(fn => fn()); }
 export function loadingSnapshot() {
   const entries = [...tasks.values()];
@@ -13,11 +14,11 @@ export function loadingSnapshot() {
   const failed = entries.some(t => t.failed);
   const progress = entries.length ? entries.reduce((sum, t) => sum + t.value, 0) / entries.length : 0;
   highWater = pending ? Math.max(highWater, Math.min(99, Math.floor(progress * 100))) : failed ? highWater : 100;
-  return { active: entries.length > 0, pending, failed, percent: highWater };
+  return { active: entries.length > 0, pending, failed, percent: highWater, batch };
 }
 export function beginLoading() {
   clearTimeout(cleanupTimer);
-  if (![...tasks.values()].some(t => t.value < 1)) { tasks.clear(); highWater = 0; }
+  if (![...tasks.values()].some(t => t.value < 1)) { tasks.clear(); highWater = 0; batch++; }
   const id = Symbol();
   const task = { value: 0, failed: false };
   tasks.set(id, task); notify();
@@ -43,18 +44,57 @@ export function installLoadingProgress() {
   badge.innerHTML = '<i aria-hidden="true"></i><span aria-hidden="true">0%</span>';
   document.body.appendChild(badge);
   let showTimer: ReturnType<typeof setTimeout> | undefined;
+  let hideTimer: ReturnType<typeof setTimeout> | undefined;
   let wasActive = false;
+  let displayedBatch = -1;
+  let displayed = 0;
+  let target = 0;
+  let frame = 0;
+  let previousTime = 0;
+  const label = badge.querySelector('span')!;
+  const paint = () => {
+    badge.style.setProperty('--load', `${displayed}%`);
+    badge.setAttribute('aria-valuenow', String(Math.floor(displayed)));
+    label.textContent = `${Math.floor(displayed)}%`;
+  };
+  const hide = () => {
+    clearTimeout(showTimer);
+    clearTimeout(hideTimer);
+    cancelAnimationFrame(frame);
+    frame = 0;
+    badge.classList.remove('is-loading');
+    badge.setAttribute('aria-hidden', 'true');
+    wasActive = false;
+  };
+  const animate = (time: number) => {
+    // Move at a constant rate toward measured progress, never ahead of it.
+    // Cap a frame's step so returning from a background tab cannot cause a jump.
+    displayed = Math.min(target, displayed + Math.min(time - previousTime, 32) * .1);
+    previousTime = time;
+    paint();
+    frame = 0;
+    if (displayed < target) frame = requestAnimationFrame(animate);
+    else if (displayed === 100) hideTimer = setTimeout(hide, 160);
+  };
   const render = () => {
     const state = loadingSnapshot();
-    const display = state.active && (state.pending || !state.failed);
-    badge.style.setProperty('--load', `${state.percent}%`);
-    badge.setAttribute('aria-valuenow', String(state.percent));
-    badge.setAttribute('aria-hidden', String(!display));
-    badge.querySelector('span')!.textContent = `${state.percent}%`;
-    if (display) {
-      if (!wasActive) showTimer = setTimeout(() => badge.classList.add('is-loading'), 120);
-    } else { clearTimeout(showTimer); badge.classList.remove('is-loading'); }
-    wasActive = display;
+    if (!state.active) return; // Let the final sweep finish after task cleanup.
+    if (!state.pending && state.failed) { hide(); return; }
+    clearTimeout(hideTimer);
+    if (!wasActive || displayedBatch !== state.batch) {
+      hide();
+      displayedBatch = state.batch;
+      displayed = 0;
+      paint();
+      badge.setAttribute('aria-hidden', 'false');
+      showTimer = setTimeout(() => badge.classList.add('is-loading'), 120);
+    }
+    wasActive = true;
+    target = Math.max(displayed, state.percent);
+    if (!frame && displayed < target) {
+      previousTime = performance.now();
+      frame = requestAnimationFrame(animate);
+    }
   };
   listeners.add(render);
   let x = 0, y = 0, hasPointer = false;
@@ -108,7 +148,9 @@ export function installLoadingProgress() {
       if (rect.width && rect.height && rect.top < innerHeight && rect.bottom > 0 && !media.closest('[inert],[hidden]')) track(media);
     }
   }
-  const observer = new MutationObserver(scan);
+  const observer = new MutationObserver(records => {
+    if (records.some(record => !badge.contains(record.target))) scan();
+  });
   observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'srcset', 'open'] });
   scan(); render();
 }

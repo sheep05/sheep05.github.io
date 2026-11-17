@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /** The sculpture is delivered as a small film, with no visitor-side 3D rendering. */
 export default function AtlasFilm({ assetBase }: { assetBase: string }) {
   const film = useRef<HTMLVideoElement>(null);
-  const manuallyPaused = useRef(false);
-  const updatePlayback = useRef(() => {});
-  const [motionAllowed, setMotionAllowed] = useState(false);
-  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const video = film.current;
@@ -19,14 +15,12 @@ export default function AtlasFilm({ assetBase }: { assetBase: string }) {
     let disposed = false;
     const update = () => {
       const allowed = !reduced.matches && !connection?.saveData;
-      setMotionAllowed(allowed);
-      if (visible && allowed && !document.hidden && !manuallyPaused.current) {
+      if (visible && allowed && !document.hidden) {
         if (!video.getAttribute('src')) video.src = `${assetBase}atlas/crystal-loop.mp4`;
         video.muted = true;
         void video.play().then(() => { if (disposed) video.pause(); }).catch(() => {});
       } else video.pause();
     };
-    updatePlayback.current = update;
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); }, { threshold: .1 });
     observer.observe(video);
     reduced.addEventListener('change', update);
@@ -38,18 +32,13 @@ export default function AtlasFilm({ assetBase }: { assetBase: string }) {
       reduced.removeEventListener('change', update);
       connection?.removeEventListener('change', update);
       document.removeEventListener('visibilitychange', update);
-      updatePlayback.current = () => {};
       video.pause();
     };
   }, [assetBase]);
 
   return <div className="atlas-film">
     <video ref={film} width="1920" height="1280" poster={`${assetBase}atlas/crystal-poster.webp`}
-      preload="none" muted loop playsInline aria-hidden="true"
-      onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
-    {motionAllowed && <button className="atlas-film-toggle" aria-label={playing ? 'Pause crystal animation' : 'Play crystal animation'}
-      onClick={() => { manuallyPaused.current = playing; updatePlayback.current(); }}>
-      {playing ? 'Pause animation' : 'Play animation'}
-    </button>}
+      preload="none" autoPlay muted loop playsInline controls={false}
+      disablePictureInPicture disableRemotePlayback tabIndex={-1} aria-hidden="true" />
   </div>;
 }
