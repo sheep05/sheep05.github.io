@@ -1,0 +1,131 @@
+{
+  "../lib/scene/batch-static.ts": {
+    "file": "assets/batch-static-Bt5yNcV9.js",
+    "name": "batch-static",
+    "src": "../lib/scene/batch-static.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "../node_modules/three/build/three.module.js"
+    ]
+  },
+  "../lib/scene/study-materials.ts": {
+    "file": "assets/study-materials-DFwwqvk1.js",
+    "name": "study-materials",
+    "src": "../lib/scene/study-materials.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "../node_modules/three/build/three.module.js"
+    ],
+    "dynamicImports": [
+      "../node_modules/three/examples/jsm/loaders/HDRLoader.js"
+    ]
+  },
+  "../lib/scene/study-room.ts": {
+    "file": "assets/study-room-pTlcVhqz.js",
+    "name": "study-room",
+    "src": "../lib/scene/study-room.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_study-state-pFpKfJT3.js",
+      "../node_modules/three/build/three.module.js"
+    ]
+  },
+  "../node_modules/three/build/three.module.js": {
+    "file": "assets/three.module-OuO7RR4-.js",
+    "name": "three.module",
+    "src": "../node_modules/three/build/three.module.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-9SAPJn0b.js"
+    ]
+  },
+  "../node_modules/three/examples/jsm/environments/RoomEnvironment.js": {
+    "file": "assets/RoomEnvironment-Dz6EYRqq.js",
+    "name": "RoomEnvironment",
+    "src": "../node_modules/three/examples/jsm/environments/RoomEnvironment.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "../node_modules/three/build/three.module.js"
+    ]
+  },
+  "../node_modules/three/examples/jsm/loaders/HDRLoader.js": {
+    "file": "assets/HDRLoader-Bi-KreOD.js",
+    "name": "HDRLoader",
+    "src": "../node_modules/three/examples/jsm/loaders/HDRLoader.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "../node_modules/three/build/three.module.js"
+    ]
+  },
+  "_react-vendor-2GV3LrUv.js": {
+    "file": "assets/react-vendor-2GV3LrUv.js",
+    "name": "react-vendor",
+    "imports": [
+      "_rolldown-runtime-9SAPJn0b.js"
+    ]
+  },
+  "_rolldown-runtime-9SAPJn0b.js": {
+    "file": "assets/rolldown-runtime-9SAPJn0b.js",
+    "name": "rolldown-runtime"
+  },
+  "_site-cursor-Td7R9RF3.js": {
+    "file": "assets/site-cursor-Td7R9RF3.js",
+    "name": "site-cursor",
+    "imports": [
+      "index.html"
+    ]
+  },
+  "_study-state-pFpKfJT3.js": {
+    "file": "assets/study-state-pFpKfJT3.js",
+    "name": "study-state"
+  },
+  "cover.js": {
+    "file": "assets/cover-C-JvrK9R.js",
+    "name": "cover",
+    "src": "cover.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_site-cursor-Td7R9RF3.js"
+    ],
+    "css": [
+      "assets/cover-DchMv_B7.css"
+    ]
+  },
+  "gallery.tsx": {
+    "file": "assets/gallery-Bq-8MwGf.js",
+    "name": "gallery",
+    "src": "gallery.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_study-state-pFpKfJT3.js",
+      "_site-cursor-Td7R9RF3.js",
+      "_react-vendor-2GV3LrUv.js"
+    ],
+    "dynamicImports": [
+      "../node_modules/three/build/three.module.js",
+      "../lib/scene/study-room.ts",
+      "../lib/scene/batch-static.ts",
+      "../node_modules/three/examples/jsm/environments/RoomEnvironment.js",
+      "../lib/scene/study-materials.ts"
+    ],
+    "css": [
+      "assets/gallery-Bf72L7-S.css"
+    ]
+  },
+  "index.html": {
+    "file": "assets/index-7JwTXWL2.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "dynamicImports": [
+      "gallery.tsx",
+      "cover.js"
+    ],
+    "css": [
+      "assets/index-ByjFer0W.css"
+    ]
+  }
+}
