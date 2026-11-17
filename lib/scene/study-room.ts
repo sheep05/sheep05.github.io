@@ -80,7 +80,7 @@ export function buildStudy(scene: THREE.Scene) {
   box('Monitor stem',[.06,.28,.055],[0,1.08,-2.23],charcoal,.015);
   box('Monitor frame',[1.36,.88,.07],[0,1.47,-2.16],black,.025);
   const screen=new THREE.Mesh(new THREE.PlaneGeometry(...screenSize),new THREE.MeshBasicMaterial({color:'#0b1116',toneMapped:false}));
-  screen.name='Interactive monitor';screen.position.fromArray(screenPosition);scene.add(screen);
+  screen.name='Monitor screen';screen.position.fromArray(screenPosition);scene.add(screen);
   const power=new THREE.Mesh(new THREE.SphereGeometry(.008,8,8),new THREE.MeshBasicMaterial({color:'#bbcfad'}));power.position.set(.6,1.06,-2.11);scene.add(power);
   box('Keyboard case',[1.03,.045,.35],[0,.947,-1.58],mat('#b3ada1',.36,.25),.025);
   const keys:THREE.Mesh[]=[];
@@ -168,5 +168,5 @@ export function buildStudy(scene: THREE.Scene) {
   for(const x of [-2.3,-1.2])box('Linen cushion',[.45,.22,.43],[x,.55,1.94],paper,.07);
   box('Closed door',[.92,2.3,.055],[.5,1.15,2.79],walnut,.014);
   cyl('Door handle',.025,.13,[.84,1.05,2.72],brass).rotation.z=Math.PI/2;
-  return {screen,keys,cameraTarget,lampTarget,windowTarget,lamp,bulbMaterial,hemi,sun,fill,windowFill,windowView,curtains,prints,textures};
+  return {screen,keys,cameraTarget,lampTarget,windowTarget,interactiveTargets:[cameraTarget,lampTarget,windowTarget],lamp,bulbMaterial,hemi,sun,fill,windowFill,windowView,curtains,prints,textures};
 }

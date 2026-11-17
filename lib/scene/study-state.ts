@@ -1,5 +1,5 @@
 // Input and timing are independent of the renderer and hosting platform.
-export type StudyStage = 'overview' | 'entering' | 'inspecting' | 'returning';
+export type StudyStage = 'overview' | 'inspecting' | 'returning';
 export const ENTER_SECONDS = 2.3;
 export function easeStudy(t: number) { const p = Math.min(1, Math.max(0, t)); return p * p * (3 - 2 * p); }
 export const overviewPosition = [0, 1.85, 2.55] as const;

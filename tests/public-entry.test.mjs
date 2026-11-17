@@ -71,6 +71,10 @@ test('collection HTML renders its requested content immediately without a worksh
     const {default:Portfolio}=await import('../app/components/Portfolio.tsx');
     const {galleryRoute}=await import('../lib/public-entry.ts');
     const {collection}=JSON.parse(readFileSync(new URL('../public/published/collection.json',import.meta.url),'utf8'));
+    const workshop=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=studio'),coverUrl:'/'}));
+    assert.ok(workshop.includes('study-room'));
+    assert.ok(!workshop.includes('gallery-surface'),'Workshop must not mount the collection entrance on its monitor');
+    assert.ok(!workshop.includes('monitor-standby'));
     for(const [view,title] of [['scenes','ATLAS'],['portraits','Portraits'],['street','Street']]) {
       const html=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute(`?view=${view}`),coverUrl:'/'}));
       assert.ok(html.includes(title));

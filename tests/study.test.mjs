@@ -33,15 +33,18 @@ test('lamp crown is level with the monitor and the chair turns in place toward i
  const direction=new THREE.Vector3(screenPosition[0]-chair.position.x,0,screenPosition[2]-chair.position.z).normalize();
  assert.ok(forward.dot(direction)>.99999);
 });
-test('monitor, X-T5, lamp, and window are hit-testable from the opening camera',()=>{
+test('X-T5, lamp, and window remain interactive while the monitor is display-only',()=>{
  const camera=new THREE.PerspectiveCamera(70,16/10,.035,65);camera.position.fromArray(overviewPosition);camera.lookAt(new THREE.Vector3(...overviewTarget));camera.updateMatrixWorld();
- const targets=[room.screen,room.cameraTarget,room.lampTarget,room.windowTarget];
- for(const target of [room.screen,room.cameraTarget,scene.getObjectByName('Lamp shade'),scene.getObjectByName('Lamp base'),room.windowTarget]){
+ const targets=room.interactiveTargets;
+ assert.ok(!targets.includes(room.screen));
+ const screenRay=new THREE.Raycaster(camera.position.clone(),room.screen.getWorldPosition(new THREE.Vector3()).sub(camera.position).normalize());
+ assert.equal(screenRay.intersectObjects(targets,true).length,0,'Clicking the blank screen must not trigger another room control');
+ for(const target of [room.cameraTarget,scene.getObjectByName('Lamp shade'),scene.getObjectByName('Lamp base'),room.windowTarget]){
   const position=target.getWorldPosition(new THREE.Vector3());
   const projected=position.clone().project(camera);assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,target.name+' is outside the opening view');
   const ray=new THREE.Raycaster(camera.position.clone(),position.sub(camera.position).normalize());
   const hit=ray.intersectObjects(targets,true)[0];assert.ok(hit,'Object should be clickable');
-  if(target===room.screen||target===room.cameraTarget||target===room.windowTarget) assert.equal(hit.object,target);
+  if(target===room.cameraTarget||target===room.windowTarget) assert.equal(hit.object,target);
   else assert.ok(room.lampTarget.children.includes(hit.object));
  }
 });

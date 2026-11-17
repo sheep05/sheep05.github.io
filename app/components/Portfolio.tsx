@@ -1,6 +1,6 @@
 "use client";
 import { observeScrollReveal } from "@/lib/scroll-reveal";
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
 import type { StudyStage } from "@/lib/scene/study-state";
@@ -45,7 +45,6 @@ export default function Portfolio({
     }));
   const [view, setView] = useState(initialRoute?.view || "studio"),
     [activeId, setActiveId] = useState<string | null>(initialRoute?.album || null),
-    [monitorAwake, setMonitorAwake] = useState(false),
     [lightbox, setLightbox] = useState<{
       photos: Photo[];
       index: number;
@@ -59,13 +58,6 @@ export default function Portfolio({
   const [info, setInfo] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const main = useRef<HTMLElement>(null);
-  const gallerySurface = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => {
-    if (view === "studio" && gallerySurface.current) {
-      gallerySurface.current.style.visibility = "hidden";
-      gallerySurface.current.style.transform = "";
-    }
-  }, [view]);
   const active: Album | undefined = country ? {
     id: `region-${region}`, title: country,
     description: listedAlbums.length===1 ? listedAlbums[0].description : "",
@@ -88,7 +80,6 @@ export default function Portfolio({
       setActiveId(route.album);
       setRegion(route.region);
       setAlbumContext({ view: route.from, region: route.region });
-      setMonitorAwake(false);
       setStudyStage("overview");
     };
     read();
@@ -125,7 +116,6 @@ export default function Portfolio({
     setRegion(country);
     setView(next);
     setActiveId(id || null);
-    setMonitorAwake(false);
     setStudyStage("overview");
     history.pushState({}, "", assetBase + (params.size ? `?${params}` : ""));
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -152,8 +142,7 @@ export default function Portfolio({
         : null,
     );
   const contact = settings.email ? `mailto:${settings.email}` : null;
-  const showGallery = view !== "studio" || monitorAwake;
-  const reveal = showGallery ? observeScrollReveal : undefined;
+  const reveal = observeScrollReveal;
   const collectionNotice = collectionStatus && (
           <div className="collection-status" role="status">
             <p>{collectionStatus === "loading"
@@ -215,15 +204,9 @@ export default function Portfolio({
     <div className={`portfolio view-${view}${["scenes", "portraits", "street", "all", "album"].includes(view) ? " photography-pages" : ""}`}>
       {view !== "studio" && view !== "collection" && <><a className="skip-link" href="#main">Skip to content</a>{galleryHeader}</>}
       <main id="main" ref={main} tabIndex={-1}>
-        {(view === "studio" || view === "collection") && <div
-          ref={gallerySurface}
-          className={`gallery-surface view-collection ${showGallery ? "monitor-awake" : "monitor-idle"} ${view === "studio" ? "gallery-in-monitor" : "gallery-live"}`}
-          inert={view === "studio"}
-          aria-hidden={view === "studio" ? true : undefined}
-        >
-          {view === "studio" && <div className="monitor-standby" aria-hidden="true" />}
+        {view === "collection" && <div className="gallery-surface view-collection monitor-awake gallery-live">
           {galleryHeader}
-          <ChapterIndex live={showGallery} albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
+          <ChapterIndex live albums={albums} photos={photos} assetBase={assetBase} onChapter={id=>navigate(id)} onAll={()=>navigate("all")} />
           {galleryFooter}
         </div>}
         {view === "studio" && (
@@ -251,18 +234,13 @@ export default function Portfolio({
             </div>
             <div className="scene-wrap">
               <Room
-                gallerySurface={gallerySurface}
                 featured={albums
                   .map((a) => ({
                     url: cover(a)?.thumb || "",
                     title: a.title,
                   }))
                   .filter((p) => p.url)}
-                onStage={(stage) => {
-                  setStudyStage(stage);
-                  if (stage === "overview") setMonitorAwake(false);
-                }}
-                onWake={() => setMonitorAwake(true)}
+                onStage={setStudyStage}
               />
             </div>
           </section>
