@@ -2,6 +2,7 @@ import markup from './cover.html?raw';
 import './cover.css';
 import { coverPhoto } from '../lib/cover-assets';
 import { installSiteCursor } from '../lib/site-cursor';
+import { scheduleCoverPreload } from '../lib/cover-preload';
 
 const base = import.meta.env.BASE_URL;
 const photo = coverPhoto(base);
@@ -88,3 +89,5 @@ if (design === 'c') {
   if(location.hash === '#collections') setMenu(true);
 
 }
+
+if (import.meta.env.PROD) scheduleCoverPreload(base);
