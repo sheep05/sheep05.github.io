@@ -148,8 +148,10 @@ main{flex:1;min-height:0}.site-footer{display:flex;justify-content:space-between
 .design-c .menu-toggle>span { font-size:21px; }
 .design-c:not(.menu-open) .menu-toggle i { width:16px; height:16px; }
 .design-c.menu-closing .menu-toggle>span { visibility:hidden; }
-.design-c .menu-primary .menu-translation { font-size:clamp(14px,1.3vw,18px); font-weight:400; line-height:1.5; letter-spacing:.02em; padding-top:.65em; color:#aaa; white-space:nowrap; }
+.design-c .menu-primary a { align-items:baseline; }
+.design-c .menu-primary .roll-word { display:inline-flex; align-items:baseline; }
+.design-c .menu-primary .menu-translation { font-size:clamp(14px,1.3vw,18px); font-weight:400; line-height:1; letter-spacing:.02em; color:#aaa; white-space:nowrap; }
 @media(max-width:700px) {
   .design-c .menu-toggle>span { font-size:20px; }
-  .design-c .menu-primary .menu-translation { font-size:13px; padding-top:.35em; }
+  .design-c .menu-primary .menu-translation { font-size:13px; }
 }
