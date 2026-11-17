@@ -1,4 +1,5 @@
 "use client";
+import { beginLoading } from "@/lib/loading-progress";
 import {updateStudyLighting} from '@/lib/scene/study-lighting';
 import {animateCurtains} from '@/lib/scene/animate-curtains';
 import { useEffect, useRef, useState, type RefObject } from 'react';
@@ -23,8 +24,10 @@ export default function Room(props: Props) {
   useEffect(()=>{commands.current.redraw();},[JSON.stringify(props.featured)]);
   useEffect(()=>{
     let disposed=false, cleanup=()=>{};
+    const startup = beginLoading();
+
     const release=()=>{const clean=cleanup;cleanup=()=>{};clean();};
-    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;release();setFailed(true);},20000);
+    const loadTimeout=setTimeout(()=>{if(disposed)return;disposed=true;startup.finish(true);release();setFailed(true);},20000);
     async function init(){
       try{
         const [THREE,{buildStudy},{batchStatic},{RoomEnvironment},{galleryProjection},{prepareStudyMaterials,applyStudyMaterials}]=await Promise.all([import('three'),import('@/lib/scene/study-room'),import('@/lib/scene/batch-static'),import('three/addons/environments/RoomEnvironment.js'),import('@/lib/scene/gallery-projection'),import('@/lib/scene/study-materials')]);
@@ -173,6 +176,7 @@ export default function Room(props: Props) {
           renderer.render(scene,camera);
           if(!enhancementsStarted){
             enhancementsStarted=true;
+            startup.finish();
             container.dataset.roomReadyMs=String(Math.round(performance.now()));
             // The base room has rendered and controls are live. Optional assets
             // start on a later task, never inside the startup timeout.
@@ -204,9 +208,9 @@ export default function Room(props: Props) {
           // Stay at the monitor after the zoom; the projected gallery remains inert.
         };
         raf=requestAnimationFrame(frame);clearTimeout(loadTimeout);setReady(true);
-      }catch(error){if(disposed)return;clearTimeout(loadTimeout);disposed=true;release();console.error('Study unavailable',error);setFailed(true);}
+      }catch(error){if(disposed)return;clearTimeout(loadTimeout);disposed=true;release();startup.finish(true);console.error('Study unavailable',error);setFailed(true);}
     }
-    init();return()=>{disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},back:()=>{},redraw:()=>{}};release();};
+    init();return()=>{startup.finish(true);disposed=true;clearTimeout(loadTimeout);commands.current={begin:()=>{},inspect:()=>{},back:()=>{},redraw:()=>{}};release();};
   },[]);
   return <div className={`room study-room ${ready?'room-ready':''} study-${stage}`}>
     <div className="study-fallback" aria-hidden="true"><strong>Between code<br />and photographs.</strong></div>

@@ -1,5 +1,7 @@
+import { installLoadingProgress } from './loading-progress';
 // Shared by the cover, galleries, workshop, and full-screen photograph viewer.
 export function installSiteCursor() {
+  installLoadingProgress();
   const fine = matchMedia('(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference)');
   const dot = document.createElement('div');
   dot.className = 'site-cursor';

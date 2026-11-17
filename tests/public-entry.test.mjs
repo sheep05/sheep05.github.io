@@ -35,7 +35,7 @@ test('home and old About links open the lightweight cover', () => {
 test('the old collection entrance opens the shared black menu', () => {
   assert.equal(publicEntry('?view=collection'), 'collections');
 });
-test('workshop, globe, categories, and existing album deep links remain reachable', () => {
+test('workshop, Atlas, categories, and existing album deep links remain reachable', () => {
   for (const view of ['studio', 'scenes', 'portraits', 'street', 'all']) {
     assert.equal(publicEntry(`?view=${view}`), 'gallery');
   }
@@ -93,7 +93,10 @@ test('collection HTML renders its requested content immediately without a worksh
     assert.match(atlas, /<video[^>]*poster="\/atlas\/crystal-poster.webp"[^>]*preload="none"/);
     assert.ok(!atlas.includes('src="/atlas/crystal-loop.mp4"'));
     assert.ok(!atlas.includes('atlas-region-list'));
-    assert.ok(statSync(new URL('../public/atlas/crystal-loop.mp4',import.meta.url)).size < 1800000);
+    const { mixedAtlasPhotos } = await import('../lib/atlas-photos.ts');
+    for (const photo of mixedAtlasPhotos(collection.albums, collection.photos)) assert.ok(atlas.includes(photo.url));
+    assert.match(atlas, /aria-label="Atlas photographs"/);
+    assert.ok(statSync(new URL('../public/atlas/crystal-loop.mp4',import.meta.url)).size <= 1639239);
     assert.ok(statSync(new URL('../public/atlas/crystal-poster.webp',import.meta.url)).size < 50000);
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
     assert.ok(country.includes('aria-label="Back to Atlas region selection"'));

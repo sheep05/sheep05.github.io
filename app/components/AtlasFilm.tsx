@@ -44,7 +44,7 @@ export default function AtlasFilm({ assetBase }: { assetBase: string }) {
   }, [assetBase]);
 
   return <div className="atlas-film">
-    <video ref={film} width="1200" height="800" poster={`${assetBase}atlas/crystal-poster.webp`}
+    <video ref={film} width="1920" height="1280" poster={`${assetBase}atlas/crystal-poster.webp`}
       preload="none" muted loop playsInline aria-hidden="true"
       onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
     {motionAllowed && <button className="atlas-film-toggle" aria-label={playing ? 'Pause crystal animation' : 'Play crystal animation'}

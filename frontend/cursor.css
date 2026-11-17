@@ -3,3 +3,9 @@
 .site-cursor.is-visible { opacity:1; }
 .site-cursor i { display:block; width:15px; height:15px; border-radius:50%; background:#fff; transform:translate(-50%,-50%) scale(var(--cursor-scale,1)); transition:transform .18s ease; }
 @media (hover:none), (pointer:coarse), (prefers-reduced-motion:reduce) { .site-cursor { display:none; } }
+
+/* A separate clockwise pie follows the native pointer while visible assets load. */
+.loading-cursor { position: fixed; top: 82px; right: 24px; z-index: 2147483647; display: flex; align-items: center; gap: 8px; color: #fff; mix-blend-mode: difference; pointer-events: none; opacity: 0; font: 400 12px/1.2 'Work Sans', sans-serif; font-variant-numeric: tabular-nums; }
+.loading-cursor.at-pointer { right: auto; }
+.loading-cursor.is-loading { opacity: 1; }
+.loading-cursor i { display: block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #fff; background: conic-gradient(from 0deg, #fff 0 var(--load, 0%), transparent var(--load, 0%) 100%); }
