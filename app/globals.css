@@ -2655,34 +2655,23 @@ button.atlas-selection:hover .atlas-selection-action { text-decoration: underlin
   }
 }
 
-/* Atlas uses a black stage; the cover and photographic collections stay white. */
-body:has(.view-scenes) { background: #000; }
-.photography-pages.view-scenes {
-  --paper: #000;
-  --ink: #fff;
-  --muted: #aaa;
-  --line: #555;
-  --accent: #fff;
-  color-scheme: dark;
-}
-.view-scenes ::selection { background: #fff; color: #000; }
-.view-scenes button:focus-visible { outline-color: #fff; }
-.view-scenes .atlas-region-list > button:hover { background: #191919; }
-.view-scenes :is(.atlas-pin > span, .atlas-tools button, .atlas-selection) {
-  background: #000;
-  color: #fff;
-}
-.view-scenes :is(.atlas-pin:hover > span, .atlas-pin.selected > span) {
-  color: #fff;
-  border-color: #fff;
-}
+/* The film's white background blends into the Atlas stage. */
+.photography-pages.view-scenes { color-scheme: light; }
+.view-scenes button:focus-visible { outline-color: #000; }
 .view-scenes .atlas-pin > span { font-size: 14px; min-height: 34px; padding: 6px 10px; letter-spacing: .01em; }
-.view-scenes .atlas-pin i { width: 11px; height: 11px; left: 8.5px; top: 8.5px; box-shadow: 0 0 0 2px #000, 0 0 0 3px #fff; }
-.view-scenes .atlas-pin.selected i { background: #000; box-shadow: 0 0 0 3px #fff; }
-.view-scenes .atlas-pin line { stroke: #bbb; stroke-width: 1.25; }
-.view-scenes .atlas-selection-action { color: #fff; font-size: 13px; }
-.photography-pages.view-scenes .atlas-coordinate { color: #ddd; }
-.view-scenes button.atlas-selection:hover { border-color: #fff; }
+.view-scenes .atlas-pin i { width: 11px; height: 11px; left: 8.5px; top: 8.5px; box-shadow: 0 0 0 2px #000; }
+.view-scenes .atlas-pin.selected i { background: #000; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; }
+.view-scenes .atlas-pin line { stroke: #626262; stroke-width: 1.25; }
+.view-scenes .atlas-selection-action { color: #000; font-size: 13px; }
+.view-scenes button.atlas-selection:hover { border-color: #000; }
+.atlas-film { position: relative; width: 100%; margin-top: 22px; }
+.atlas-film video { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: #fff; pointer-events: none; }
+.atlas-film-toggle { display: block; margin: 0 12px 0 auto; padding: 12px; font-size: 11px; color: #626262; }
+.atlas-film-toggle:hover { color: #000; }
+@media (max-width: 760px) {
+  .atlas-film { grid-row: 4; margin: 36px auto 0; max-width: 540px; }
+}
+
 @media (min-width: 761px) {
   .view-scenes .atlas-pin > span { font-size: 16px; }
 }
@@ -2706,3 +2695,16 @@ body:has(.view-scenes) { background: #000; }
 }
 
 .view-scenes .atlas-region-list > button:first-child { border:0; }
+
+/* Atlas is a decorative film stage; the Collections menu remains the exit. */
+.atlas-page--film { display: block; position: relative; max-width: none; min-height: calc(100svh - 76px); padding: 0 4.3% 24px; }
+.atlas-page--film .atlas-intro { position: absolute; top: 32px; left: 4.3%; padding: 0; pointer-events: none; }
+.atlas-page--film .atlas-intro h1 { margin: 0; }
+.atlas-page--film .atlas-film { height: calc(100svh - 100px); min-height: 480px; margin: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.atlas-page--film .atlas-film video { width: 100%; height: 100%; object-fit: contain; }
+.atlas-page--film .atlas-film-toggle { position: absolute; bottom: 0; right: 0; margin: 0; min-height: 44px; }
+@media(max-width:760px) {
+  .atlas-page--film .atlas-intro { display: block; top: 22px; }
+  .atlas-page--film .atlas-film { max-width: none; }
+  .atlas-page--film .atlas-film video { width: 150%; max-width: none; flex-shrink: 0; }
+}

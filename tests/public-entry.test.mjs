@@ -80,12 +80,21 @@ test('collection HTML renders its requested content immediately without a worksh
       if(view==='scenes') assert.ok(!html.includes('Across the atlas'));
     }
     const atlas=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=scenes&region=JP'),coverUrl:'/'}));
-    assert.match(atlas, /<button[^>]*class="atlas-selection"[^>]*aria-label="View photos from Japan"/);
+    assert.ok(!atlas.includes('atlas-selection'));
+    assert.ok(!atlas.includes('Interactive Earth'));
+    assert.ok(!atlas.includes('<canvas'));
     assert.ok(!atlas.includes('atlas-collections'));
     assert.ok(!atlas.includes('region-number'));
     assert.ok(!atlas.includes('Explore 1 collection'));
     assert.ok(!atlas.includes('DRAG TO EXPLORE'));
     assert.ok(!atlas.includes('Earth imagery:'));
+    // A static poster renders first; the decorative video must not
+    // load its source until browser playback policy allows it.
+    assert.match(atlas, /<video[^>]*poster="\/atlas\/crystal-poster.webp"[^>]*preload="none"/);
+    assert.ok(!atlas.includes('src="/atlas/crystal-loop.mp4"'));
+    assert.ok(!atlas.includes('atlas-region-list'));
+    assert.ok(statSync(new URL('../public/atlas/crystal-loop.mp4',import.meta.url)).size < 1800000);
+    assert.ok(statSync(new URL('../public/atlas/crystal-poster.webp',import.meta.url)).size < 50000);
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
     assert.ok(country.includes('aria-label="Back to Atlas region selection"'));
     assert.ok(country.includes('Love scences in Japan'));

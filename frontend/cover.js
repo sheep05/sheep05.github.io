@@ -2,7 +2,6 @@ import markup from './cover.html?raw';
 import './cover.css';
 import { coverPhoto } from '../lib/cover-assets';
 import { installSiteCursor } from '../lib/site-cursor';
-import { warmAtlas } from '../lib/atlas-assets';
 
 const base = import.meta.env.BASE_URL;
 const photo = coverPhoto(base);
@@ -60,13 +59,11 @@ if (design === 'c') {
       <a href="${base}?view=studio">Visit my workshop</a>
     </div>
     <div class="menu-primary">
-      <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${base}?view=scenes"><span data-roll>Atlas</span><small class="menu-translation" lang="zh-Hans">地图集</small></a></div></div>
-      <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${base}?view=portraits"><span data-roll>Portraits</span><small class="menu-translation" lang="zh-Hans">人像</small></a></div></div>
-      <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${base}?view=street"><span data-roll>Street</span><small class="menu-translation" lang="zh-Hans">街拍</small></a></div></div>
+      <div class="menu-row" style="--row:0"><div class="menu-line"><a href="${base}?view=scenes"><span data-roll>Atlas</span></a></div></div>
+      <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${base}?view=portraits"><span data-roll>Portraits</span></a></div></div>
+      <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${base}?view=street"><span data-roll>Street</span></a></div></div>
     </div>
     <a class="menu-credits" href="${base}atlas/README.md">Image credits</a>`;
-  const atlasLink = panel.querySelector('a[href$="?view=scenes"]');
-  for (const event of ['pointerenter', 'focus', 'touchstart']) atlasLink.addEventListener(event, () => warmAtlas(base), {once:true, passive:true});
   panel.hidden = false;
   panel.setAttribute('aria-hidden','true');
   // Three copies of each character allow adjacent letters to roll in opposite directions.
@@ -75,7 +72,7 @@ if (design === 'c') {
   for (const word of letters) {
     const text = word.textContent;
     const link = word.closest('a');
-    link.setAttribute('aria-label', `${text} ${link.querySelector('.menu-translation').textContent}`);
+    link.setAttribute('aria-label', text);
     word.classList.add('roll-word');
     word.setAttribute('aria-hidden','true');
     word.replaceChildren(...Array.from(text, letter=>{

@@ -267,7 +267,7 @@ export default function Portfolio({
             </div>
           </section>
         )}
-        {view === "scenes" && <Atlas albums={albums} photos={photos} assetBase={assetBase} selected={region} onSelect={id=>navigate("scenes", undefined, id)} onExplore={id=>navigate("all",undefined,id)} />}
+        {view === "scenes" && <Atlas assetBase={assetBase} />}
         {!country && ["all", "portraits", "street"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
