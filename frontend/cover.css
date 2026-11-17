@@ -144,10 +144,29 @@ main{flex:1;min-height:0}.site-footer{display:flex;justify-content:space-between
   .design-c .menu-actions { top:env(safe-area-inset-top); right:calc(116px + env(safe-area-inset-right)); gap:16px; font-size:clamp(11px,3vw,14px); }
 }
 
-/* Keep the cover entrance readable and reveal its label after the sheet returns. */
-.design-c .menu-toggle>span { font-size:21px; }
-.design-c:not(.menu-open) .menu-toggle i { width:16px; height:16px; }
+/* Larger cover identity and entrance, aligned along their visible top edges. */
+.design-c { --cover-header-top:28px; }
+.design-c .masthead { padding-top:var(--cover-header-top); }
+.design-c .cover-identity { align-items:flex-start; }
+.design-c .wordmark { padding-top:0; font-size:24px; }
+.design-c .identity-icon { width:80px; height:54px; margin-top:-5px; }
+.design-c:not(.menu-open) .menu-toggle { top:var(--cover-header-top); right:var(--pad); width:auto; height:auto; align-items:flex-start; gap:20px; }
+.design-c .menu-toggle>span { font-size:27px; line-height:1.05; }
+.design-c:not(.menu-open) .menu-toggle>span { position:static; pointer-events:auto; }
+.design-c:not(.menu-open) .menu-toggle i { width:20px; height:20px; margin-top:4px; }
 .design-c.menu-closing .menu-toggle>span { visibility:hidden; }
 @media(max-width:700px) {
-  .design-c .menu-toggle>span { font-size:20px; }
+  .design-c { --cover-header-top:max(24px,env(safe-area-inset-top)); }
+  .design-c .wordmark { font-size:16px; }
+  .design-c .identity-icon { width:58px; height:39px; margin-top:-4px; }
+  .design-c .menu-toggle>span { font-size:22px; }
+  .design-c:not(.menu-open) .menu-toggle { gap:12px; }
+  .design-c:not(.menu-open) .menu-toggle i { width:18px; height:18px; margin-top:3px; }
+}
+@media(max-width:360px) {
+  .design-c { --pad:max(16px,env(safe-area-inset-left),env(safe-area-inset-right)); }
+  .design-c .wordmark { font-size:15px; }
+  .design-c .identity-icon { width:54px; height:36px; }
+  .design-c .menu-toggle>span { font-size:18px; }
+  .design-c:not(.menu-open) .menu-toggle { gap:10px; }
 }
