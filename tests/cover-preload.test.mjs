@@ -57,6 +57,17 @@ test('warming covers video, photos, thumbnails and workshop with bounded concurr
   assert.ok(!requested.some(url=>url.includes('external.test')));
 });
 
+test('the compact crystal starts warming before either manifest and skips the desktop encode', async t => {
+  const requested = [];
+  t.mock.method(globalThis, 'fetch', async url => {
+    requested.push(url);
+    return {ok: true, json: async () => ({}), arrayBuffer: async () => new ArrayBuffer(1)};
+  });
+  await warmCoverDestinations('/', new AbortController().signal, true, true);
+  assert.deepEqual(requested.slice(0, 2), ['/atlas/crystal-poster.webp', '/atlas/crystal-mobile.mp4']);
+  assert.ok(!requested.includes('/atlas/crystal-loop.mp4'));
+});
+
 test('reduced motion warms only the poster and code; missing manifest is harmless', async t => {
   const requested = [];
   t.mock.method(globalThis, 'fetch', async url => {

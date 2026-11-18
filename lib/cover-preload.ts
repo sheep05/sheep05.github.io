@@ -1,3 +1,4 @@
+import { compactCrystal, crystalFile, storeCrystal } from './crystal-media.ts';
 type BuildManifest = Record<string, { file: string; imports?: string[]; dynamicImports?: string[]; css?: string[] }>;
 type PreloadResources = { photos?: string[]; workshop?: string[] };
 type Connection = { saveData?: boolean; effectiveType?: string };
@@ -24,7 +25,7 @@ export function galleryWarmAssets(manifest: BuildManifest, includeDynamic = fals
   return [...files];
 }
 
-export async function warmCoverDestinations(base: string, signal: AbortSignal, animate: boolean) {
+export async function warmCoverDestinations(base: string, signal: AbortSignal, animate: boolean, compact = false) {
   const options = { signal, credentials: 'same-origin', priority: 'low' } as RequestInit;
   async function read<T>(file: string): Promise<T> {
     try {
@@ -32,15 +33,15 @@ export async function warmCoverDestinations(base: string, signal: AbortSignal, a
       return response.ok ? await response.json() as T : {} as T;
     } catch { return {} as T; }
   }
-  const [manifest, resources] = await Promise.all([
-    read<BuildManifest>('preload-manifest.json'), read<PreloadResources>('preload-resources.json'),
-  ]);
+  const clip = crystalFile(compact);
   const visited = new Set<string>();
   async function warm(file: string) {
     try {
       const response = await fetch(`${base}${file}`, options);
       // Consume the complete response so subsequent page/media requests can reuse it.
-      if (response.ok) await response.arrayBuffer();
+      if (!response.ok) return;
+      if (file === clip && typeof caches !== 'undefined') await storeCrystal(base, file, response);
+      else await response.arrayBuffer();
     } catch { /* Speculation must never block navigation or display an error. */ }
   }
   async function drain(files: string[]) {
@@ -54,7 +55,12 @@ export async function warmCoverDestinations(base: string, signal: AbortSignal, a
       while (queue.length && !signal.aborted) await warm(queue.shift()!);
     }));
   }
-  await drain(['atlas/crystal-poster.webp', ...(animate ? ['atlas/crystal-loop.mp4'] : []), ...galleryWarmAssets(manifest)]);
+  await drain(['atlas/crystal-poster.webp', ...(animate ? [clip] : [])]);
+  if (signal.aborted) return;
+  const [manifest, resources] = await Promise.all([
+    read<BuildManifest>('preload-manifest.json'), read<PreloadResources>('preload-resources.json'),
+  ]);
+  await drain(galleryWarmAssets(manifest));
   const media = (resources.photos || []).filter(path => /^(published\/media\/[a-f0-9]{64}|samples\/[\w-]+)\.jpg$/.test(path));
   const workshop = (resources.workshop || []).filter(path => /^materials\/poly-haven\/[\w/-]+\.(jpg|webp|png|hdr)$/.test(path));
   await drain([...media, ...galleryWarmAssets(manifest, true), ...workshop]);
@@ -72,14 +78,10 @@ export function scheduleCoverPreload(base: string) {
       return;
     }
     const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-    void warmCoverDestinations(base, controller.signal, animate);
-  };
-  const ready = () => {
-    if ('requestIdleCallback' in window) window.requestIdleCallback(run, { timeout: 1500 });
-    else setTimeout(run, 500);
+    void warmCoverDestinations(base, controller.signal, animate, compactCrystal());
   };
   // Protect the first visit: the cover image gets the connection to itself first.
   const photo = document.querySelector<HTMLImageElement>('.about-photo img');
-  if (photo) void photo.decode().catch(() => {}).then(ready);
-  else ready();
+  if (photo) void photo.decode().catch(() => {}).then(run);
+  else run();
 }

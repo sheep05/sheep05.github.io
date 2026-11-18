@@ -2699,11 +2699,11 @@ button.atlas-selection:hover .atlas-selection-action { text-decoration: underlin
 .atlas-page--film .atlas-intro { position: absolute; top: 32px; left: 4.3%; padding: 0; pointer-events: none; }
 .atlas-page--film .atlas-intro h1 { margin: 0; }
 .atlas-page--film .atlas-film { height: calc(100svh - 100px); min-height: 480px; margin: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.atlas-page--film .atlas-film video { width: min(100%, max(720px, calc(150svh - 150px))); height: auto; max-height: 100%; object-fit: contain; }
+.atlas-page--film .atlas-film :is(video, .crystal-recovery) { width: min(100%, max(720px, calc(150svh - 150px))); height: auto; max-height: 100%; object-fit: contain; }
 @media(max-width:760px) {
   .atlas-page--film .atlas-intro { display: block; top: 22px; }
   .atlas-page--film .atlas-film { max-width: none; }
-  .atlas-page--film .atlas-film video { width: 150%; max-width: none; flex-shrink: 0; }
+  .atlas-page--film .atlas-film :is(video, .crystal-recovery) { width: 150%; max-width: none; flex-shrink: 0; }
 }
 
 /* Uneven editorial pairs retain the large photographs, with roomier small slots. */
@@ -2738,3 +2738,6 @@ button.atlas-selection:hover .atlas-selection-action { text-decoration: underlin
   mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent);
   mask-composite: intersect;
 }
+
+.atlas-film .crystal-recovery { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); aspect-ratio: 3 / 2; pointer-events: none; }
+.atlas-film .crystal-retry { position: absolute; bottom: 1rem; right: 1rem; background: #fff; color: #111; padding: .6rem 1rem; }
