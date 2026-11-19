@@ -1,4 +1,4 @@
-import{n as e}from"./index-Bub_ngdi.js";import{a as t,n,r,t as i}from"./crystal-media-B3uw8MA6.js";var a=`
+import{n as e}from"./index-BCq4qE5-.js";import{a as t,n,r,t as i}from"./crystal-media-Cf1lBhPk.js";var a=`
   <div class="stage">
     <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
     </nav>
