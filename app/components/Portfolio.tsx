@@ -1,4 +1,5 @@
 "use client";
+import { albumPhotoSizes, inlinePhoto } from "@/lib/photo-renditions";
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { useState, useEffect, useRef } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
@@ -37,11 +38,13 @@ export default function Portfolio({
   const samples = settings.showSamples
     ? sampleCollection
     : { albums: [], photos: [] };
+  const localAsset = (url: string) => url.startsWith("/") ? assetBase + url.slice(1) : url;
   const albums = [...initial.albums, ...samples.albums],
     photos = [...initial.photos, ...samples.photos].map((photo) => ({
       ...photo,
-      url: photo.url.startsWith("/") ? assetBase + photo.url.slice(1) : photo.url,
-      thumb: photo.thumb.startsWith("/") ? assetBase + photo.thumb.slice(1) : photo.thumb,
+      url: localAsset(photo.url),
+      thumb: localAsset(photo.thumb),
+      renditions: photo.renditions?.map(rendition => ({...rendition, url: localAsset(rendition.url)})),
     }));
   const [view, setView] = useState(initialRoute?.view || "studio"),
     [activeId, setActiveId] = useState<string | null>(initialRoute?.album || null),
@@ -281,7 +284,7 @@ export default function Portfolio({
                   <div className="row-image">
                     {cover(a) ? (
                       <img
-                        src={cover(a)!.url}
+                        {...inlinePhoto(cover(a)!, "(max-width: 760px) 90vw, min(60vw, 900px)")}
                         alt={cover(a)!.alt || cover(a)!.title}
                         loading="lazy"
                       />
@@ -332,7 +335,8 @@ export default function Portfolio({
                       aria-label={`View ${p.title} full screen`}
                     >
                       <img
-                        src={p.url}
+                        {...inlinePhoto(p, albumPhotoSizes(i, p.height > p.width))}
+                        width={p.width} height={p.height} decoding="async"
                         alt={p.alt || p.title}
                         loading={i === 0 ? "eager" : "lazy"}
                       />

@@ -1,3 +1,4 @@
+import type { PhotoRendition } from "./photo-renditions";
 import type { ChapterId } from "./catalog";
 export type Photo = {
   id: string;
@@ -8,6 +9,7 @@ export type Photo = {
   height: number;
   url: string;
   thumb: string;
+  renditions?: PhotoRendition[];
   albumIds: string[];
   credit?: string;
   source?: string;

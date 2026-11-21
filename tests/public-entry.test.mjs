@@ -102,6 +102,18 @@ test('collection HTML renders its requested content immediately without a worksh
     assert.match(atlas, /aria-label="Atlas photographs"/);
     assert.ok(statSync(new URL('../public/atlas/crystal-loop.mp4',import.meta.url)).size <= 1639239);
     assert.ok(statSync(new URL('../public/atlas/crystal-poster.webp',import.meta.url)).size < 50000);
+    // The static build passes local WebP candidates into shared gallery components.
+    const withRenditions = {...collection, photos:collection.photos.map(photo=>({
+      ...photo, renditions:[480, 1200].map(width=>({width,url:`/published/renditions/${photo.id}-${width}.webp`})),
+    }))};
+    const album = collection.albums.find(a=>a.photoIds.length);
+    for (const query of ['?view=scenes', '?view=street', '?view=all', `?album=${album.id}`]) {
+      const rendered=renderToString(createElement(Portfolio,{
+        initial:withRenditions,initialRoute:galleryRoute(query),assetBase:'/portfolio/',
+      }));
+      assert.match(rendered, /srcSet="\/portfolio\/published\/renditions\/[^"]+480w,[^"]+1200w"/i, query);
+      assert.ok(!rendered.includes('/published/media/'), query);
+    }
     const country=renderToString(createElement(Portfolio,{initial:collection,initialRoute:galleryRoute('?view=all&region=JP'),coverUrl:'/'}));
     assert.ok(country.includes('aria-label="Back to Atlas region selection"'));
     assert.ok(country.includes('Love scences in Japan'));

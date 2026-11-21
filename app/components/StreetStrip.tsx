@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Album, Photo } from "@/lib/types";
+import { inlinePhoto, streetPhotoSizes } from "@/lib/photo-renditions";
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 
 export default function StreetStrip({ album, photos, onOpen }: {
@@ -90,10 +91,10 @@ export default function StreetStrip({ album, photos, onOpen }: {
           onOpen();
         }}>
         <picture>
-          <source media="(max-width: 600px) and (max-resolution: 2dppx)" srcSet={photo.thumb} />
-          <img src={photo.url}
+          {!photo.renditions?.length && <source media="(max-width: 600px) and (max-resolution: 2dppx)" srcSet={photo.thumb} />}
+          <img {...inlinePhoto(photo, streetPhotoSizes(photo))}
             alt={photo.alt || photo.title} width={photo.width || 3} height={photo.height || 2}
-            loading={index < 2 ? "eager" : "lazy"} draggable={false} />
+            loading={index < 2 ? "eager" : "lazy"} decoding="async" draggable={false} />
         </picture>
       </a>)}
     </div> : <p>No photographs yet.</p>}
