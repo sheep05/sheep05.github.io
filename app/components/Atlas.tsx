@@ -3,6 +3,7 @@
 import { observeScrollReveal } from "@/lib/scroll-reveal";
 import { mixedAtlasPhotos } from "@/lib/atlas-photos";
 import type { Album, Photo } from "@/lib/types";
+import { atlasPhotoSizes, inlinePhoto } from "@/lib/photo-renditions";
 import AtlasFilm from "./AtlasFilm";
 
 export default function Atlas({ assetBase, albums, photos, onOpen }: {
@@ -19,7 +20,7 @@ export default function Atlas({ assetBase, albums, photos, onOpen }: {
           {sequence.slice(row * 2, row * 2 + 2).map((photo, column) =>
             <figure key={photo.id}>
               <button onClick={() => onOpen(sequence, row * 2 + column)} aria-label={`View ${photo.alt || photo.title} full screen`}>
-                <img src={photo.url} width={photo.width} height={photo.height}
+                <img {...inlinePhoto(photo, atlasPhotoSizes(row, column))} width={photo.width} height={photo.height}
                   alt={photo.alt || photo.title} loading="lazy" decoding="async" />
               </button>
             </figure>)}

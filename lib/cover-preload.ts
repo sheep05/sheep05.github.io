@@ -1,6 +1,6 @@
 import { compactCrystal, crystalFile, storeCrystal } from './crystal-media.ts';
 type BuildManifest = Record<string, { file: string; imports?: string[]; dynamicImports?: string[]; css?: string[] }>;
-type PreloadResources = { photos?: string[]; workshop?: string[] };
+type PreloadResources = { workshop?: string[] };
 type Connection = { saveData?: boolean; effectiveType?: string };
 
 export function allowsCoverPreload(connection?: Connection) {
@@ -55,15 +55,16 @@ export async function warmCoverDestinations(base: string, signal: AbortSignal, a
       while (queue.length && !signal.aborted) await warm(queue.shift()!);
     }));
   }
-  await drain(['atlas/crystal-poster.webp', ...(animate ? [clip] : [])]);
+  const early = drain(['atlas/crystal-poster.webp', ...(animate ? [clip] : [])]);
+  const manifest = await read<BuildManifest>('preload-manifest.json');
+  await early;
   if (signal.aborted) return;
-  const [manifest, resources] = await Promise.all([
-    read<BuildManifest>('preload-manifest.json'), read<PreloadResources>('preload-resources.json'),
-  ]);
   await drain(galleryWarmAssets(manifest));
-  const media = (resources.photos || []).filter(path => /^(published\/media\/[a-f0-9]{64}|samples\/[\w-]+)\.jpg$/.test(path));
+  // The workshop itself owns its textures on phones; don't compete with the gallery.
+  if (compact || signal.aborted) return;
+  const resources = await read<PreloadResources>('preload-resources.json');
   const workshop = (resources.workshop || []).filter(path => /^materials\/poly-haven\/[\w/-]+\.(jpg|webp|png|hdr)$/.test(path));
-  await drain([...media, ...galleryWarmAssets(manifest, true), ...workshop]);
+  await drain([...galleryWarmAssets(manifest, true), ...workshop]);
 }
 
 export function scheduleCoverPreload(base: string) {

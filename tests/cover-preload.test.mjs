@@ -28,7 +28,7 @@ test('automatic warming respects data saving and very slow connections', () => {
   }
 });
 
-test('warming covers video, photos, thumbnails and workshop with bounded concurrency and no duplicate downloads', async t => {
+test('warming covers video, gallery code and desktop workshop, never collection photos with bounded concurrency and no duplicate downloads', async t => {
   const requested = [], consumed = [];
   let active = 0, peak = 0;
   const signal = new AbortController().signal;
@@ -49,12 +49,12 @@ test('warming covers video, photos, thumbnails and workshop with bounded concurr
   assert.ok(consumed.includes('/portfolio/atlas/crystal-loop.mp4'));
   assert.ok(consumed.includes('/portfolio/assets/gallery.css'));
   assert.ok(consumed.includes('/portfolio/assets/gallery.js'));
-  for (const file of [original, thumb, texture, 'assets/three.js']) assert.ok(consumed.includes(`/portfolio/${file}`));
+  for (const file of [texture, 'assets/three.js']) assert.ok(consumed.includes(`/portfolio/${file}`));
   assert.equal(new Set(requested).size, requested.length);
   assert.ok(peak <= 2);
-  assert.ok(requested.indexOf('/portfolio/assets/react.js') < requested.indexOf(`/portfolio/${original}`));
+  assert.ok(requested.indexOf('/portfolio/assets/react.js') < requested.indexOf(`/portfolio/${texture}`));
   assert.ok(requested.every(url=>url.startsWith('/portfolio/')));
-  assert.ok(!requested.some(url=>url.includes('external.test')));
+  assert.ok(!requested.some(url=>url.includes('external.test') || url.includes('/published/')));
 });
 
 test('the compact crystal starts warming before either manifest and skips the desktop encode', async t => {
@@ -66,6 +66,7 @@ test('the compact crystal starts warming before either manifest and skips the de
   await warmCoverDestinations('/', new AbortController().signal, true, true);
   assert.deepEqual(requested.slice(0, 2), ['/atlas/crystal-poster.webp', '/atlas/crystal-mobile.mp4']);
   assert.ok(!requested.includes('/atlas/crystal-loop.mp4'));
+  assert.ok(!requested.includes('/preload-resources.json'));
 });
 
 test('reduced motion warms only the poster and code; missing manifest is harmless', async t => {
@@ -102,11 +103,9 @@ test('the production manifest separates initial gallery code and later workshop 
 });
 
 const builtResources = new URL('../outputs/github-pages/preload-resources.json', import.meta.url);
-test('the generated list includes every published photo and thumbnail and only existing local resources', {skip:!existsSync(builtResources)}, () => {
+test('the generated list contains only existing local workshop resources', {skip:!existsSync(builtResources)}, () => {
   const list = JSON.parse(readFileSync(builtResources));
-  const {collection} = JSON.parse(readFileSync(new URL('../public/published/collection.json', import.meta.url)));
-  for (const photo of collection.photos) for (const key of ['url','thumb']) assert.ok(list.photos.includes(photo[key].slice(1)));
-  assert.equal(new Set(list.photos).size, list.photos.length);
+  assert.equal(list.photos, undefined);
   assert.ok(list.workshop.some(path=>path.endsWith('.hdr')));
-  for (const path of [...list.photos,...list.workshop]) assert.ok(existsSync(new URL('../public/'+path,import.meta.url)));
+  for (const path of list.workshop) assert.ok(existsSync(new URL('../public/'+path,import.meta.url)));
 });

@@ -2,6 +2,8 @@
 
 A photography portfolio with a warm room entrance and a private workspace for uploading photographs and publishing collections. Private Studio remains the editor; a daily GitHub Actions job publishes a complete copy of public content and photos to GitHub Pages. Visitors do not need to reach Cloudflare.
 
+GitHub Pages also derives responsive WebP sizes from those published JPEGs at build time. Gallery pages select a size for the rendered layout, and the full JPEG remains available in the lightbox. These derived files do not upload to Studio or require Cloudflare Image Transformations.
+
 ## Open the website
 
 ### [→ Open the photography website](https://sheep05.github.io/)
