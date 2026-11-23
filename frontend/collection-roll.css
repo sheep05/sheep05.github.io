@@ -1,0 +1,15 @@
+.collection-roll .roll-word { display:inline-block; height:1.06em; line-height:1.06; overflow:hidden; vertical-align:top; white-space:nowrap; padding-right:.06em; }
+.collection-roll .roll-char { position:relative; display:inline-block; vertical-align:top; transform:translateY(0); transition:transform 850ms cubic-bezier(.16,1,.3,1); }
+.collection-roll .roll-char::before,.collection-roll .roll-char::after { content:attr(data-letter); position:absolute; left:0; pointer-events:none; }
+.collection-roll .roll-char::before { top:-100%; }
+.collection-roll .roll-char::after { top:100%; }
+a.collection-roll:focus-visible .roll-char:nth-child(odd) { transform:translateY(100%); }
+a.collection-roll:focus-visible .roll-char:nth-child(even) { transform:translateY(-100%); }
+@media(hover:hover) and (pointer:fine) {
+  a.collection-roll:hover .roll-char:nth-child(odd) { transform:translateY(100%); }
+  a.collection-roll:hover .roll-char:nth-child(even) { transform:translateY(-100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collection-roll .roll-char { transition:none; transform:none !important; }
+  .collection-roll .roll-char::before, .collection-roll .roll-char::after { display:none; }
+}

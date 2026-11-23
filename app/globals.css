@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../frontend/cursor.css";
+@import "../frontend/collection-roll.css";
 @font-face {
   font-family: Work;
   src: url('/cover/WorkSans-Variable.woff2') format('woff2');
@@ -2741,3 +2742,22 @@ button.atlas-selection:hover .atlas-selection-action { text-decoration: underlin
 
 .atlas-film .crystal-recovery { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); aspect-ratio: 3 / 2; pointer-events: none; }
 .atlas-film .crystal-retry { position: absolute; bottom: 1rem; right: 1rem; background: #fff; color: #111; padding: .6rem 1rem; }
+
+.collection-footer {
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(16px, 2vw, 28px) clamp(20px, 3vw, 52px);
+}
+.collection-footer nav { display: grid; justify-items: start; }
+.collection-footer a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 0;
+  color: inherit;
+  font: 400 clamp(48px, 5.4vw, 78px)/1 Work, Arial, sans-serif;
+  letter-spacing: -.055em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.collection-footer a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }

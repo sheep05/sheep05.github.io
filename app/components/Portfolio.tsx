@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
 import type { StudyStage } from "@/lib/scene/study-state";
+import CollectionFooter from "./CollectionFooter";
 import ChapterIndex from "./ChapterIndex";
 import StreetStrip from "./StreetStrip";
 import { atRegion, chapters, inChapter, regions } from "@/lib/catalog";
@@ -356,11 +357,6 @@ export default function Portfolio({
                   This collection is waiting for its first photograph.
                 </p>
               )}
-              <div ref={observeScrollReveal} className="album-end">
-                <button onClick={() => navigate("collection")}>
-                  Keep looking ↗
-                </button>
-              </div>
             </section>
           ) : (
             <section className="empty">
@@ -404,6 +400,9 @@ export default function Portfolio({
           </section>
         )}
       </main>
+      {["scenes", "portraits", "street", "all", "album"].includes(view) && (
+        <CollectionFooter assetBase={assetBase} view={view} />
+      )}
       {view !== "studio" && view !== "collection" && galleryFooter}
       <dialog
         className="lightbox"

@@ -74,6 +74,7 @@ if (design === 'c') {
     const text = word.textContent;
     const link = word.closest('a');
     link.setAttribute('aria-label', text);
+    link.classList.add('collection-roll');
     word.classList.add('roll-word');
     word.setAttribute('aria-hidden','true');
     word.replaceChildren(...Array.from(text, letter=>{
