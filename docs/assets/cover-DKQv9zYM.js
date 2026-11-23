@@ -1,4 +1,4 @@
-import{n as e}from"./index-B4sjDKGT.js";import{a as t,n,r,t as i}from"./crystal-media-DL1psGEw.js";var a=`
+import{n as e}from"./index-I5XoaWVe.js";import{a as t,n,r,t as i}from"./crystal-media-hbI5hWPY.js";var a=`
   <div class="stage">
     <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
     </nav>
@@ -21,4 +21,4 @@ import{n as e}from"./index-B4sjDKGT.js";import{a as t,n,r,t as i}from"./crystal-
       <div class="menu-row" style="--row:1"><div class="menu-line"><a href="${u}?view=portraits"><span data-roll>Portraits</span></a></div></div>
       <div class="menu-row" style="--row:2"><div class="menu-line"><a href="${u}?view=street"><span data-roll>Street</span></a></div></div>
     </div>
-    <a class="menu-credits" href="${u}atlas/README.md">Image credits</a>`,g.hidden=!1,g.setAttribute(`aria-hidden`,`true`);let e=g.querySelectorAll(`.menu-primary [data-roll]`);for(let t of e){let e=t.textContent;t.closest(`a`).setAttribute(`aria-label`,e),t.classList.add(`roll-word`),t.setAttribute(`aria-hidden`,`true`),t.replaceChildren(...Array.from(e,e=>{let t=document.createElement(`span`);return t.className=`roll-char`,t.textContent=e===` `?`\xA0`:e,t.dataset.letter=t.textContent,t}))}h.querySelector(`i`).setAttribute(`data-collection-magnet`,``),location.hash===`#collections`&&x(!0)}l(u);
+    <a class="menu-credits" href="${u}atlas/README.md">Image credits</a>`,g.hidden=!1,g.setAttribute(`aria-hidden`,`true`);let e=g.querySelectorAll(`.menu-primary [data-roll]`);for(let t of e){let e=t.textContent,n=t.closest(`a`);n.setAttribute(`aria-label`,e),n.classList.add(`collection-roll`),t.classList.add(`roll-word`),t.setAttribute(`aria-hidden`,`true`),t.replaceChildren(...Array.from(e,e=>{let t=document.createElement(`span`);return t.className=`roll-char`,t.textContent=e===` `?`\xA0`:e,t.dataset.letter=t.textContent,t}))}h.querySelector(`i`).setAttribute(`data-collection-magnet`,``),location.hash===`#collections`&&x(!0)}l(u);
