@@ -7,7 +7,7 @@ import Room from "./Room";
 import type { StudyStage } from "@/lib/scene/study-state";
 import CollectionFooter from "./CollectionFooter";
 import ChapterIndex from "./ChapterIndex";
-import StreetStrip from "./StreetStrip";
+import StreetGallery from "./StreetGallery";
 import { atRegion, chapters, inChapter, regions } from "@/lib/catalog";
 import Atlas from "./Atlas";
 import { galleryRoute } from "@/lib/public-entry";
@@ -250,7 +250,12 @@ export default function Portfolio({
           </section>
         )}
         {view === "scenes" && <Atlas assetBase={assetBase} albums={albums} photos={photos} onOpen={open} />}
-        {!country && ["all", "portraits", "street"].includes(view) && (
+        {view === "street" && <>
+          {collectionNotice}
+          <StreetGallery photos={[...new Set(listedAlbums.flatMap(a => a.photoIds))]
+            .map(id => photos.find(p => p.id === id)).filter((p): p is Photo => !!p)} onOpen={open} />
+        </>}
+        {!country && ["all", "portraits"].includes(view) && (
           <section className="collection-page">
             {collectionNotice}
             <div ref={observeScrollReveal} className="collection-heading">
@@ -260,9 +265,7 @@ export default function Portfolio({
                 <sup>{String(listedAlbums.length).padStart(2, "0")}</sup>
               </h1>
             </div>
-            {view === "street" ? listedAlbums.map(album => (
-              <StreetStrip key={album.id} album={album} photos={albumPhotos(album)} onOpen={() => navigate("album", album.id)} />
-            )) : <div className="collection-list">
+            <div className="collection-list">
               {listedAlbums.map((a, i) => (
                 <button
                   ref={observeScrollReveal}
@@ -295,7 +298,7 @@ export default function Portfolio({
                   </div>
                 </button>
               ))}
-            </div>}
+            </div>
             {listedAlbums.length === 0 && !collectionStatus && <Empty owner={initial.isOwner} managementUrl={managementUrl} />}
           </section>
         )}
