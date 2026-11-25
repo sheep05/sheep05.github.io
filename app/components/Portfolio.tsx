@@ -1,6 +1,6 @@
 "use client";
 import { albumPhotoSizes, inlinePhoto } from "@/lib/photo-renditions";
-import { observeScrollReveal } from "@/lib/scroll-reveal";
+import { observePhotoReveal, observeScrollReveal } from "@/lib/scroll-reveal";
 import { useState, useEffect, useRef } from "react";
 import type { Collection, Album, Photo } from "@/lib/types";
 import Room from "./Room";
@@ -253,7 +253,7 @@ export default function Portfolio({
         {view === "street" && <>
           {collectionNotice}
           <StreetGallery photos={[...new Set(listedAlbums.flatMap(a => a.photoIds))]
-            .map(id => photos.find(p => p.id === id)).filter((p): p is Photo => !!p)} onOpen={open} />
+            .map(id => photos.find(p => p.id === id)).filter(p => p !== undefined)} onOpen={open} />
         </>}
         {!country && ["all", "portraits"].includes(view) && (
           <section className="collection-page">
@@ -268,7 +268,7 @@ export default function Portfolio({
             <div className="collection-list">
               {listedAlbums.map((a, i) => (
                 <button
-                  ref={observeScrollReveal}
+                  ref={cover(a) ? observePhotoReveal : observeScrollReveal}
                   className="collection-row"
                   key={a.id}
                   onClick={() => navigate("album", a.id)}
@@ -330,7 +330,7 @@ export default function Portfolio({
               <div className="photo-sequence">
                 {albumPhotos(active).map((p, i) => (
                   <figure
-                    ref={observeScrollReveal}
+                    ref={observePhotoReveal}
                     className={`photo-frame frame-${i % 4} ${p.height > p.width ? "portrait" : ""}`}
                     key={p.id}
                   >

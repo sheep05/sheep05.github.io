@@ -1,6 +1,6 @@
 "use client";
 
-import { observeScrollReveal } from "@/lib/scroll-reveal";
+import { observePhotoReveal, observeScrollReveal } from "@/lib/scroll-reveal";
 import { mixedAtlasPhotos } from "@/lib/atlas-photos";
 import type { Album, Photo } from "@/lib/types";
 import { atlasPhotoSizes, inlinePhoto } from "@/lib/photo-renditions";
@@ -18,7 +18,7 @@ export default function Atlas({ assetBase, albums, photos, onOpen }: {
       {Array.from({ length: Math.ceil(sequence.length / 2) }, (_, row) =>
         <div className={`atlas-editorial-row arrangement-${row % 3}`} key={row}>
           {sequence.slice(row * 2, row * 2 + 2).map((photo, column) =>
-            <figure key={photo.id}>
+            <figure key={photo.id} ref={observePhotoReveal}>
               <button onClick={() => onOpen(sequence, row * 2 + column)} aria-label={`View ${photo.alt || photo.title} full screen`}>
                 <img {...inlinePhoto(photo, atlasPhotoSizes(row, column))} width={photo.width} height={photo.height}
                   alt={photo.alt || photo.title} loading="lazy" decoding="async" />

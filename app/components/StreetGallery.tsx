@@ -2,6 +2,7 @@
 
 import type { Photo } from "@/lib/types";
 import { inlinePhoto } from "@/lib/photo-renditions";
+import { observePhotoReveal } from "@/lib/scroll-reveal";
 
 export default function StreetGallery({ photos, onOpen }: {
   photos: Photo[];
@@ -12,7 +13,7 @@ export default function StreetGallery({ photos, onOpen }: {
     const wide = index === 0 || index % 5 === 3;
     const sizes = portrait ? "(max-width: 680px) 80vw, min(38vw, 52vh)"
       : wide ? "(max-width: 680px) 94vw, 76vw" : "(max-width: 680px) 94vw, 55vw";
-    return <figure key={photo.id} className={portrait ? "street-vertical" : undefined}>
+    return <figure key={photo.id} ref={observePhotoReveal} className={portrait ? "street-vertical" : undefined}>
       <button type="button" onClick={() => onOpen(photos, index)}
         aria-label={`View ${photo.title || photo.alt || "photograph"} full screen`}>
         <img {...inlinePhoto(photo, sizes)} width={photo.width} height={photo.height}

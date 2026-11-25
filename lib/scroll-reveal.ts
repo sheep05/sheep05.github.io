@@ -29,3 +29,49 @@ export function observeScrollReveal(element: HTMLElement | null) {
     element.style.removeProperty('--reveal-delay');
   };
 }
+
+let photoObserver: IntersectionObserver | undefined;
+let lastPhotoScrollY = 0;
+
+export function observePhotoReveal(frame: HTMLElement | null) {
+  const image = frame?.querySelector('img');
+  if (!frame || !image || typeof IntersectionObserver === 'undefined') return;
+
+  // Observe the stationary frame so the moving picture cannot retrigger itself.
+  photoObserver ??= new IntersectionObserver(entries => {
+    const scrollY = window.scrollY;
+    for (const entry of entries) {
+      const frame = entry.target as HTMLElement;
+      if (!entry.isIntersecting) {
+        frame.dataset.photoReveal = 'outside';
+        continue;
+      }
+      const fromAbove = scrollY === lastPhotoScrollY
+        ? entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0)
+        : scrollY < lastPhotoScrollY;
+      frame.dataset.photoReveal = frame.dataset.photoReveal !== 'initial' && fromAbove ? 'above' : 'below';
+    }
+    lastPhotoScrollY = scrollY;
+  });
+  frame.dataset.photoReveal = 'initial';
+  photoObserver.observe(frame);
+
+  let mounted = true;
+  const ready = () => { if (mounted) frame.dataset.photoReady = ''; };
+  const afterLoad = () => {
+    if (image.decode) void image.decode().then(ready, ready);
+    else ready();
+  };
+  image.addEventListener('load', afterLoad);
+  image.addEventListener('error', ready);
+  if (image.complete) afterLoad();
+
+  return () => {
+    mounted = false;
+    photoObserver?.unobserve(frame);
+    image.removeEventListener('load', afterLoad);
+    image.removeEventListener('error', ready);
+    delete frame.dataset.photoReveal;
+    delete frame.dataset.photoReady;
+  };
+}
