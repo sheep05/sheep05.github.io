@@ -9,7 +9,7 @@
     ]
   },
   "../lib/scene/study-materials.ts": {
-    "file": "assets/study-materials-DxwGxk_n.js",
+    "file": "assets/study-materials-Chm1DWT6.js",
     "name": "study-materials",
     "src": "../lib/scene/study-materials.ts",
     "isDynamicEntry": true,
@@ -58,8 +58,8 @@
       "../node_modules/three/build/three.module.js"
     ]
   },
-  "_crystal-media-CmFyojI9.js": {
-    "file": "assets/crystal-media-CmFyojI9.js",
+  "_crystal-media-D98_Umz8.js": {
+    "file": "assets/crystal-media-D98_Umz8.js",
     "name": "crystal-media",
     "imports": [
       "index.html"
@@ -81,26 +81,26 @@
     "name": "study-state"
   },
   "cover.js": {
-    "file": "assets/cover-CjnmQv0v.js",
+    "file": "assets/cover-dAmPMa93.js",
     "name": "cover",
     "src": "cover.js",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_crystal-media-CmFyojI9.js"
+      "_crystal-media-D98_Umz8.js"
     ],
     "css": [
       "assets/cover-hriaNHRa.css"
     ]
   },
   "gallery.tsx": {
-    "file": "assets/gallery-CkDKRLOD.js",
+    "file": "assets/gallery-CCM_FwKa.js",
     "name": "gallery",
     "src": "gallery.tsx",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_crystal-media-CmFyojI9.js",
+      "_crystal-media-D98_Umz8.js",
       "_study-state-pFpKfJT3.js",
       "_react-vendor-2GV3LrUv.js"
     ],
@@ -112,11 +112,11 @@
       "../lib/scene/study-materials.ts"
     ],
     "css": [
-      "assets/gallery-CeRmQr6O.css"
+      "assets/gallery-tDN0d7e_.css"
     ]
   },
   "index.html": {
-    "file": "assets/index-CnntR6fZ.js",
+    "file": "assets/index-DtRjYerv.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
