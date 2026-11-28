@@ -1,13 +1,18 @@
-
-  <div class="stage">
-    <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden>
-    </nav>
-    <button class="menu-toggle" aria-controls="menu-panel" aria-expanded="false"><span>Menu</span><i aria-hidden="true"></i></button>
-    <div class="sheet">
-      <a class="skip-link" href="#cover">Skip to introduction</a>
-      <header class="masthead"><div class="cover-identity"><img class="identity-icon" src="/cover/sheep-icon-small.webp" width="192" height="128" alt=""><div class="wordmark">Sheep’s<br>photography</div></div></header>
-      <main id="cover" tabindex="-1"></main>
-
-    </div>
-    <button class="menu-dismiss" aria-label="Close menu" tabindex="-1" hidden></button>
+<div class="stage">
+  <nav class="menu-panel" id="menu-panel" aria-label="Main navigation" inert hidden></nav>
+  <button class="menu-toggle" aria-label="Close collections" aria-controls="menu-panel" hidden><i aria-hidden="true"></i></button>
+  <div class="sheet">
+    <main id="cover" tabindex="-1">
+      <div class="cover-frames"></div>
+      <h1 class="cover-title">Sheep’s Photography</h1>
+      <div class="cover-mark" aria-hidden="true"><img src="/cover/sheep-icon-small.webp" width="192" height="128" alt=""></div>
+      <button class="cover-enter" aria-controls="menu-panel" aria-expanded="false"><span>Collections</span><i aria-hidden="true" data-collection-magnet></i></button>
+      <div class="cover-playback" hidden>
+        <span class="cover-caption"></span>
+        <button class="cover-pause" aria-label="Pause slideshow"><i aria-hidden="true"></i></button>
+        <button class="cover-next" aria-label="Next photograph"><i aria-hidden="true"></i></button>
+      </div>
+    </main>
   </div>
+  <button class="menu-dismiss" aria-label="Close collections" tabindex="-1" hidden></button>
+</div>

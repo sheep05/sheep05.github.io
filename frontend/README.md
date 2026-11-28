@@ -2,11 +2,10 @@
 
 This frontend bundles `public/published/collection.json` and serves local photographs. Shared gallery components live in `app/components/`; `config/backend.json` supplies the editor link and publishing API origin so the gallery can use another compatible backend later.
 
-The public homepage is the About cover in `cover.html`, `cover.js`, and `cover.css`.
+The public homepage is the photographic slideshow in `cover.html`, `cover.js`, `cover-slideshow.js`, and `cover.css`.
 `main.tsx` selects the cover or the dynamically loaded `gallery.tsx` entry, so the
 homepage does not load React, Three.js, the photo catalog, or room textures.
-The approved portrait and locally hosted Work Sans font live in `public/cover/`;
-the font license is included there. The contact email is explicitly published as
+Choose and order the cover photographs in `config/cover-favorites.json` using published photo IDs. Each `focusX` sets the horizontal crop position on phones from 0 (left) to 100 (right). The Pages build skips unavailable picks and uses the portrait in `public/cover/` if none are available. That directory also contains Work Sans and its license. The contact email is explicitly published as
 part of the cover, independently of the private Studio settings export.
 
 `#collections` opens the shared black menu. Existing `?view=collection` and

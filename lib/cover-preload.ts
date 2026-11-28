@@ -82,7 +82,7 @@ export function scheduleCoverPreload(base: string) {
     void warmCoverDestinations(base, controller.signal, animate, compactCrystal());
   };
   // Protect the first visit: the cover image gets the connection to itself first.
-  const photo = document.querySelector<HTMLImageElement>('.about-photo img');
+  const photo = document.querySelector<HTMLImageElement>('.cover-frames img');
   if (photo) void photo.decode().catch(() => {}).then(run);
   else run();
 }

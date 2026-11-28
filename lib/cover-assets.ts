@@ -1,3 +1,9 @@
+import type { PhotoRendition } from './photo-renditions';
+export type CoverSlide = { title: string; alt: string; wide: PhotoRendition[]; tall: PhotoRendition[] };
+export const tallCover = '(max-aspect-ratio: 3/4)';
+export function slideSrcset(base: string, candidates: PhotoRendition[]) {
+  return candidates.map(({url, width}) => `${base}${url.slice(1)} ${width}w`).join(', ');
+}
 // Keep the image preload and the rendered cover in sync to avoid duplicate downloads.
 export function coverPhoto(base: string) {
   return {
