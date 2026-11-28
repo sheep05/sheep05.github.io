@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
+      actions: read
       contents: write
       pages: write
       id-token: write
@@ -58,10 +59,27 @@ jobs:
         if: steps.changes.outputs.publish == 'true'
         with:
           path: outputs/github-pages
+          name: github-pages-${{ github.run_attempt }}
+      - name: Wait for the uploaded site to be available
+        if: steps.changes.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=github-pages-$GITHUB_RUN_ATTEMPT"
+          for delay in 5 5 10 20 30 30; do
+            sleep "$delay"
+            if gh api "$endpoint" --jq '.artifacts[] | select(.expired == false) | .id' | grep -q '[0-9]'; then
+              exit 0
+            fi
+          done
+          echo "::error::GitHub could not find the uploaded Pages artifact"
+          exit 1
       - name: Deploy the complete website
         id: deployment
         if: steps.changes.outputs.publish == 'true'
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
       - name: Save the published copy in the repository
         if: steps.changes.outputs.publish == 'true'
         run: |
